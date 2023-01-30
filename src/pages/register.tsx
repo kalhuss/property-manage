@@ -1,9 +1,7 @@
 import Head from "next/head";
 import Layout from "../layout/layout";
-import { FC } from "react";
 import Link from "next/link";
 import styles from "../styles/Form.module.css";
-import Image from "next/image";
 import { HiAtSymbol, HiUser } from "react-icons/hi";
 import { FaLock } from "react-icons/fa";
 import { useState } from "react";
@@ -21,14 +19,12 @@ export default function Register() {
         },
         validate: validateRegister,
         onSubmit: async (values) => {
-            // const result = await signIn("credentials", {
-            //     redirect: false,
-            //     email: values.email,
-            //     password: values.password,
-            // });
+            //call the signUp api
+            fetch('/api/auth/signUp', { method: 'POST', body: JSON.stringify(values) })
             console.log(values);
         },
     });
+
 
     return (
         <Layout>
