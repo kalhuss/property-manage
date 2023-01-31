@@ -7,13 +7,14 @@ import Image from "next/image";
 import { HiAtSymbol } from "react-icons/hi";
 import { FaLock } from "react-icons/fa";
 import { useState } from "react";
-import { signIn, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useFormik } from "formik";
 import { validateLogin } from "lib/validate";
+import { useRouter } from "next/router";
 
 const Login: FC = () => {
     const [show, setShow] = useState(false);
-
+    const router = useRouter();
     // Formik form
     const formik = useFormik({
         initialValues: {
@@ -23,12 +24,17 @@ const Login: FC = () => {
         validate: validateLogin,
         onSubmit: async (values) => {
             const result = await signIn("credentials", {
-                callbackUrl: "http://localhost:3000/",
+                callbackUrl: "/",
                 email: values.email,
                 password: values.password,
             });
+
+            if(result!.ok){
+                router.push(result!.url!);
+            }
         },
     });
+
 
     async function handleGoogleSignIn() {
         await signIn("google", {
