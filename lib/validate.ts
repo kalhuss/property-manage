@@ -1,5 +1,7 @@
 
 interface LoginErrors {
+    name?: string;
+    surname?: string;
     email?: string;
     password?: string;
     cpassword?: string;
@@ -32,6 +34,28 @@ export const validateLogin = (values: LoginErrors): LoginErrors => {
 export const validateRegister = (values: LoginErrors): LoginErrors => {
 
     const errors: LoginErrors = {};
+
+    if (!values.name) {
+        errors.name = "Name is required";
+    } else if (values.name.length < 3 || values.name.length > 20) {
+        errors.name = "Name must be at least 3 characters and less than 20 characters";
+    } else if (!/^[a-zA-Z]+$/.test(values.name)) {
+        errors.name = "Name must contain only letters";
+    } else if (values.name.includes(" ")) {
+        errors.name = "Invalid name";
+    }
+
+    if (!values.surname) {
+        errors.surname = "Surname is required";
+    } else if (values.surname.length < 3 || values.surname.length > 20) {
+        errors.surname = "Surname must be at least 3 characters and less than 20 characters";
+    } else if (!/^[a-zA-Z]+$/.test(values.surname)) {
+        errors.surname = "Surname must contain only letters";
+    } else if (values.surname.includes(" ")) {
+        errors.surname = "Invalid surname";
+    }
+
+
 
     if (!values.username){
         errors.username = "Username is required";

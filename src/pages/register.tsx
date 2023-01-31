@@ -12,6 +12,8 @@ export default function Register() {
     const [show, setShow] = useState({ password: false, cpassword: false });
     const formik = useFormik({
         initialValues: {
+            name: "",
+            surname: "",
             username: "",
             email: "",
             password: "",
@@ -21,6 +23,9 @@ export default function Register() {
         onSubmit: async (values) => {
             //call the signUp api
             fetch('/api/auth/signUp', { method: 'POST', body: JSON.stringify(values) })
+            // Then go to the login page
+                .then(() => window.location.href = '/login')
+                
         },
     });
 
@@ -50,6 +55,42 @@ export default function Register() {
 
                 {/* Form */}
                 <form className="flex flex-col gap-5" onSubmit={formik.handleSubmit}>
+                    {/* Name */}
+                    <div className={styles.input_group}>
+                        <input
+                            className={styles.input_text}
+                            type="text"
+                            placeholder="Name"
+                            {...formik.getFieldProps("name")}
+                        />
+                        <span className="icon flex items-center px-4">
+                            <HiUser size={25} />
+                        </span>
+                    </div>
+                    { formik.touched.name && formik.errors.name ? (
+                        <div className="text-red-500 text-sm">
+                            {formik.errors.name}
+                        </div>
+                    ) : null }
+
+                    {/* Surname */}
+                    <div className={styles.input_group}>
+                        <input
+                            className={styles.input_text}
+                            type="text"
+                            placeholder="Surname"
+                            {...formik.getFieldProps("surname")}
+                        />
+                        <span className="icon flex items-center px-4">
+                            <HiUser size={25} />
+                        </span>
+                    </div>
+                    { formik.touched.surname && formik.errors.surname ? (
+                        <div className="text-red-500 text-sm">
+                            {formik.errors.surname}
+                        </div>
+                    ) : null }
+
                     {/* Username */}
                     <div className={styles.input_group}>
                         <input

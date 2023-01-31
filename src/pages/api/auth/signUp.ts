@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(405).json({message: "Method not allowed"})
     }
 
-    const {username, email, password} : {username: string, email: string, password: string} = JSON.parse(req.body)
+    const {name, surname, username, email, password} : {name: string, surname: string, username: string, email: string, password: string} = JSON.parse(req.body)
 
     //Check if user already exists
     const userExists = await prisma.user.findUnique({
@@ -31,6 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Create user
     const user = await prisma.user.create({
         data: {
+            name: name,
+            surname: surname,
             username: username,
             email: email,
             password: hashedPassword
