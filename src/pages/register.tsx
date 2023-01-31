@@ -21,7 +21,6 @@ export default function Register() {
         onSubmit: async (values) => {
             //call the signUp api
             fetch('/api/auth/signUp', { method: 'POST', body: JSON.stringify(values) })
-            console.log(values);
         },
     });
 

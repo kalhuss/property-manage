@@ -22,12 +22,11 @@ const Login: FC = () => {
         },
         validate: validateLogin,
         onSubmit: async (values) => {
-            // const result = await signIn("credentials", {
-            //     redirect: false,
-            //     email: values.email,
-            //     password: values.password,
-            // });
-            console.log(values);
+            const result = await signIn("credentials", {
+                callbackUrl: "http://localhost:3000/",
+                email: values.email,
+                password: values.password,
+            });
         },
     });
 
