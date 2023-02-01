@@ -11,10 +11,33 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String  
-  surname   String
-  username  String   @unique
-  email     String   @unique
-  password  String
+  id         String   @id @default(uuid())
+  name       String  
+  surname    String
+  username   String   @unique
+  email      String   @unique
+  password   String
+  properties Property[]
+}
+
+model Property {
+  id            String   @id @default(uuid())
+  price         String
+  size          String
+  bedrooms      String
+  bathrooms     String
+  houseType     String
+  address       String   @unique
+  tenure        String
+  taxBand       String
+  rent          String
+  keyFeatures   String
+  description   String   @db.Text
+  contactNumber String
+  contactEmail  String
+  photos        String
+  floorPlan     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user User     @relation(fields: [id], references: [id])
 }

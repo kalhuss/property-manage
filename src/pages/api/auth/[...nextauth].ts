@@ -10,14 +10,9 @@ export default NextAuth({
     callbacks: {
         async session({ session, token, user }) {
             return session; // The return type will match the one returned in `useSession()`
-            // session = {
-            //     ...session,
-            //     user: {
-            //         id: user.id,
-            //         ...session.user,
-            //     },
-            // }
-            // return session;
+        },
+        async jwt({ token, user, account, profile, isNewUser }) {
+            return token; // The return type will match the one returned in `getToken()`
         },
     },
 

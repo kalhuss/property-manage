@@ -29,7 +29,6 @@ export default function Register() {
         },
     });
 
-
     return (
         <Layout>
             <Head>
