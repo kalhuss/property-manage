@@ -35,13 +35,6 @@ const Login: FC = () => {
         },
     });
 
-
-    async function handleGoogleSignIn() {
-        await signIn("google", {
-            callbackUrl: "http://localhost:3000/",
-        });
-    }
-
     return (
         <Layout>
             <Head>
@@ -113,22 +106,6 @@ const Login: FC = () => {
                         </button>
                     </div>
 
-                    {/* Google */}
-                    <div className="input-button">
-                        <button
-                            className={styles.button_custom}
-                            type="button"
-                            onClick={handleGoogleSignIn}
-                        >
-                            Sign in with Google
-                            <Image
-                                src={"assets/google.svg"}
-                                width="20"
-                                height="20"
-                                alt="google icon"
-                            ></Image>
-                        </button>
-                    </div>
                 </form>
 
                 <p className="text-center text-gray-400">

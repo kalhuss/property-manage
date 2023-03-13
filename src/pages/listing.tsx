@@ -1,19 +1,20 @@
-import { FC } from 'react';
-import Head from 'next/head';
-import { useFormik } from 'formik';
-import { useSession } from 'next-auth/react';
+import { ChangeEvent, FC } from "react";
+import Head from "next/head";
+import { useFormik } from "formik";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { createClient } from "@supabase/supabase-js";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
 
 type sessionProps = {
-    session: Session; 
+    session: Session;
 };
 
 const Listing: FC<sessionProps> = () => {
-
     const { data: session, status } = useSession();
-
+    let images: string[] = [];
     const formik = useFormik({
         initialValues: {
             price: "",
@@ -29,17 +30,68 @@ const Listing: FC<sessionProps> = () => {
             description: "",
             contactNumber: "",
             contactEmail: "",
-            photos: "",
+            images: images,
             floorPlan: "",
             email: session?.user?.email,
         },
         onSubmit: async (values) => {
             //call the createListing api
-            fetch('/api/auth/createListing', { method: 'POST', body: JSON.stringify(values) })
-
+            console.log(values.images)
+            fetch("/api/createListing", {
+                method: "POST",
+                body: JSON.stringify(values),
+            });
         },
     });
 
+    useEffect(() => {
+        formik.setValues((values) => ({
+            ...values,
+            email: session?.user?.email || "",
+        }));
+    }, [session?.user?.email]);
+
+
+    function readFileAsText(file: File){
+        return new Promise(function(resolve,reject){
+            let fr = new FileReader();
+
+            fr.onload = function(){
+                resolve(fr.result);
+            };
+
+            fr.onerror = function(){
+                reject(fr);
+            };
+
+            fr.readAsDataURL(file);
+        });
+    }
+
+    async function encodeImage(e: ChangeEvent<HTMLInputElement>) {
+        let files = e.target.files!;
+                let readers = [];
+
+                // Abort if there were no files selected
+                if(!files.length) return;
+
+                // Store promises in array
+                for(let i = 0;i < files.length;i++){
+                    readers.push(readFileAsText(files[i]));
+                }
+                
+                // Trigger Promises
+                Promise.all(readers).then((image) => {
+                    // Values will be an array that contains an item
+                    // with the text of every selected file
+                    // ["File1 Content", "File2 Content" ... "FileN Content"]
+                    formik.setValues((values) => ({
+                        ...values,
+                        images: image as string[],
+                    }));
+                    console.log(formik.values.images)
+                });
+    }
 
     return (
         <>
@@ -56,15 +108,15 @@ const Listing: FC<sessionProps> = () => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-
             {/* Title */}
             <h1 className="text-4xl font-bold">Create a new listing</h1>
 
             <section className="w-3/4 mx-auto flex flex-col gap-10">
-                
-
                 {/* Form */}
-                <form className="mt-10 flex flex-col" onSubmit={formik.handleSubmit}>
+                <form
+                    className="mt-10 flex flex-col"
+                    onSubmit={formik.handleSubmit}
+                >
                     {/* Price */}
                     <div className="flex flex-row">
                         <label htmlFor="price">Price</label>
@@ -119,7 +171,7 @@ const Listing: FC<sessionProps> = () => {
                     <div className="flex flex-row">
                         <label htmlFor="tenure">Tenure</label>
                         <input
-                            className='border'
+                            className="border"
                             type="text"
                             {...formik.getFieldProps("tenure")}
                         />
@@ -129,7 +181,6 @@ const Listing: FC<sessionProps> = () => {
                     <div className="flex flex-row">
                         <label htmlFor="taxBand">Tax Band</label>
                         <input
-
                             className="border"
                             type="text"
                             {...formik.getFieldProps("taxBand")}
@@ -186,13 +237,17 @@ const Listing: FC<sessionProps> = () => {
                         />
                     </div>
 
-                    {/* Photos */}
+                    {/* Images */}
                     <div className="flex flex-row">
-                        <label htmlFor="photos">Photos</label>
+                        <label htmlFor="images">Images</label>
                         <input
+                            type={"file"}
+                            accept={"image/png, image/jpg"}
+                            multiple
                             className="border"
-                            type="text"
-                            {...formik.getFieldProps("photos")}
+                            onChange={(e) => {
+                                encodeImage(e);
+                            }}
                         />
                     </div>
 
@@ -200,9 +255,13 @@ const Listing: FC<sessionProps> = () => {
                     <div className="flex flex-row">
                         <label htmlFor="floorPlan">Floor Plan</label>
                         <input
+                            type={"file"}
+                            accept={"image/png, image/jpg"}
+                            multiple
                             className="border"
-                            type="text"
-                            {...formik.getFieldProps("floorPlan")}
+                            onChange={(e) => {
+                                //encodeFloorPlan(e);
+                            }}
                         />
                     </div>
 
@@ -211,10 +270,8 @@ const Listing: FC<sessionProps> = () => {
                         Submit
                     </button>
                 </form>
-
             </section>
         </>
-
     );
 };
 
