@@ -48,7 +48,7 @@ export default async function handler(
         contactNumber: string;
         contactEmail: string;
         images: string[];
-        floorPlan: string;
+        floorPlan: string[];
         email: string;
     } = JSON.parse(req.body);
 
@@ -76,23 +76,25 @@ export default async function handler(
         return res.status(400).json({ message: "Listing already exists" });
     }
 
+    // Decide the image type
+    function getImageType(image: string) {
+        if (image.includes("data:image/jpeg;base64,")) {
+            return "image/jpeg";
+        } else if (image.includes("data:image/png;base64,")) {
+            return "image/png";
+        }
+    }
+
+    // Upload images to supabase
     async function uploadImages(images: string[]){
         let dataArray = [];
         for(let i = 0; i < images.length; i++){
-            let imageType = "";
-            if (images[i].includes("data:image/jpg;base64,")) {
-                imageType = "image/jpg";
-            }
-            else if (images[i].includes("data:image/png;base64,")) {
-                imageType = "image/png";
-            }
-
+            
             const imageFile = Buffer.from(images[i].replace(/^data:image\/\w+;base64,/, ""), "base64");
-            const filePath = `${userID?.id}/images/${nanoid(10)}`
-            console.log(filePath);
+
             const { data, error } = await supabase.storage
                 .from("property-images")
-                .upload(filePath, imageFile, { contentType: imageType });
+                .upload(`${userID?.id}/images/${nanoid(10)}`, imageFile, { contentType: getImageType(images[i]) });
             if(data){
                 console.log(data.path);
                 dataArray.push(data.path);
@@ -103,7 +105,26 @@ export default async function handler(
         }
         return dataArray;
     }
-    
+
+    // Upload floorplans to supabase
+    async function uploadFloorPlan(floorPlan: string[]){
+        let dataArray = [];
+        for(let i = 0; i < floorPlan.length; i++){
+
+            const imageFile = Buffer.from(floorPlan[i].replace(/^data:image\/\w+;base64,/, ""), "base64");
+
+            const { data, error } = await supabase.storage
+                .from("property-images")
+                .upload(`${userID?.id}/floorplans/${nanoid(10)}`, imageFile, { contentType: getImageType(floorPlan[i]) });
+            if(data){
+                console.log(data.path);
+                dataArray.push(data.path);
+            } else if(error){
+                console.log(error);
+            }
+        }
+        return dataArray;
+    }
 
     // Create listing
     const listing = await prisma.property
@@ -123,7 +144,7 @@ export default async function handler(
                 contactNumber: contactNumber,
                 contactEmail: contactEmail,
                 images: await uploadImages(images),
-                floorPlan: floorPlan,
+                floorPlan: await uploadFloorPlan(floorPlan),
                 user: {
                     connect: {
                         id: userID?.id,

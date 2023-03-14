@@ -3,7 +3,6 @@ import Head from "next/head";
 import { useFormik } from "formik";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -15,6 +14,8 @@ type sessionProps = {
 const Listing: FC<sessionProps> = () => {
     const { data: session, status } = useSession();
     let images: string[] = [];
+    let floorPlans: string[] = [];
+
     const formik = useFormik({
         initialValues: {
             price: "",
@@ -31,12 +32,12 @@ const Listing: FC<sessionProps> = () => {
             contactNumber: "",
             contactEmail: "",
             images: images,
-            floorPlan: "",
+            floorPlan: floorPlans,
             email: session?.user?.email,
         },
         onSubmit: async (values) => {
             //call the createListing api
-            console.log(values.images)
+            console.log(values.images);
             fetch("/api/createListing", {
                 method: "POST",
                 body: JSON.stringify(values),
@@ -51,16 +52,15 @@ const Listing: FC<sessionProps> = () => {
         }));
     }, [session?.user?.email]);
 
-
-    function readFileAsText(file: File){
-        return new Promise(function(resolve,reject){
+    function readFileAsText(file: File) {
+        return new Promise(function (resolve, reject) {
             let fr = new FileReader();
 
-            fr.onload = function(){
+            fr.onload = function () {
                 resolve(fr.result);
             };
 
-            fr.onerror = function(){
+            fr.onerror = function () {
                 reject(fr);
             };
 
@@ -70,27 +70,50 @@ const Listing: FC<sessionProps> = () => {
 
     async function encodeImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
-                let readers = [];
+        let readers = [];
 
-                // Abort if there were no files selected
-                if(!files.length) return;
+        // Abort if there were no files selected
+        if (!files.length) return;
 
-                // Store promises in array
-                for(let i = 0;i < files.length;i++){
-                    readers.push(readFileAsText(files[i]));
-                }
-                
-                // Trigger Promises
-                Promise.all(readers).then((image) => {
-                    // Values will be an array that contains an item
-                    // with the text of every selected file
-                    // ["File1 Content", "File2 Content" ... "FileN Content"]
-                    formik.setValues((values) => ({
-                        ...values,
-                        images: image as string[],
-                    }));
-                    console.log(formik.values.images)
-                });
+        // Store promises in array
+        for (let i = 0; i < files.length; i++) {
+            readers.push(readFileAsText(files[i]));
+        }
+
+        // Trigger Promises
+        Promise.all(readers).then((image) => {
+            // Values will be an array that contains an item
+            // with the text of every selected file
+            // ["File1 Content", "File2 Content" ... "FileN Content"]
+            formik.setValues((values) => ({
+                ...values,
+                images: image as string[],
+            }));
+        });
+    }
+
+    async function encodeFloorPlan(e: ChangeEvent<HTMLInputElement>) {
+        let files = e.target.files!;
+        let readers = [];
+
+        // Abort if there were no files selected
+        if (!files.length) return;
+
+        // Store promises in array
+        for (let i = 0; i < files.length; i++) {
+            readers.push(readFileAsText(files[i]));
+        }
+
+        // Trigger Promises
+        Promise.all(readers).then((floorPlan) => {
+            // Values will be an array that contains an item
+            // with the text of every selected file
+            // ["File1 Content", "File2 Content" ... "FileN Content"]
+            formik.setValues((values) => ({
+                ...values,
+                floorPlan: floorPlan as string[],
+            }));
+        });
     }
 
     return (
@@ -242,7 +265,7 @@ const Listing: FC<sessionProps> = () => {
                         <label htmlFor="images">Images</label>
                         <input
                             type={"file"}
-                            accept={"image/png, image/jpg"}
+                            accept={"image/png, image/jpg, image/jpeg"}
                             multiple
                             className="border"
                             onChange={(e) => {
@@ -256,11 +279,11 @@ const Listing: FC<sessionProps> = () => {
                         <label htmlFor="floorPlan">Floor Plan</label>
                         <input
                             type={"file"}
-                            accept={"image/png, image/jpg"}
+                            accept={"image/png, image/jpg, image/jpeg"}
                             multiple
                             className="border"
                             onChange={(e) => {
-                                //encodeFloorPlan(e);
+                                encodeFloorPlan(e);
                             }}
                         />
                     </div>
