@@ -4,13 +4,14 @@ import { useState } from "react";
 import { getSession, useSession, signOut } from "next-auth/react";
 import { FC } from "react";
 import { NextApiRequest } from "next";
-
+import NavBar from "../components/NavBar";
+import Image from "next/image";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
 
 type sessionProps = {
-    session: Session; 
+    session: Session;
 };
 
 export default function Home() {
@@ -30,75 +31,62 @@ export default function Home() {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            {session ? <User session={session} /> : <Guest />}
+            <div className="relative">
+                <NavBar isLoggedIn={!!session} />
+
+                <Image
+                    src="/assets/interiordesign.jpg"
+                    alt="Interior Design"
+                    width="0"
+                    height="0"
+                    sizes="100vw"
+                    className="w-full h-screen"
+                />
+                <div className="absolute top-52 left-0 w-full h-1/2 flex m-50 items-center justify-center z-0">
+                    <h1 className="absolute top-28 text-center font-bold text-white text-4xl">
+                        Experience the joy of finding your perfect home
+                    </h1>
+                    <Link href="/properties">
+                        <button className="px-8 py-3 mt-44 bg-white bg-opacity-75 text-blue-500 font-bold text-3xl rounded-md hover:shadow-lg hover:bg-transparent hover:border-white hover:text-white border-2 border-blue-500">
+                            Properties
+                        </button>
+                    </Link>
+                </div>
+            </div>
         </>
     );
 }
 
-// Guest
-function Guest() {
-    return (
-        <main className="container mx-auto text-center py-20">
-            <h3 className="text-4xl font-bold">Guest Homepage</h3>
-            <div className="flex justify-center">
-                <Link
-                    className="mt-5 px-10 py-1 rounded-sm bg-indigo-500 text-gray-50"
-                    href="/login"
-                >
-                    Sign In
-                </Link>
-            </div>
-        </main>
-    );
-}
+// Experience the joy of finding your perfect home
 
-// Authorised User
-const User: FC<sessionProps> = ({ session }) => {
-    return (
-        <main className="container mx-auto text-center py-20">
-            <h3 className="text-4xl font-bold">Authorised User Homepage</h3>
+// // Authorised User
+// const User: FC<sessionProps> = ({ session }) => {
+//     return (
+//         <main className="container mx-auto text-center py-20">
+//             <h3 className="text-4xl font-bold">Authorised User Homepage</h3>
 
-            <div className="details">
-                <h5>{session?.user?.name}</h5>
-                <h5>{session?.user?.email}</h5>
-            </div>
+//             <div className="details">
+//                 <h5>{session?.user?.name}</h5>
+//                 <h5>{session?.user?.email}</h5>
+//             </div>
 
-            <div className="flex justify-center">
-                <button
-                    className="mt-5 px-10 py-1 rounded-sm bg-indigo-500 text-gray-50"
-                    onClick={() => signOut()}
-                >
-                    Sign Out
-                </button>
-            </div>
+//             <div className="flex justify-center">
+//                 <button
+//                     className="mt-5 px-10 py-1 rounded-sm bg-indigo-500 text-gray-50"
+//                     onClick={() => signOut()}
+//                 >
+//                     Sign Out
+//                 </button>
+//             </div>
 
-            <div className="flex justify-center">
-                <Link
-                    className="mt-5 px-10 py-1 rounded-sm bg-indigo-500 text-gray-50"
-                    href="/profile"
-                >
-                    Profile Page
-                </Link>
-            </div>
-        </main>
-    );
-};
-
-// export async function getserverSideProps({ req }: { req: NextApiRequest }) {
-//     const session = await getSession({ req });
-
-//     if (!session) {
-//         return {
-//             redirect: {
-//                 destination: "/login",
-//                 permanent: false,
-//             },
-//         };
-//     }
-
-//     return {
-//         props: {
-//             session,
-//         },
-//     };
-// }
+//             <div className="flex justify-center">
+//                 <Link
+//                     className="mt-5 px-10 py-1 rounded-sm bg-indigo-500 text-gray-50"
+//                     href="/profile"
+//                 >
+//                     Profile Page
+//                 </Link>
+//             </div>
+//         </main>
+//     );
+// };
