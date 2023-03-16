@@ -2,6 +2,8 @@
 interface LoginErrors {
     name?: string;
     surname?: string;
+    dob?: string;
+    phoneNumber?: string;
     email?: string;
     password?: string;
     cpassword?: string;
@@ -57,15 +59,13 @@ export const validateRegister = (values: LoginErrors): LoginErrors => {
 
 
 
-    if (!values.username){
-        errors.username = "Username is required";
-    } else if (values.username.length < 3 || values.username.length > 20) {
-        errors.username = "Username must be at least 3 characters and less than 20 characters";
-    } else if (!/^[a-zA-Z0-9]+$/.test(values.username)) {
-        errors.username = "Username must contain only letters and numbers";
-    } else if (values.username.includes(" ")) {
-        errors.username = "Invalid username";
-    }
+    if (!values.dob){
+        errors.dob = "Username is required";
+    } 
+
+    if (!values.phoneNumber){
+        errors.phoneNumber = "Phone number is required";
+    } 
 
 
     if (!values.email) {

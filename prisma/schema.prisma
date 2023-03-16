@@ -9,12 +9,13 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  name       String  
-  surname    String
-  username   String   @unique
-  email      String   @unique
-  password   String
+  id          String    @id @default(uuid())
+  name        String  
+  surname     String
+  dob         String
+  phoneNumber String    @unique
+  email       String    @unique
+  password    String
   properties Property[]
 }
 

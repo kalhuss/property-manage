@@ -22,10 +22,13 @@ const Navbar: NextPage<NavbarProps> = ({ isLoggedIn }) => {
     };
 
     return (
-        <nav className="flex items-center justify-between flex-wrap bg-white p-6 px-10 w-full fixed z-2">
+        <nav className="flex items-center justify-between flex-wrap bg-white bg-opacity-80 p-6 px-10 w-full fixed z-2">
             <div className="flex items-center flex-shrink-0 text-black mr-6">
                 <Link href="/">
-                    <div className="font-bold text-xl">Real Estate</div>
+                    <div className="block group text-lg mt-4 lg:inline-block lg:mt-0 font-bold text-black relative">
+                        Real Estate
+                        <span className="absolute bottom-0 group-hover:w-full left-0 w-0 h-0.5 bg-blue-500  transition-all duration-300 origin-left"></span>
+                    </div>
                 </Link>
             </div>
             <div className="w-full flex lg:flex lg:items-center lg:w-auto">
@@ -73,7 +76,7 @@ const Navbar: NextPage<NavbarProps> = ({ isLoggedIn }) => {
                                                 Profile
                                             </div>
                                         </Link>
-                                        <Link href="/listing">
+                                        <Link href="/myListing">
                                             <div
                                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                                 role="menuitem"
@@ -82,7 +85,7 @@ const Navbar: NextPage<NavbarProps> = ({ isLoggedIn }) => {
                                                 My Listings
                                             </div>
                                         </Link>
-                                        <Link href="/new-listing">
+                                        <Link href="/listing">
                                             <div
                                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                                 role="menuitem"

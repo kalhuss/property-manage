@@ -12,25 +12,27 @@ let CDN = "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/pro
 const DisplayCard: NextPage<PropertyProps> = ({ properties }) => {
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 font-mono">
+        <div className="grid grid-cols-1 gap-6 font-mono">
             {properties.map((property) => (
                 <div
                     key={property.id}
-                    className="bg-white p-6 rounded-lg shadow-lg w-auto mb-6 cursor-default flex flex-col group hover:drop-shadow-md"
+                    className="bg-white p-6 rounded-lg shadow-lg mb-6 cursor-default grid grid-cols-2 group hover:drop-shadow-md w-4/12 md:mx-auto"
                 >
-                    <div className="relative h-64 rounded-lg overflow-hidden mb-4">
+                    <div className="relative h-48 w-48 md:h-64 md:w-64 rounded-t-lg overflow-hidden mb-4 place-items-center mx-auto">
                         <img className="absolute inset-0 h-full w-full object-cover" src={CDN + property.images[0]} alt={property.address} />
                     </div>
-                    <div className="flex flex-col flex-grow">
+                    <div className="flex flex-col flex-grow justify-center">
                         <h1 className="text-2xl font-medium mb-2">
                             £{property.price}
                         </h1>
                         <p className="text-gray-400 mb-4">{`${property.bedrooms} bed, ${property.bathrooms} bathroom ${property.houseType} for sale`}</p>
                         <p className="mb-4 text-lg">{property.address}</p>
                         <Link href={`/properties/${property.propertyID}`}>
-                            <div className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+                            {/* <div className="w-36 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded text-center"> */}
+                            <button className="px-8 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-transparent hover:bg-blue-500 hover:text-white border-2 border-blue-500">
                                 View Details
-                            </div>
+                            {/* </div> */}
+                            </button>
                         </Link>
                     </div>
                 </div>
@@ -38,5 +40,6 @@ const DisplayCard: NextPage<PropertyProps> = ({ properties }) => {
         </div>
     );
 };
+
 
 export default DisplayCard;

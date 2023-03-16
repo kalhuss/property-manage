@@ -2,14 +2,28 @@ import { GetServerSideProps, NextPage } from "next";
 import { Property } from "@prisma/client";
 import prisma from "../../../prisma/prisma";
 import Head from "next/head";
+import { getSession, useSession, signOut } from "next-auth/react";
+import NavBar from "../../components/NavBar";
+import { BsArrowLeft } from "react-icons/bs";
+import Link from "next/link";
 
 interface PropertyPageProps {
     property: Property;
 }
 
+type Session = ReturnType<typeof useSession>["data"];
+type SessionNoNull = NonNullable<Session>;
+
+type sessionProps = {
+    session: Session;
+};
+
 let CDN = "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
 
 const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
+
+    const { data: session, status } = useSession();
+
     return (
         <div>
             <Head>
@@ -17,12 +31,16 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                 <meta name="description" content={property.description} />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-
-            <div className="container mx-auto px-4">
+            <NavBar isLoggedIn={!!session} />
+            <div className="container mx-auto px-4 pt-20">
+                <Link className="flex pb-5"href={'/properties'}>
+                    <span className="text-2xl font-bold mr-2"><BsArrowLeft /></span>
+                    <h1 className="text-lg font-bold inline-block">Back to properties</h1>
+                </Link>
                 <div className="flex flex-wrap justify-center mb-8">
-                    <div className="w-full md:w-1/2 lg:w-3/5">
+                    <div className="w-full md:w-1/2 lg:w-1/25">
                         <div className="relative">
-                            <img src={CDN + property.images[0]} alt={property.address} className="w-full h-auto rounded-lg shadow-lg" />
+                            <img src={CDN + property.images[0]} alt={property.address} className="w-full h-auto rounded-lg object-contain" />
                             <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
                         </div>
                         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
@@ -48,14 +66,18 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                 </div>
                             </div>
                     </div>
+                    
                     <div className="w-full md:w-1/2 lg:w-2/5 lg:pl-8">
-                        <div className="sticky top-0">
+                        <div className="">
                             <div className="bg-white rounded-lg shadow-lg p-4 mt-4">
                                 <p className="text-xl font-bold mb-2">Contact</p>
                                 <p className="text-lg mb-2">Phone: {property.contactNumber}</p>
                                 <p className="text-lg">Email: {property.contactEmail}</p>
                             </div>
                         </div>
+                    </div>
+                    <div className="w-full md:w-1/2 lg:w-2/5 lg:pl-8 left-0">
+                        <img src={CDN + property.floorPlan[0]} alt={property.address} className="w-full h-auto rounded-lg object-contain" />
                     </div>
                 </div>
             </div>

@@ -7,6 +7,8 @@ import { FaLock } from "react-icons/fa";
 import { useState } from "react";
 import { useFormik } from "formik";
 import { validateRegister } from "lib/validate";
+import { FaCalendarAlt } from "react-icons/fa";
+import { AiFillPhone } from "react-icons/ai";
 
 export default function Register() {
     const [show, setShow] = useState({ password: false, cpassword: false });
@@ -14,7 +16,8 @@ export default function Register() {
         initialValues: {
             name: "",
             surname: "",
-            username: "",
+            dob: "",
+            phoneNumber: "",
             email: "",
             password: "",
             cpassword: "",
@@ -22,10 +25,12 @@ export default function Register() {
         validate: validateRegister,
         onSubmit: async (values) => {
             //call the signUp api
-            fetch('/api/auth/signUp', { method: 'POST', body: JSON.stringify(values) })
-            // Then go to the login page
-                .then(() => window.location.href = '/login')
-                
+            fetch("/api/auth/signUp", {
+                method: "POST",
+                body: JSON.stringify(values),
+            })
+                // Then go to the login page
+                .then(() => (window.location.href = "/login"));
         },
     });
 
@@ -49,11 +54,16 @@ export default function Register() {
                     <h1 className="text-gray-800 text-4xl font-bold py-4">
                         Register
                     </h1>
-                    <p className="w-3/4 mx-auto text-gray-400">Register idk</p>
+                    <p className="w-3/4 mx-auto text-gray-400">
+                        Let us help you find your next home
+                    </p>
                 </div>
 
                 {/* Form */}
-                <form className="flex flex-col gap-5" onSubmit={formik.handleSubmit}>
+                <form
+                    className="flex flex-col gap-5"
+                    onSubmit={formik.handleSubmit}
+                >
                     {/* Name */}
                     <div className={styles.input_group}>
                         <input
@@ -66,11 +76,11 @@ export default function Register() {
                             <HiUser size={25} />
                         </span>
                     </div>
-                    { formik.touched.name && formik.errors.name ? (
+                    {formik.touched.name && formik.errors.name ? (
                         <div className="text-red-500 text-sm">
                             {formik.errors.name}
                         </div>
-                    ) : null }
+                    ) : null}
 
                     {/* Surname */}
                     <div className={styles.input_group}>
@@ -84,29 +94,44 @@ export default function Register() {
                             <HiUser size={25} />
                         </span>
                     </div>
-                    { formik.touched.surname && formik.errors.surname ? (
+                    {formik.touched.surname && formik.errors.surname ? (
                         <div className="text-red-500 text-sm">
                             {formik.errors.surname}
                         </div>
-                    ) : null }
+                    ) : null}
 
-                    {/* Username */}
+                    {/* Date of Birth */}
+                    <div className={styles.input_group}>
+                        <input
+                            className={styles.input_text}
+                            type="date"
+                            placeholder="Date of Birth"
+                            {...formik.getFieldProps("dob")}
+                        />
+                        <span className="icon flex items-center px-4">
+                            <FaCalendarAlt size={20} />
+                        </span>
+                    </div>
+                    
+
+                    {/* Phone Number */}
                     <div className={styles.input_group}>
                         <input
                             className={styles.input_text}
                             type="text"
-                            placeholder="Username"
-                            {...formik.getFieldProps("username")}
+                            placeholder="Phone Number"
+                            {...formik.getFieldProps("phoneNumber")}
                         />
                         <span className="icon flex items-center px-4">
-                            <HiUser size={25} />
+                            <AiFillPhone size={25} />
                         </span>
                     </div>
-                    { formik.touched.username && formik.errors.username ? (
+                    {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
                         <div className="text-red-500 text-sm">
-                            {formik.errors.username}
+                            {formik.errors.phoneNumber}
                         </div>
-                    ) : null }
+                    ) : null}
+
 
                     {/* Email */}
                     <div className={styles.input_group}>
@@ -120,11 +145,11 @@ export default function Register() {
                             <HiAtSymbol size={25} />
                         </span>
                     </div>
-                    { formik.touched.email && formik.errors.email ? (
+                    {formik.touched.email && formik.errors.email ? (
                         <div className="text-red-500 text-sm">
                             {formik.errors.email}
                         </div>
-                    ) : null }
+                    ) : null}
 
                     {/* Password */}
                     <div className={styles.input_group}>
@@ -143,11 +168,11 @@ export default function Register() {
                             <FaLock size={20} />
                         </span>
                     </div>
-                    { formik.touched.password && formik.errors.password ? (
+                    {formik.touched.password && formik.errors.password ? (
                         <div className="text-red-500 text-sm">
                             {formik.errors.password}
                         </div>
-                    ) : null }
+                    ) : null}
 
                     {/* Confirm password */}
                     <div className={styles.input_group}>
@@ -166,11 +191,11 @@ export default function Register() {
                             <FaLock size={20} />
                         </span>
                     </div>
-                    { formik.touched.cpassword && formik.errors.cpassword ? (
+                    {formik.touched.cpassword && formik.errors.cpassword ? (
                         <div className="text-red-500 text-sm">
                             {formik.errors.cpassword}
                         </div>
-                    ) : null }
+                    ) : null}
 
                     {/* Login buttons */}
                     <div className="input-button">

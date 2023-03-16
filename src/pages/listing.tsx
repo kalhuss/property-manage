@@ -1,8 +1,10 @@
 import { ChangeEvent, FC } from "react";
 import Head from "next/head";
 import { useFormik } from "formik";
-import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import { getSession, useSession, signOut } from "next-auth/react";
+import NavBar from "../components/NavBar";
+import Image from "next/image";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -130,170 +132,233 @@ const Listing: FC<sessionProps> = () => {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
+            <div className="relative">
+                <NavBar isLoggedIn={!!session} />
 
-            {/* Title */}
-            <h1 className="text-4xl font-bold">Create a new listing</h1>
+                <Image
+                    src="/assets/interiorform.jpg"
+                    alt="Interior Design Form"
+                    width="0"
+                    height="0"
+                    sizes="100vw"
+                    className="w-full h-screen opacity-100"
+                />
+                <div className="absolute top-52 left-0 w-full h-4/6 flex m-50 items-center justify-center z-0">
+                    <div className="p-10 w-3/6 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center">
+                        <div className="flex flex-col">
+                            {/* Title */}
+                            <h1 className="text-4xl font-bold text-center">
+                                Create a new listing
+                            </h1>
 
-            <section className="w-3/4 mx-auto flex flex-col gap-10">
-                {/* Form */}
-                <form
-                    className="mt-10 flex flex-col"
-                    onSubmit={formik.handleSubmit}
-                >
-                    {/* Price */}
-                    <div className="flex flex-row">
-                        <label htmlFor="price">Price</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("price")}
-                        />
+                            <section className="w-3/4 mx-auto flex flex-col">
+                                {/* Form */}
+                                <form
+                                    className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
+                                    onSubmit={formik.handleSubmit}
+                                >
+                                    {/* Price */}
+                                    <div className="flex flex-col">
+                                        <label
+                                            htmlFor="price"
+                                            className="font-bold"
+                                        >
+                                            Price
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps("price")}
+                                        />
+                                    </div>
+
+                                    {/* Bedrooms */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="bedrooms" className="font-bold">
+                                            Bedrooms
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps(
+                                                "bedrooms"
+                                            )}
+                                        />
+                                    </div>
+
+                                    {/* Bathrooms */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="bathrooms" className="font-bold">
+                                            Bathrooms
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps(
+                                                "bathrooms"
+                                            )}
+                                        />
+                                    </div>
+
+                                    {/* House Type */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="houseType" className="font-bold">
+                                            House Type
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps(
+                                                "houseType"
+                                            )}
+                                        />
+                                    </div>
+
+                                    {/* Address */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="address" className="font-bold">Address</label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps("address")}
+                                        />
+                                    </div>
+
+                                    {/* Tenure */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="tenure" className="font-bold">Tenure</label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps("tenure")}
+                                        />
+                                    </div>
+
+                                    {/* Tax Band */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="taxBand" className="font-bold">
+                                            Tax Band
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps("taxBand")}
+                                        />
+                                    </div>
+
+                                    {/* Rent */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="rent" className="font-bold">Rent</label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps("rent")}
+                                        />
+                                    </div>
+
+                                    {/* Key Features */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="keyFeatures" className="font-bold">
+                                            Key Features
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps(
+                                                "keyFeatures"
+                                            )}
+                                        />
+                                    </div>
+
+                                    {/* Description */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="description" className="font-bold">
+                                            Description
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps(
+                                                "description"
+                                            )}
+                                        />
+                                    </div>
+
+                                    {/* Contact Number */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="contactNumber" className="font-bold">
+                                            Contact Number
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps(
+                                                "contactNumber"
+                                            )}
+                                        />
+                                    </div>
+
+                                    {/* Contact Email */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="contactEmail" className="font-bold">
+                                            Contact Email
+                                        </label>
+                                        <input
+                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            type="text"
+                                            {...formik.getFieldProps(
+                                                "contactEmail"
+                                            )}
+                                        />
+                                    </div>
+
+                                    {/* Images */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="images" className="font-bold">Images</label>
+                                        <input
+                                            type={"file"}
+                                            accept={
+                                                "image/png, image/jpg, image/jpeg"
+                                            }
+                                            multiple
+                                            className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 dark:border-neutral-600 bg-clip-padding py-[0.32rem] px-3 text-base font-normal text-neutral-700 dark:text-neutral-200 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 dark:file:bg-neutral-700 file:px-3 file:py-[0.32rem] file:text-neutral-700 dark:file:text-neutral-100 file:transition file:duration-150 file:ease-in-out file:[margin-inline-end:0.75rem] file:[border-inline-end-width:1px] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-[0_0_0_1px] focus:shadow-primary focus:outline-none"
+                                            onChange={(e) => {
+                                                encodeImage(e);
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Floor Plan */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="floorPlan" className="font-bold">
+                                            Floor Plan
+                                        </label>
+                                        <input
+                                            type={"file"}
+                                            accept={
+                                                "image/png, image/jpg, image/jpeg"
+                                            }
+                                            multiple
+                                            className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 dark:border-neutral-600 bg-clip-padding py-[0.32rem] px-3 text-base font-normal text-neutral-700 dark:text-neutral-200 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 dark:file:bg-neutral-700 file:px-3 file:py-[0.32rem] file:text-neutral-700 dark:file:text-neutral-100 file:transition file:duration-150 file:ease-in-out file:[margin-inline-end:0.75rem] file:[border-inline-end-width:1px] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-[0_0_0_1px] focus:shadow-primary focus:outline-none"
+                                            onChange={(e) => {
+                                                encodeFloorPlan(e);
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Submit */}
+                                    <button
+                                        className="p-4 col-span-2 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                        type="submit"
+                                    >
+                                        Submit
+                                    </button>
+                                </form>
+                            </section>
+                        </div>
                     </div>
-
-                    {/* Bedrooms */}
-                    <div className="flex flex-row">
-                        <label htmlFor="bedrooms">Bedrooms</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("bedrooms")}
-                        />
-                    </div>
-
-                    {/* Bathrooms */}
-                    <div className="flex flex-row">
-                        <label htmlFor="bathrooms">Bathrooms</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("bathrooms")}
-                        />
-                    </div>
-
-                    {/* House Type */}
-                    <div className="flex flex-row">
-                        <label htmlFor="houseType">House Type</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("houseType")}
-                        />
-                    </div>
-
-                    {/* Address */}
-                    <div className="flex flex-row">
-                        <label htmlFor="address">Address</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("address")}
-                        />
-                    </div>
-
-                    {/* Tenure */}
-                    <div className="flex flex-row">
-                        <label htmlFor="tenure">Tenure</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("tenure")}
-                        />
-                    </div>
-
-                    {/* Tax Band */}
-                    <div className="flex flex-row">
-                        <label htmlFor="taxBand">Tax Band</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("taxBand")}
-                        />
-                    </div>
-
-                    {/* Rent */}
-                    <div className="flex flex-row">
-                        <label htmlFor="rent">Rent</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("rent")}
-                        />
-                    </div>
-
-                    {/* Key Features */}
-                    <div className="flex flex-row">
-                        <label htmlFor="keyFeatures">Key Features</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("keyFeatures")}
-                        />
-                    </div>
-
-                    {/* Description */}
-                    <div className="flex flex-row">
-                        <label htmlFor="description">Description</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("description")}
-                        />
-                    </div>
-
-                    {/* Contact Number */}
-                    <div className="flex flex-row">
-                        <label htmlFor="contactNumber">Contact Number</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("contactNumber")}
-                        />
-                    </div>
-
-                    {/* Contact Email */}
-                    <div className="flex flex-row">
-                        <label htmlFor="contactEmail">Contact Email</label>
-                        <input
-                            className="border"
-                            type="text"
-                            {...formik.getFieldProps("contactEmail")}
-                        />
-                    </div>
-
-                    {/* Images */}
-                    <div className="flex flex-row">
-                        <label htmlFor="images">Images</label>
-                        <input
-                            type={"file"}
-                            accept={"image/png, image/jpg, image/jpeg"}
-                            multiple
-                            className="border"
-                            onChange={(e) => {
-                                encodeImage(e);
-                            }}
-                        />
-                    </div>
-
-                    {/* Floor Plan */}
-                    <div className="flex flex-row">
-                        <label htmlFor="floorPlan">Floor Plan</label>
-                        <input
-                            type={"file"}
-                            accept={"image/png, image/jpg, image/jpeg"}
-                            multiple
-                            className="border"
-                            onChange={(e) => {
-                                encodeFloorPlan(e);
-                            }}
-                        />
-                    </div>
-
-                    {/* Submit */}
-                    <button className="bg-blue-500 text-white" type="submit">
-                        Submit
-                    </button>
-                </form>
-            </section>
+                </div>
+            </div>
         </>
     );
 };
