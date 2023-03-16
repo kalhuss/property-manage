@@ -20,7 +20,7 @@ interface UserProps {
     user: User;
 }
 
-const Profile: NextPage<UserProps, sessionProps> = ({ user }) => {
+const Profile: NextPage<UserProps> = ({ user }) => {
     const { data: session, status } = useSession();
     console.log(session)
     return (

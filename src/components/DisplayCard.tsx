@@ -2,6 +2,7 @@ import React from "react";
 import { Property } from "@prisma/client";
 import { NextPage } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 interface PropertyProps {
     properties: Property[];
@@ -19,7 +20,8 @@ const DisplayCard: NextPage<PropertyProps> = ({ properties }) => {
                     className="bg-white p-6 rounded-lg shadow-lg mb-6 cursor-default grid grid-cols-2 group hover:drop-shadow-md w-4/12 md:mx-auto"
                 >
                     <div className="relative h-48 w-48 md:h-64 md:w-64 rounded-t-lg overflow-hidden mb-4 place-items-center mx-auto">
-                        <img className="absolute inset-0 h-full w-full object-cover" src={CDN + property.images[0]} alt={property.address} />
+                        {/* <img className="absolute inset-0 h-full w-full object-cover" src={CDN + property.images[0]} alt={property.address} /> */}
+                        <Image src={CDN + property.images[1]} alt={property.address} width="0" height="0" sizes="100vw" className="absolute inset-0 h-full w-full object-cover" />
                     </div>
                     <div className="flex flex-col flex-grow justify-center">
                         <h1 className="text-2xl font-medium mb-2">

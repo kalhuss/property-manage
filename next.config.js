@@ -3,4 +3,25 @@ const nextConfig = {
   reactStrictMode: true,
 }
 
-module.exports = nextConfig
+module.exports = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'zqmbrfgddurttslljblz.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/property-images/**',
+      },
+    ],
+  },
+  // images: {
+  //   remotePatterns: [
+  //       {
+  //           protocol: 'https',
+  //           hostname: '**',
+  //           port: '',
+  //           pathname: '**',
+  //       },
+  //   ],
+  // },
+}

@@ -6,6 +6,7 @@ import { getSession, useSession, signOut } from "next-auth/react";
 import NavBar from "../../components/NavBar";
 import { BsArrowLeft } from "react-icons/bs";
 import Link from "next/link";
+import Image from "next/image";
 
 interface PropertyPageProps {
     property: Property;
@@ -27,7 +28,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
     return (
         <div>
             <Head>
-                <title>{property.address} - {property.price}</title>
+                <title>{property.address}</title>
                 <meta name="description" content={property.description} />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
@@ -40,7 +41,8 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                 <div className="flex flex-wrap justify-center mb-8">
                     <div className="w-full md:w-1/2 lg:w-1/25">
                         <div className="relative">
-                            <img src={CDN + property.images[0]} alt={property.address} className="w-full h-auto rounded-lg object-contain" />
+                            {/* <img src={CDN + property.images[0]} alt={property.address} className="w-full h-auto rounded-lg object-contain" /> */}
+                            <Image src={CDN + property.images[0]} alt={property.address} width="0" height="0" sizes="100vw" className="w-full h-auto rounded-lg object-contain" />
                             <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
                         </div>
                         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
@@ -77,7 +79,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                         </div>
                     </div>
                     <div className="w-full md:w-1/2 lg:w-2/5 lg:pl-8 left-0">
-                        <img src={CDN + property.floorPlan[0]} alt={property.address} className="w-full h-auto rounded-lg object-contain" />
+                        <Image src={CDN + property.floorPlan[0]} alt={property.address} width="0" height="0" sizes="100vw" className="w-full h-auto rounded-lg object-contain" />
                     </div>
                 </div>
             </div>
