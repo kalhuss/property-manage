@@ -1,4 +1,4 @@
-import { useSession } from "next-auth/react";
+import { useSession, getSession } from 'next-auth/react';
 import NavBar from "../components/NavBar";
 import Head from "next/head";
 import Image from "next/image";
@@ -20,7 +20,7 @@ interface UserProps {
     user: User;
 }
 
-const Profile: NextPage<UserProps> = ({ user }) => {
+const Profile: NextPage<UserProps, sessionProps> = ({ user }) => {
     const { data: session, status } = useSession();
     console.log(session)
     return (
@@ -104,14 +104,16 @@ const Guest: NextPage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
-
-    const email = context.params?.email;
+    const session = await getSession(context);
+    const email = session?.user?.email;
 
     const user = await prisma.user.findFirst({
         where: {
             email: email as string,
         },
     });
+
+    context.res.setHeader('Cache-Control', 'no-store');
 
     return {
         props: {
