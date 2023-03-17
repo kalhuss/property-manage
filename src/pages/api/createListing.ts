@@ -18,7 +18,6 @@ export default async function handler(
     }
     const {
         price,
-        size,
         bedrooms,
         bathrooms,
         houseType,
@@ -30,12 +29,12 @@ export default async function handler(
         description,
         contactNumber,
         contactEmail,
+        exteriorImage,
         images,
         floorPlan,
         email,
     }: {
         price: string;
-        size: string;
         bedrooms: string;
         bathrooms: string;
         houseType: string;
@@ -47,6 +46,7 @@ export default async function handler(
         description: string;
         contactNumber: string;
         contactEmail: string;
+        exteriorImage: string[];
         images: string[];
         floorPlan: string[];
         email: string;
@@ -56,7 +56,6 @@ export default async function handler(
     if (!email) {
         return res.status(400).json({ message: "No current session" });
     }
-    //TODO: Check if user is logged in
 
     // Get user id
     const userID = await prisma.user.findUnique({
@@ -64,7 +63,7 @@ export default async function handler(
             email: email,
         },
     });
-    
+
     //Check if listing already exists
     const listingExists = await prisma.property.findUnique({
         where: {
@@ -85,21 +84,70 @@ export default async function handler(
         }
     }
 
-    // Upload images to supabase
-    async function uploadImages(images: string[]){
+    // Upload exterior image to supabase
+    async function uploadExteriorImage(exteriorImage: string[]) {
         let dataArray = [];
-        for(let i = 0; i < images.length; i++){
-            
-            const imageFile = Buffer.from(images[i].replace(/^data:image\/\w+;base64,/, ""), "base64");
+        for (let i = 0; i < images.length; i++) {
+            const exteriorImageFile = Buffer.from(
+                images[i].replace(/^data:image\/\w+;base64,/, ""),
+                "base64"
+            );
 
             const { data, error } = await supabase.storage
                 .from("property-images")
-                .upload(`${userID?.id}/images/${nanoid(10)}`, imageFile, { contentType: getImageType(images[i]) });
-            if(data){
+                .upload(
+                    `${userID?.id}/exteriorImage/${nanoid(10)}`,
+                    exteriorImageFile,
+                    { contentType: getImageType(exteriorImage[i]) }
+                );
+            if (data) {
                 console.log(data.path);
                 dataArray.push(data.path);
+            } else if (error) {
+                console.log(error);
+            }
+        }
+        return dataArray;
+    }
 
-            } else if(error){
+    async function uploadImages(images: string[], exteriorImage: string[]) {
+        let dataArray = [];
+        // Upload exterior image first so that it will always be the first image in the array and then upload the rest of the images from images array
+        for (let i = 0; i < exteriorImage.length; i++) {
+            const exteriorImageFile = Buffer.from(
+                exteriorImage[i].replace(/^data:image\/\w+;base64,/, ""),
+                "base64"
+            );
+
+            const { data, error } = await supabase.storage
+                .from("property-images")
+                .upload(
+                    `${userID?.id}/images/${nanoid(10)}`,
+                    exteriorImageFile,
+                    { contentType: getImageType(exteriorImage[i]) }
+                );
+            if (data) {
+                console.log(data.path);
+                dataArray.push(data.path);
+            } else if (error) {
+                console.log(error);
+            }
+        }
+        for (let i = 0; i < images.length; i++) {
+            const imageFile = Buffer.from(
+                images[i].replace(/^data:image\/\w+;base64,/, ""),
+                "base64"
+            );
+
+            const { data, error } = await supabase.storage
+                .from("property-images")
+                .upload(`${userID?.id}/images/${nanoid(10)}`, imageFile, {
+                    contentType: getImageType(images[i]),
+                });
+            if (data) {
+                console.log(data.path);
+                dataArray.push(data.path);
+            } else if (error) {
                 console.log(error);
             }
         }
@@ -107,19 +155,23 @@ export default async function handler(
     }
 
     // Upload floorplans to supabase
-    async function uploadFloorPlan(floorPlan: string[]){
+    async function uploadFloorPlan(floorPlan: string[]) {
         let dataArray = [];
-        for(let i = 0; i < floorPlan.length; i++){
-
-            const imageFile = Buffer.from(floorPlan[i].replace(/^data:image\/\w+;base64,/, ""), "base64");
+        for (let i = 0; i < floorPlan.length; i++) {
+            const imageFile = Buffer.from(
+                floorPlan[i].replace(/^data:image\/\w+;base64,/, ""),
+                "base64"
+            );
 
             const { data, error } = await supabase.storage
                 .from("property-images")
-                .upload(`${userID?.id}/floorplans/${nanoid(10)}`, imageFile, { contentType: getImageType(floorPlan[i]) });
-            if(data){
+                .upload(`${userID?.id}/floorplans/${nanoid(10)}`, imageFile, {
+                    contentType: getImageType(floorPlan[i]),
+                });
+            if (data) {
                 console.log(data.path);
                 dataArray.push(data.path);
-            } else if(error){
+            } else if (error) {
                 console.log(error);
             }
         }
@@ -131,7 +183,6 @@ export default async function handler(
         .create({
             data: {
                 price: price,
-                size: size,
                 bedrooms: bedrooms,
                 bathrooms: bathrooms,
                 houseType: houseType,
@@ -143,7 +194,7 @@ export default async function handler(
                 description: description,
                 contactNumber: contactNumber,
                 contactEmail: contactEmail,
-                images: await uploadImages(images),
+                images: await uploadImages(images, exteriorImage),
                 floorPlan: await uploadFloorPlan(floorPlan),
                 user: {
                     connect: {
@@ -160,13 +211,12 @@ export default async function handler(
 
     // Return listing
     return res.status(200).json({ listing: listing });
-
 }
 
 export const config = {
     api: {
         bodyParser: {
-            sizeLimit: '50mb' // Set desired value here
-        }
-    }
-}
+            sizeLimit: "50mb", // Set desired value here
+        },
+    },
+};

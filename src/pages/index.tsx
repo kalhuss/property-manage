@@ -6,6 +6,7 @@ import { FC } from "react";
 import { NextApiRequest } from "next";
 import NavBar from "../components/NavBar";
 import Image from "next/image";
+import Background from "../components/Backgrounds";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -31,27 +32,25 @@ export default function Home() {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <div className="relative">
-                <NavBar isLoggedIn={!!session} />
 
-                <Image
-                    src="/assets/interiordesign.jpg"
-                    alt="Interior Design"
-                    width="0"
-                    height="0"
-                    sizes="100vw"
-                    className="w-full h-screen"
-                />
-                <div className="absolute top-52 left-0 w-full h-1/2 flex m-50 items-center justify-center z-0">
-                    <h1 className="absolute top-28 text-center font-bold text-white text-4xl">
-                        Experience the joy of finding your perfect home
-                    </h1>
-                    <Link href="/properties">
-                        <button className="px-8 py-3 mt-44 bg-white bg-opacity-75 text-blue-500 font-bold text-3xl rounded-md hover:shadow-lg hover:bg-transparent hover:border-white hover:text-white border-2 border-blue-500">
-                            Properties
-                        </button>
-                    </Link>
-                </div>
+            <NavBar isLoggedIn={!!session} />
+            <Image
+                src="/assets/interiordesign.jpg"
+                alt="Interior Design"
+                width="0"
+                height="0"
+                sizes="100vw"
+                className="w-full h-screen absolute -z-10"
+            />
+            <div className="w-full items-center justify-center flex flex-col pt-20">
+                <h1 className="text-center font-bold text-white text-4xl pt-36">
+                    Experience the joy of finding your perfect home
+                </h1>
+                <Link href="/properties">
+                    <button className="px-8 py-3 mt-44 bg-white bg-opacity-75 text-blue-500 font-bold text-3xl rounded-md hover:shadow-lg hover:bg-transparent hover:border-white hover:text-white border-2 border-blue-500">
+                        Properties
+                    </button>
+                </Link>
             </div>
         </>
     );
@@ -59,4 +58,3 @@ export default function Home() {
 
 // // Authorised User
 // const User: FC<sessionProps> = ({ session }) => {
-

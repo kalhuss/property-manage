@@ -22,7 +22,7 @@ const Navbar: NextPage<NavbarProps> = ({ isLoggedIn }) => {
     };
 
     return (
-        <nav className="flex items-center justify-between flex-wrap bg-white bg-opacity-80 p-6 px-10 w-full fixed z-2">
+        <nav className="flex items-center justify-between flex-wrap bg-white bg-opacity-80 p-6 px-10 w-full fixed z-20">
             <div className="flex items-center flex-shrink-0 text-black mr-6">
                 <Link href="/">
                     <div className="block group text-lg mt-4 lg:inline-block lg:mt-0 font-bold text-black relative">

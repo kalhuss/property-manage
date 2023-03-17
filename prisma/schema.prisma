@@ -23,7 +23,6 @@ model Property {
   id            String   @id @default(uuid())
   propertyID    Int      @unique @default(autoincrement())
   price         String
-  size          String
   bedrooms      String
   bathrooms     String
   houseType     String

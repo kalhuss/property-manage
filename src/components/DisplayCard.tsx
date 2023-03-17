@@ -20,8 +20,7 @@ const DisplayCard: NextPage<PropertyProps> = ({ properties }) => {
                     className="bg-white p-6 rounded-lg shadow-lg mb-6 cursor-default grid grid-cols-2 group hover:drop-shadow-md w-4/12 md:mx-auto"
                 >
                     <div className="relative h-48 w-48 md:h-64 md:w-64 rounded-t-lg overflow-hidden mb-4 place-items-center mx-auto">
-                        {/* <img className="absolute inset-0 h-full w-full object-cover" src={CDN + property.images[0]} alt={property.address} /> */}
-                        <Image src={CDN + property.images[1]} alt={property.address} width="0" height="0" sizes="100vw" className="absolute inset-0 h-full w-full object-cover" />
+                        <Image src={CDN + property.images[0]} alt={property.address} width="0" height="0" sizes="100vw" className="absolute inset-0 h-full w-full object-cover" />
                     </div>
                     <div className="flex flex-col flex-grow justify-center">
                         <h1 className="text-2xl font-medium mb-2">
@@ -30,7 +29,6 @@ const DisplayCard: NextPage<PropertyProps> = ({ properties }) => {
                         <p className="text-gray-400 mb-4">{`${property.bedrooms} bed, ${property.bathrooms} bathroom ${property.houseType} for sale`}</p>
                         <p className="mb-4 text-lg">{property.address}</p>
                         <Link href={`/properties/${property.propertyID}`}>
-                            {/* <div className="w-36 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded text-center"> */}
                             <button className="px-8 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-transparent hover:bg-blue-500 hover:text-white border-2 border-blue-500">
                                 View Details
                             {/* </div> */}

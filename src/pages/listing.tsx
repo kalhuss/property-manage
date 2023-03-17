@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { getSession, useSession, signOut } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import Image from "next/image";
+import Router from "next/router";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -15,6 +16,7 @@ type sessionProps = {
 
 const Listing: FC<sessionProps> = () => {
     const { data: session, status } = useSession();
+    let exteriorImage: string[] = [];
     let images: string[] = [];
     let floorPlans: string[] = [];
 
@@ -33,17 +35,18 @@ const Listing: FC<sessionProps> = () => {
             description: "",
             contactNumber: "",
             contactEmail: "",
+            exteriorImage: exteriorImage,
             images: images,
             floorPlan: floorPlans,
             email: session?.user?.email,
         },
         onSubmit: async (values) => {
             //call the createListing api
-            console.log(values.images);
             fetch("/api/createListing", {
                 method: "POST",
                 body: JSON.stringify(values),
             });
+            Router.push("/properties");
         },
     });
 
@@ -69,6 +72,31 @@ const Listing: FC<sessionProps> = () => {
             fr.readAsDataURL(file);
         });
     }
+
+    async function encodeExteriorImage(e: ChangeEvent<HTMLInputElement>) {
+        let files = e.target.files!;
+        let readers = [];
+
+        // Abort if there were no files selected
+        if (!files.length) return;
+
+        // Store promises in array
+        for (let i = 0; i < files.length; i++) {
+            readers.push(readFileAsText(files[i]));
+        }
+
+        // Trigger Promises
+        Promise.all(readers).then((exteriorImage) => {
+            // Values will be an array that contains an item
+            // with the text of every selected file
+            // ["File1 Content", "File2 Content" ... "FileN Content"]
+            formik.setValues((values) => ({
+                ...values,
+                exteriorImage: exteriorImage as string[],
+            }));
+        });
+    }
+
 
     async function encodeImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
@@ -141,10 +169,10 @@ const Listing: FC<sessionProps> = () => {
                     width="0"
                     height="0"
                     sizes="100vw"
-                    className="w-full h-screen opacity-100"
+                    className="w-full h-screen absolute -z-10"
                 />
-                <div className="absolute top-52 left-0 w-full h-4/6 flex m-50 items-center justify-center z-0">
-                    <div className="p-10 w-3/6 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center">
+                <div className="w-full items-center justify-center flex flex-col pt-24">
+                    <div className="p-5 w-3/6 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center">
                         <div className="flex flex-col">
                             {/* Title */}
                             <h1 className="text-4xl font-bold text-center">
@@ -311,6 +339,22 @@ const Listing: FC<sessionProps> = () => {
                                             )}
                                         />
                                     </div>
+                                    
+                                    {/* Exterior Images */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor="exteriorImage" className="font-bold">Exterior Image</label>
+                                        <input
+                                            type={"file"}
+                                            accept={
+                                                "image/png, image/jpg, image/jpeg"
+                                            }
+                                            className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 dark:border-neutral-600 bg-clip-padding py-[0.32rem] px-3 text-base font-normal text-neutral-700 dark:text-neutral-200 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 dark:file:bg-neutral-700 file:px-3 file:py-[0.32rem] file:text-neutral-700 dark:file:text-neutral-100 file:transition file:duration-150 file:ease-in-out file:[margin-inline-end:0.75rem] file:[border-inline-end-width:1px] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-[0_0_0_1px] focus:shadow-primary focus:outline-none"
+                                            onChange={(e) => {
+                                                encodeExteriorImage(e);
+                                            }}
+                                        />
+                                    </div>
+
 
                                     {/* Images */}
                                     <div className="flex flex-col">

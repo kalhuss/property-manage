@@ -8,6 +8,7 @@ import { GetServerSideProps } from "next";
 import prisma from "../../prisma/prisma";
 import { User } from "@prisma/client";
 import { useState } from "react";
+import Background from '@/components/Backgrounds';
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -33,7 +34,7 @@ const Profile: NextPage<UserProps> = ({ user }) => {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <div className="relative">
+
                 <NavBar isLoggedIn={!!session} />
 
                 <Image
@@ -42,17 +43,27 @@ const Profile: NextPage<UserProps> = ({ user }) => {
                     width="0"
                     height="0"
                     sizes="100vw"
-                    className="w-full h-screen"
+                    className="w-full h-screen absolute -z-10"
                 />
-                <div className="absolute top-52 left-0 w-full h-1/2 flex m-50 items-center justify-center z-0">
-                    {/* If session then show user */}
-                    {session ? (
-                        <UserDisplay user={user} />
-                    ) : (
-                        <Guest />
-                    )}
+                <div className="pt-20">
+                    <div className='pt-20 w-full flex justify-center'>
+                        {/* If session then show user */}
+                        {session ? (
+                            <UserDisplay user={user} />
+                        ) : (
+                            <Guest />
+                        )}
+                    </div>
                 </div>
-            </div>
+
+            {/* <Background />
+            <NavBar isLoggedIn={!!session} />
+
+            <div className="pt-20">
+                <div className="flex justify-center pt-64">
+                    {session ? <UserDisplay user={user} /> : <Guest />}
+                </div>
+            </div> */}
         </div>
     );
 };
