@@ -6,6 +6,8 @@ import { getSession, useSession, signOut } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import Image from "next/image";
 import Router from "next/router";
+import KeyFeaturesInput from "../components/KeyFeaturesInput";
+import { useState } from "react";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -19,6 +21,7 @@ const Listing: FC<sessionProps> = () => {
     let exteriorImage: string[] = [];
     let images: string[] = [];
     let floorPlans: string[] = [];
+    const [tags, setTags] = useState<string[]>([]);
 
     const formik = useFormik({
         initialValues: {
@@ -31,7 +34,7 @@ const Listing: FC<sessionProps> = () => {
             tenure: "",
             taxBand: "",
             rent: "",
-            keyFeatures: "",
+            keyFeatures: [],
             description: "",
             contactNumber: "",
             contactEmail: "",
@@ -169,10 +172,10 @@ const Listing: FC<sessionProps> = () => {
                     width="0"
                     height="0"
                     sizes="100vw"
-                    className="w-full h-screen absolute -z-10"
+                    className="w-full h-screen bg-repeat absolute -z-10"
                 />
                 <div className="w-full items-center justify-center flex flex-col pt-24">
-                    <div className="p-5 w-3/6 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center">
+                    <div className="p-5 w-3/6 bg-white rounded-lg shadow-lg flex flex-col">
                         <div className="flex flex-col">
                             {/* Title */}
                             <h1 className="text-4xl font-bold text-center">
@@ -184,6 +187,11 @@ const Listing: FC<sessionProps> = () => {
                                 <form
                                     className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
                                     onSubmit={formik.handleSubmit}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                 >
                                     {/* Price */}
                                     <div className="flex flex-col">
@@ -283,29 +291,18 @@ const Listing: FC<sessionProps> = () => {
                                             {...formik.getFieldProps("rent")}
                                         />
                                     </div>
-
+                                    
                                     {/* Key Features */}
-                                    <div className="flex flex-col">
-                                        <label htmlFor="keyFeatures" className="font-bold">
-                                            Key Features
-                                        </label>
-                                        <input
-                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
-                                            type="text"
-                                            {...formik.getFieldProps(
-                                                "keyFeatures"
-                                            )}
-                                        />
-                                    </div>
+                                    <KeyFeaturesInput setFieldValue={formik.setFieldValue}/>
 
                                     {/* Description */}
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col row-span-2">
                                         <label htmlFor="description" className="font-bold">
                                             Description
                                         </label>
-                                        <input
-                                            className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
-                                            type="text"
+                                        <textarea
+                                            className="p-1 border h-full resize-none rounded-lg bg-gray-50 border-gray-300 text-gray-900"
+                                            // type="text"
                                             {...formik.getFieldProps(
                                                 "description"
                                             )}

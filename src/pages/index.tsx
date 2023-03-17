@@ -6,7 +6,7 @@ import { FC } from "react";
 import { NextApiRequest } from "next";
 import NavBar from "../components/NavBar";
 import Image from "next/image";
-import Background from "../components/Backgrounds";
+import KeyFeaturesInput from "../components/KeyFeaturesInput";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;

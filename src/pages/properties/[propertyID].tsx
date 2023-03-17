@@ -130,6 +130,26 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                             <p className="text-lg mb-2">
                                 Tax Band: {property.taxBand}
                             </p>
+                            <div className="flex flex-col border-t-2">
+                                <p className="text-lg mb-2 mt-2">Key Features:</p>
+                                <div className="flex flex-wrap">
+                                    {property.keyFeatures.map(
+                                        (feature, index) => (
+                                            <div
+                                                className="flex items-center mr-5 mb-2"
+                                                key={index}
+                                            >
+                                                <span className="mr-1">
+                                                    &#8226;
+                                                </span>
+                                                <p className="text-lg">
+                                                    {feature}
+                                                </p>
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            </div>
                             <div className="border-t border-b pt-2 mt-2 mb-4">
                                 <p className="text-lg mb-1">Description:</p>
                                 <p className="text-lg">

@@ -1,6 +1,5 @@
 import React from "react";
 import { Property } from "@prisma/client";
-import { NextPage } from "next";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -10,7 +9,7 @@ interface PropertyProps {
 
 let CDN = "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
 
-const DisplayCard: NextPage<PropertyProps> = ({ properties }) => {
+const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
 
     return (
         <div className="grid grid-cols-1 gap-6 font-mono">

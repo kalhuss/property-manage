@@ -30,7 +30,7 @@ model Property {
   tenure        String
   taxBand       String
   rent          String
-  keyFeatures   String
+  keyFeatures   String[]
   description   String   @db.Text
   contactNumber String
   contactEmail  String

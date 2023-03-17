@@ -42,7 +42,7 @@ export default async function handler(
         tenure: string;
         taxBand: string;
         rent: string;
-        keyFeatures: string;
+        keyFeatures: string[];
         description: string;
         contactNumber: string;
         contactEmail: string;

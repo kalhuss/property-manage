@@ -1,8 +1,6 @@
-import { getSession, useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
-import { NextPage } from "next";
-import Image from "next/image";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import Router from "next/router";
 
@@ -10,7 +8,7 @@ type NavbarProps = {
     isLoggedIn: boolean;
 };
 
-const Navbar: NextPage<NavbarProps> = ({ isLoggedIn }) => {
+const Navbar: React.FC<NavbarProps> = ({ isLoggedIn }) => {
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
     const handleProfileMenuOpen = () => {
