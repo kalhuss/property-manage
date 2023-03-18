@@ -15,6 +15,23 @@ type sessionProps = {
     session: Session;
 };
 
+// TODO: Fix Register page -> the input fields are going outside of the container
+// TODO: When user does incorrect login details, it should not show the error message but instead just let them try again
+// TODO: Fix the user hover in the navbar
+// TODO: Show the time of creation of the listing on the DisplayCard
+// TODO: Show the time of creation of the listing on the property[id] page
+// TODO: Find a way to speed up image loading
+// TODO: Find a way to load the new listing without refreshing the page
+// TODO: Add a map to the property page
+// TODO: Implement the offer system
+// TODO: Error handle all the new listing inputs -> make sure that the correct types and update the database
+// TODO: Add a way to edit/delete the listing -> only the user who created the listing can edit/delete it
+// TODO: Let users edit their profile details
+// TODO: Add a filter system to the properties page
+// TODO: Add a payment system
+// TODO: Add a digital contract and a way to sign it
+// TODO: Change the X button on the KeyFeaturesInput 
+
 export default function Home() {
     const { data: session, status } = useSession();
 

@@ -124,7 +124,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     {property.bathrooms} bathroom
                                 </p>
                                 <p className="text-lg mr-1">
-                                    {property.houseType} for {property.tenure}
+                                    {property.houseType} {property.tenure}
                                 </p>
                             </div>
                             <p className="text-lg mb-2">
