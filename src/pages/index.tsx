@@ -1,12 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useState } from "react";
-import { getSession, useSession, signOut } from "next-auth/react";
-import { FC } from "react";
-import { NextApiRequest } from "next";
+import { useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import Image from "next/image";
-import KeyFeaturesInput from "../components/KeyFeaturesInput";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -18,8 +14,6 @@ type sessionProps = {
 // TODO: Fix Register page -> the input fields are going outside of the container
 // TODO: When user does incorrect login details, it should not show the error message but instead just let them try again
 // TODO: Fix the user hover in the navbar
-// TODO: Show the time of creation of the listing on the DisplayCard
-// TODO: Show the time of creation of the listing on the property[id] page
 // TODO: Find a way to speed up image loading
 // TODO: Find a way to load the new listing without refreshing the page
 // TODO: Add a map to the property page

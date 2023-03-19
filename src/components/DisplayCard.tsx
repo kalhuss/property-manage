@@ -25,14 +25,16 @@ const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
                         <h1 className="text-2xl font-medium mb-2">
                             £{property.price}
                         </h1>
-                        <p className="text-gray-400 mb-4">{`${property.bedrooms} bed, ${property.bathrooms} bathroom ${property.houseType} ${property.tenure}`}</p>
+                        <p className="text-gray-600 mb-4">{`${property.bedrooms} bed, ${property.bathrooms} bathroom ${property.houseType} ${property.tenure}`}</p>
                         <p className="mb-4 text-lg">{property.address}</p>
+                        
                         <Link href={`/properties/${property.propertyID}`}>
-                            <button className="px-8 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-transparent hover:bg-blue-500 hover:text-white border-2 border-blue-500">
+                            <button className="mb-4 px-8 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-transparent hover:bg-blue-500 hover:text-white border-2 border-blue-500">
                                 View Details
                             {/* </div> */}
                             </button>
                         </Link>
+                        <p className="mb-4 text-sm text-gray-600">Listed on: {property.createdAt.toString().substring(0, property.createdAt.toString().indexOf('T'))}</p>
                     </div>
                 </div>
             ))}

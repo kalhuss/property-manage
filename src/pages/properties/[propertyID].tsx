@@ -156,6 +156,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     {property.description}
                                 </p>
                             </div>
+                            <p className="mb-4 text-sm text-gray-600">Listed on: {property.createdAt.toString().substring(0, property.createdAt.toString().indexOf('T'))}</p>
                         </div>
                         <div className="relative">
                             <div className="bg-white shadow-lg p-4 mb-4 h-fit">
