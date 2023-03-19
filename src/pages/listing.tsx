@@ -23,6 +23,7 @@ const Listing: FC<sessionProps> = () => {
     let exteriorImage: string[] = [];
     let images: string[] = [];
     let floorPlans: string[] = [];
+    let panoramicImages: string[] = [];
 
     const formik = useFormik({
         initialValues: {
@@ -41,6 +42,7 @@ const Listing: FC<sessionProps> = () => {
             contactEmail: "",
             exteriorImage: exteriorImage,
             images: images,
+            panoramicImages: panoramicImages,
             floorPlan: floorPlans,
             email: session?.user?.email,
         },
@@ -125,6 +127,31 @@ const Listing: FC<sessionProps> = () => {
             }));
         });
     }
+
+    async function encodePanoramicImage(e: ChangeEvent<HTMLInputElement>) {
+        let files = e.target.files!;
+        let readers = [];
+
+        // Abort if there were no files selected
+        if (!files.length) return;
+
+        // Store promises in array
+        for (let i = 0; i < files.length; i++) {
+            readers.push(readFileAsText(files[i]));
+        }
+
+        // Trigger Promises
+        Promise.all(readers).then((image) => {
+            // Values will be an array that contains an item
+            // with the text of every selected file
+            // ["File1 Content", "File2 Content" ... "FileN Content"]
+            formik.setValues((values) => ({
+                ...values,
+                panoramicImages: image as string[],
+            }));
+        });
+    }
+
 
     async function encodeFloorPlan(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
@@ -236,6 +263,10 @@ const Listing: FC<sessionProps> = () => {
 
                                     {/* Images */}
                                     <ListingFileUpload labelName="Images" onChange={encodeImage} />
+
+
+                                    {/* Panoramic Images */}
+                                    <ListingFileUpload labelName="Panoramic Images" onChange={encodePanoramicImage} />
 
                                     {/* Floor Plan */}
                                     <ListingFileUpload labelName="Floor Plan" onChange={encodeFloorPlan} />

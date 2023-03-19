@@ -31,6 +31,7 @@ export default async function handler(
         contactEmail,
         exteriorImage,
         images,
+        panoramicImages,
         floorPlan,
         email,
     }: {
@@ -48,6 +49,7 @@ export default async function handler(
         contactEmail: string;
         exteriorImage: string[];
         images: string[];
+        panoramicImages: string[];
         floorPlan: string[];
         email: string;
     } = JSON.parse(req.body);
@@ -85,20 +87,20 @@ export default async function handler(
     }
 
     // Upload exterior image to supabase
-    async function uploadExteriorImage(exteriorImage: string[]) {
+    async function uploadPanoramicImages(panoramicImages: string[]) {
         let dataArray = [];
-        for (let i = 0; i < images.length; i++) {
-            const exteriorImageFile = Buffer.from(
-                images[i].replace(/^data:image\/\w+;base64,/, ""),
+        for (let i = 0; i < panoramicImages.length; i++) {
+            const panoramicImagesFile = Buffer.from(
+                panoramicImages[i].replace(/^data:image\/\w+;base64,/, ""),
                 "base64"
             );
 
             const { data, error } = await supabase.storage
                 .from("property-images")
                 .upload(
-                    `${userID?.id}/exteriorImage/${nanoid(10)}`,
-                    exteriorImageFile,
-                    { contentType: getImageType(exteriorImage[i]) }
+                    `${userID?.id}/panoramicImages/${nanoid(10)}`,
+                    panoramicImagesFile,
+                    { contentType: getImageType(panoramicImages[i]) }
                 );
             if (data) {
                 console.log(data.path);
@@ -195,6 +197,7 @@ export default async function handler(
                 contactNumber: contactNumber,
                 contactEmail: contactEmail,
                 images: await uploadImages(images, exteriorImage),
+                panoramicImages: await uploadPanoramicImages(panoramicImages),
                 floorPlan: await uploadFloorPlan(floorPlan),
                 user: {
                     connect: {

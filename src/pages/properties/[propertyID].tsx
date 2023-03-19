@@ -9,6 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import Background from "@/components/Backgrounds";
+import PanoramaViewer from "@/components/PanoramaViewer";
 
 interface PropertyPageProps {
     property: Property;
@@ -29,35 +30,30 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [currentFloorPlanIndex, setCurrentFloorPlanIndex] = useState(0);
 
+    const imageSliderLength =
+        property.images.length + property.panoramicImages.length;
+    const floorPlanSliderLength = property.floorPlan.length;
+
     function handleNextImage() {
-        setCurrentImageIndex(
-            currentImageIndex === property.images.length - 1
-                ? 0
-                : currentImageIndex + 1
-        );
+        setCurrentImageIndex((currentImageIndex + 1) % imageSliderLength);
     }
 
     function handlePrevImage() {
         setCurrentImageIndex(
-            currentImageIndex === 0
-                ? property.images.length - 1
-                : currentImageIndex - 1
+            (currentImageIndex - 1 + imageSliderLength) % imageSliderLength
         );
     }
 
     function handleNextFloorPlan() {
         setCurrentFloorPlanIndex(
-            currentFloorPlanIndex === property.floorPlan.length - 1
-                ? 0
-                : currentFloorPlanIndex + 1
+            (currentFloorPlanIndex + 1) % floorPlanSliderLength
         );
     }
 
     function handlePrevFloorPlan() {
         setCurrentFloorPlanIndex(
-            currentFloorPlanIndex === 0
-                ? property.floorPlan.length - 1
-                : currentFloorPlanIndex - 1
+            (currentFloorPlanIndex - 1 + floorPlanSliderLength) %
+                floorPlanSliderLength
         );
     }
 
@@ -83,15 +79,32 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                 <div className="grid grid-cols-2 gap-2">
                     <div className="grid grid-flow-row mb-3">
                         <div className="relative">
-                            <Image
-                                src={CDN + property.images[currentImageIndex]}
-                                alt={property.address}
-                                width="0"
-                                height="0"
-                                sizes="100vw"
-                                className="w-full h-auto object-cover aspect-square -z-10"
-                            />
-                            {property.images.length > 1 && (
+                            {currentImageIndex < property.images.length ? (
+                                <Image
+                                    src={
+                                        CDN + property.images[currentImageIndex]
+                                    }
+                                    alt={property.address}
+                                    width="0"
+                                    height="0"
+                                    sizes="100vw"
+                                    className="w-full h-auto object-cover aspect-square -z-10"
+                                />
+                            ) : property.panoramicImages.length > 0 &&
+                                currentImageIndex >= property.images.length ? (
+                                <PanoramaViewer
+                                    image={
+                                        CDN +
+                                        property.panoramicImages[
+                                            currentImageIndex -
+                                                property.images.length
+                                        ]
+                                    }
+                                />
+                            ) : null}
+                            {property.images.length +
+                                property.panoramicImages.length >
+                                1 && (
                                 <div className="absolute top-1/2 left-0 right-0 bottom-0">
                                     <button
                                         onClick={handlePrevImage}
@@ -109,6 +122,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                 </div>
                             )}
                         </div>
+
                         <div className="bg-white shadow-lg p-4 mb- h-fit flex-col">
                             <p className="text-2xl font-extrabold mb-2">
                                 £{property.price}
@@ -131,7 +145,9 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                 Tax Band: {property.taxBand}
                             </p>
                             <div className="flex flex-col border-t-2">
-                                <p className="text-lg mb-2 mt-2">Key Features:</p>
+                                <p className="text-lg mb-2 mt-2">
+                                    Key Features:
+                                </p>
                                 <div className="flex flex-wrap">
                                     {property.keyFeatures.map(
                                         (feature, index) => (
@@ -156,7 +172,17 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     {property.description}
                                 </p>
                             </div>
-                            <p className="mb-4 text-sm text-gray-600">Listed on: {property.createdAt.toString().substring(0, property.createdAt.toString().indexOf('T'))}</p>
+                            <p className="mb-4 text-sm text-gray-600">
+                                Listed on:{" "}
+                                {property.createdAt
+                                    .toString()
+                                    .substring(
+                                        0,
+                                        property.createdAt
+                                            .toString()
+                                            .indexOf("T")
+                                    )}
+                            </p>
                         </div>
                         <div className="relative">
                             <div className="bg-white shadow-lg p-4 mb-4 h-fit">
