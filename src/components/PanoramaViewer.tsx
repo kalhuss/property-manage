@@ -84,6 +84,11 @@ const PanoramaViewer: React.FC<PanoramicImage> = ({ image }) => {
     return (
         <div className="w-full h-auto aspect-square -z-10">
             <canvas ref={canvasRef} className="w-full h-full aspect-video" />
+            {isLoading && (
+                <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center bg-gray-500 bg-opacity-75">
+                    <p className="text-white font-bold text-xl">Loading...</p>
+                </div>
+            )}
         </div>
     );
 };

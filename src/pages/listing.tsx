@@ -24,7 +24,7 @@ const Listing: FC<sessionProps> = () => {
     let images: string[] = [];
     let floorPlans: string[] = [];
     let panoramicImages: string[] = [];
-
+    
     const formik = useFormik({
         initialValues: {
             price: "",

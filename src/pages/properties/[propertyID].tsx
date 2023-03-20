@@ -89,9 +89,10 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     height="0"
                                     sizes="100vw"
                                     className="w-full h-auto object-cover aspect-square -z-10"
+                                    priority={true}
                                 />
                             ) : property.panoramicImages.length > 0 &&
-                                currentImageIndex >= property.images.length ? (
+                              currentImageIndex >= property.images.length ? (
                                 <PanoramaViewer
                                     image={
                                         CDN +
@@ -119,6 +120,10 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     >
                                         {">"}
                                     </button>
+                                    <div className="absolute bottom-2 left-2 text-white bg-gray-700 bg-opacity-50 p-2">
+                                        {currentImageIndex + 1} /{" "}
+                                        {imageSliderLength}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -184,8 +189,8 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     )}
                             </p>
                         </div>
-                        <div className="relative">
-                            <div className="bg-white shadow-lg p-4 mb-4 h-fit">
+                        <div className="relative bg-white shadow-lg p-4">
+                            {/* <div className="bg-white shadow-lg p-4 mb-4 h-fit"> */}
                                 <Image
                                     src={
                                         CDN +
@@ -199,7 +204,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     sizes="100vw"
                                     className="w-full h-auto object-scale-down aspect-square -z-10"
                                 />
-                            </div>
+                            {/* </div> */}
                             {property.floorPlan.length > 1 && (
                                 <div className="absolute top-1/2 left-0 right-0 bottom-0">
                                     <button
@@ -215,6 +220,10 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     >
                                         {">"}
                                     </button>
+                                    <div className="absolute bottom-2 left-2 text-white bg-gray-700 bg-opacity-50 p-2">
+                                        {currentFloorPlanIndex + 1} /{" "}
+                                        {floorPlanSliderLength}
+                                    </div>
                                 </div>
                             )}
                         </div>
