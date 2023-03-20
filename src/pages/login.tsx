@@ -109,7 +109,7 @@ const Login: FC = () => {
                 </form>
 
                 <p className="text-center text-gray-400">
-                    Don't have an account?{" "}
+                    Dont have an account?{" "}
                     <Link href={"/register"} className="text-blue-700">
                         Sign Up
                     </Link>

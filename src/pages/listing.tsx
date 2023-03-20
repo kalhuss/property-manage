@@ -61,7 +61,7 @@ const Listing: FC<sessionProps> = () => {
             ...values,
             email: session?.user?.email || "",
         }));
-    }, [session?.user?.email]);
+    }, [session?.user?.email, formik]);
 
     function readFileAsText(file: File) {
         return new Promise(function (resolve, reject) {
