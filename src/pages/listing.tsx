@@ -56,12 +56,6 @@ const Listing: FC<sessionProps> = () => {
         },
     });
 
-    useEffect(() => {
-        formik.setValues((values) => ({
-            ...values,
-            email: session?.user?.email || "",
-        }));
-    }, [session?.user?.email, formik]);
 
     function readFileAsText(file: File) {
         return new Promise(function (resolve, reject) {
@@ -117,13 +111,13 @@ const Listing: FC<sessionProps> = () => {
         }
 
         // Trigger Promises
-        Promise.all(readers).then((image) => {
+        Promise.all(readers).then((images) => {
             // Values will be an array that contains an item
             // with the text of every selected file
             // ["File1 Content", "File2 Content" ... "FileN Content"]
             formik.setValues((values) => ({
                 ...values,
-                images: image as string[],
+                images: images as string[],
             }));
         });
     }
@@ -141,13 +135,13 @@ const Listing: FC<sessionProps> = () => {
         }
 
         // Trigger Promises
-        Promise.all(readers).then((image) => {
+        Promise.all(readers).then((panoramicImages) => {
             // Values will be an array that contains an item
             // with the text of every selected file
             // ["File1 Content", "File2 Content" ... "FileN Content"]
             formik.setValues((values) => ({
                 ...values,
-                panoramicImages: image as string[],
+                panoramicImages: panoramicImages as string[],
             }));
         });
     }
@@ -202,7 +196,7 @@ const Listing: FC<sessionProps> = () => {
                     sizes="100vw"
                     className="w-full h-screen bg-repeat absolute -z-10"
                 />
-                <div className="w-full items-center justify-center flex flex-col pt-24">
+                <div className="relative w-full items-center justify-center flex flex-col pt-24">
                     <div className="p-5 w-3/6 bg-white rounded-lg shadow-lg flex flex-col">
                         <div className="flex flex-col">
                             {/* Title */}

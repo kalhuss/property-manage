@@ -53,7 +53,7 @@ export default function Home() {
                 sizes="100vw"
                 className="w-full h-screen absolute -z-10"
             />
-            <div className="w-full items-center justify-center flex flex-col pt-20">
+            <div className="relative w-full items-center justify-center flex flex-col pt-20">
                 <h1 className="text-center font-bold text-white text-4xl pt-36">
                     Experience the joy of finding your perfect home
                 </h1>

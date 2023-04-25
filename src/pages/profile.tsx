@@ -45,7 +45,7 @@ const Profile: NextPage<UserProps> = ({ user }) => {
                     sizes="100vw"
                     className="w-full h-screen absolute -z-10"
                 />
-                <div className="pt-20">
+                <div className="relative pt-20">
                     <div className='pt-20 w-full flex justify-center'>
                         {/* If session then show user */}
                         {session ? (

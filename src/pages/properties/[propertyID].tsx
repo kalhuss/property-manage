@@ -10,9 +10,11 @@ import Image from "next/image";
 import { useState } from "react";
 import Background from "@/components/Backgrounds";
 import PanoramaViewer from "@/components/PanoramaViewer";
+import { User } from "@prisma/client";
 
 interface PropertyPageProps {
     property: Property;
+    user: User;
 }
 
 type Session = ReturnType<typeof useSession>["data"];
@@ -25,36 +27,37 @@ type sessionProps = {
 let CDN =
     "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
 
-const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
+const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
     const { data: session, status } = useSession();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [currentFloorPlanIndex, setCurrentFloorPlanIndex] = useState(0);
+    const [offerValue, setOfferValue] = useState("");
 
     const imageSliderLength =
         property.images.length + property.panoramicImages.length;
     const floorPlanSliderLength = property.floorPlan.length;
 
-    function handleNextImage() {
-        setCurrentImageIndex((currentImageIndex + 1) % imageSliderLength);
+    function handleNextImage(imageType: string) {
+        if (imageType === "image") {
+            setCurrentImageIndex((currentImageIndex + 1) % imageSliderLength);
+        } else if (imageType === "floorPlan") {
+            setCurrentFloorPlanIndex(
+                (currentFloorPlanIndex + 1) % floorPlanSliderLength
+            );
+        }
     }
 
-    function handlePrevImage() {
-        setCurrentImageIndex(
-            (currentImageIndex - 1 + imageSliderLength) % imageSliderLength
-        );
-    }
-
-    function handleNextFloorPlan() {
-        setCurrentFloorPlanIndex(
-            (currentFloorPlanIndex + 1) % floorPlanSliderLength
-        );
-    }
-
-    function handlePrevFloorPlan() {
-        setCurrentFloorPlanIndex(
-            (currentFloorPlanIndex - 1 + floorPlanSliderLength) %
-                floorPlanSliderLength
-        );
+    function handlePrevImage(imageType: string): void {
+        if (imageType === "image") {
+            setCurrentImageIndex(
+                (currentImageIndex - 1 + imageSliderLength) % imageSliderLength
+            );
+        } else if (imageType === "floorPlan") {
+            setCurrentFloorPlanIndex(
+                (currentFloorPlanIndex - 1 + floorPlanSliderLength) %
+                    floorPlanSliderLength
+            );
+        }
     }
 
     return (
@@ -88,11 +91,11 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                     width="0"
                                     height="0"
                                     sizes="100vw"
-                                    className="w-full h-auto object-cover aspect-square -z-10"
+                                    className="w-full h-auto object-cover -z-10"
                                     priority={true}
                                 />
                             ) : property.panoramicImages.length > 0 &&
-                              currentImageIndex >= property.images.length ? (
+                                currentImageIndex >= property.images.length ? (
                                 <PanoramaViewer
                                     image={
                                         CDN +
@@ -108,14 +111,14 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                 1 && (
                                 <div className="absolute top-1/2 left-0 right-0 bottom-0">
                                     <button
-                                        onClick={handlePrevImage}
+                                        onClick={() => handlePrevImage("image")}
                                         className="text-white bg-gray-700 opacity-80 hover:opacity-100 py-2 px-4 rounded-full mr-2 focus:outline-none absolute left-2"
                                     >
                                         {"<"}
                                     </button>
 
                                     <button
-                                        onClick={handleNextImage}
+                                        onClick={() => handleNextImage("image")}
                                         className="text-white bg-gray-700 opacity-80 hover:opacity-100 py-2 px-4 rounded-full mr-2 focus:outline-none absolute -right-0"
                                     >
                                         {">"}
@@ -190,32 +193,32 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                             </p>
                         </div>
                         <div className="relative bg-white shadow-lg p-4">
-                            {/* <div className="bg-white shadow-lg p-4 mb-4 h-fit"> */}
-                                <Image
-                                    src={
-                                        CDN +
-                                        property.floorPlan[
-                                            currentFloorPlanIndex
-                                        ]
-                                    }
-                                    alt={property.address}
-                                    width="0"
-                                    height="0"
-                                    sizes="100vw"
-                                    className="w-full h-auto object-scale-down aspect-square -z-10"
-                                />
-                            {/* </div> */}
+                            <Image
+                                src={
+                                    CDN +
+                                    property.floorPlan[currentFloorPlanIndex]
+                                }
+                                alt={property.address}
+                                width="0"
+                                height="0"
+                                sizes="100vw"
+                                className="w-full h-auto object-scale-down aspect-square -z-10"
+                            />
                             {property.floorPlan.length > 1 && (
                                 <div className="absolute top-1/2 left-0 right-0 bottom-0">
                                     <button
-                                        onClick={handlePrevFloorPlan}
+                                        onClick={() =>
+                                            handlePrevImage("floorPlan")
+                                        }
                                         className="text-white bg-gray-700 opacity-80 hover:opacity-100 py-2 px-4 rounded-full mr-2 focus:outline-none absolute left-2"
                                     >
                                         {"<"}
                                     </button>
 
                                     <button
-                                        onClick={handleNextFloorPlan}
+                                        onClick={() =>
+                                            handleNextImage("floorPlan")
+                                        }
                                         className="text-white bg-gray-700 opacity-80 hover:opacity-100 py-2 px-4 rounded-full mr-2 focus:outline-none absolute -right-0"
                                     >
                                         {">"}
@@ -263,10 +266,27 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
                                             type="text"
                                             placeholder="£"
                                             className="border border-gray-300 rounded-md p-2 mr-2"
+                                            value={offerValue}
+                                            onChange={(e) =>
+                                                setOfferValue(e.target.value)
+                                            }
+                                            disabled={
+                                                property.userId === user?.id
+                                            }
                                         />
-                                        <button className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg">
-                                            Make Offer
-                                        </button>
+                                        {property.userId === user?.id ? (
+                                            <button className="p-4 border-blue-500 border-2 text-blue-500 rounded-lg cursor-not-allowed opacity-50">
+                                                Make Offer
+                                            </button>
+                                        ) : (
+                                            <Link
+                                                href={`/properties/${property.propertyID}/offer?offerValue=${offerValue}`}
+                                            >
+                                                <button className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg" disabled = {!offerValue}>
+                                                    Make Offer
+                                                </button>
+                                            </Link>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -280,14 +300,24 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property }) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const id = context.params?.propertyID;
+    const session = await getSession(context);
     const property = await prisma.property.findFirst({
         where: {
             propertyID: parseInt(id as string),
         },
     });
 
+    const user = await prisma.user.findFirst({
+        where: {
+            email: session?.user?.email!,
+        },
+    });
+
     return {
-        props: { property: JSON.parse(JSON.stringify(property)) },
+        props: {
+            property: JSON.parse(JSON.stringify(property)),
+            user: JSON.parse(JSON.stringify(user)),
+        },
     };
 };
 
