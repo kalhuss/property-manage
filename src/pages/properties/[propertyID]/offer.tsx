@@ -43,10 +43,10 @@ const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
                 method: "POST",
                 body: JSON.stringify(values),
             });
-            // Router.push(
-            //     "/properties/[propertyID]",
-            //     `/properties/${property.propertyID}`
-            // );
+            Router.push(
+                "/properties/[propertyID]",
+                `/properties/${property.propertyID}`
+            );
         },
     });
 

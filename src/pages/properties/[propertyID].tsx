@@ -11,6 +11,7 @@ import { useState } from "react";
 import Background from "@/components/Backgrounds";
 import PanoramaViewer from "@/components/PanoramaViewer";
 import { User } from "@prisma/client";
+import BackArrow from "@/components/BackArrow";
 
 interface PropertyPageProps {
     property: Property;
@@ -70,15 +71,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
             <Background />
             <NavBar isLoggedIn={!!session} />
             <div className="container mx-auto px-4 pt-20">
-                <Link className="flex pb-5" href={"/properties"}>
-                    <span className="text-2xl font-bold mr-2">
-                        <BsArrowLeft />
-                    </span>
-                    <div className="block group text-lg mt-4 lg:inline-block lg:mt-0 font-bold text-black relative">
-                        Back to properties
-                        <span className="absolute bottom-0 group-hover:w-full left-0 w-0 h-0.5 bg-blue-500  transition-all duration-300 origin-left"></span>
-                    </div>
-                </Link>
+                <BackArrow label="Back to properties"/>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="grid grid-flow-row mb-3">
                         <div className="relative">
@@ -262,28 +255,50 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                         Offer
                                     </p>
                                     <div className="flex mb-2">
-                                        <input
-                                            type="text"
-                                            placeholder="£"
-                                            className="border border-gray-300 rounded-md p-2 mr-2"
-                                            value={offerValue}
-                                            onChange={(e) =>
-                                                setOfferValue(e.target.value)
-                                            }
-                                            disabled={
-                                                property.userId === user?.id
-                                            }
-                                        />
-                                        {property.userId === user?.id ? (
-                                            <button className="p-4 border-blue-500 border-2 text-blue-500 rounded-lg cursor-not-allowed opacity-50">
-                                                Make Offer
-                                            </button>
+                                        {user ? (
+                                            property.userId === user.id ? (
+                                                <Link
+                                                    href={`/properties/${property.propertyID}/checkOffers`}
+                                                >
+                                                    <button className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg">
+                                                        Check Offers
+                                                    </button>
+                                                </Link>
+                                            ) : (
+                                                <>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="£"
+                                                        className="border border-gray-300 rounded-md p-2 mr-2"
+                                                        value={offerValue}
+                                                        onChange={(e) =>
+                                                            setOfferValue(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            property.userId ===
+                                                            user?.id
+                                                        }
+                                                    />
+                                                    <Link
+                                                        href={`/properties/${property.propertyID}/offer?offerValue=${offerValue}`}
+                                                    >
+                                                        <button
+                                                            className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                                            disabled={
+                                                                !offerValue
+                                                            }
+                                                        >
+                                                            Make Offer
+                                                        </button>
+                                                    </Link>
+                                                </>
+                                            )
                                         ) : (
-                                            <Link
-                                                href={`/properties/${property.propertyID}/offer?offerValue=${offerValue}`}
-                                            >
-                                                <button className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg" disabled = {!offerValue}>
-                                                    Make Offer
+                                            <Link href={`/login`}>
+                                                <button className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg">
+                                                    Log in to make an offer
                                                 </button>
                                             </Link>
                                         )}
