@@ -38,14 +38,18 @@ const checkOffers: NextPage<CheckOffersPageProps> = ({
 }) => {
     const { data: session, status } = useSession();
     const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+    const [offersValue, setOffers] = useState<Offer[]>(offers);
 
     const handleOfferClick = (offer: Offer) => {
         setSelectedOffer(offer);
     };
 
-    const handleConfirmClick = () => {
-        // TODO: handle offer confirmation
-    };
+    async function handleConfirmClick() {
+        fetch("/api/updateOffers", {
+            method: "POST",
+            body: JSON.stringify({ offerId: selectedOffer?.id }),
+        });
+    }
 
     const handleCancelClick = () => {
         setSelectedOffer(null);
@@ -59,64 +63,78 @@ const checkOffers: NextPage<CheckOffersPageProps> = ({
                 <meta name="description" content={property.description} />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <div className = "container mx-auto p-5 pt-20">
+            <div className="container mx-auto p-5 pt-20">
                 <BackArrow label="Back" />
-                <h1 className = "text-4xl font-bold text-center mb-5">Offers</h1>
+                <h1 className="text-4xl font-bold text-center mb-5">Offers</h1>
                 <div className="bg-white rounded-lg shadow-lg p-4 mb-4 w-auto">
-                    <h2 className="text-2xl font-bold mb-4">{property.address}</h2>
+                    <h2 className="text-2xl font-bold mb-4">
+                        {property.address}
+                    </h2>
                     <p className="text-lg mb-2">Price: £{property.price}</p>
-                    <p className="text-lg mb-2">{property.bedrooms} Bedrooms, {property.bathrooms} Bathrooms</p>
+                    <p className="text-lg mb-2">
+                        {property.bedrooms} Bedrooms, {property.bathrooms}{" "}
+                        Bathrooms
+                    </p>
                     <p className="text-lg mb-2"></p>
                 </div>
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                    {offers.map((offer) => (
-                        <button
-                            key={offer.id}
-                            className={`${
-                                selectedOffer?.id === offer.id
-                                    ? "bg-green-200"
-                                    : "bg-white"
-                            } rounded-lg shadow-lg p-4`}
-                            onClick={() => handleOfferClick(offer)}
-                        >
-                            <p className="text-lg mb-2">
-                                {
-                                    users.filter(
-                                        (user) => user.id === offer.userId
-                                    )[0]?.name
-                                }{" "}
-                                {
-                                    users.filter(
-                                        (user) => user.id === offer.userId
-                                    )[0]?.surname
-                                }
-                            </p>
-                            <p className="text-lg mb-2">
-                                Offer amount: {offer.amount}
-                            </p>
-                            <p className="text-lg mb-2">
-                                Mortgage status: {offer.status}
-                            </p>
-                        </button>
-                    ))}
+                    {offers
+                        .filter(
+                            (offer) =>
+                                offer.offerStatus === "Pending" ||
+                                offer.offerStatus === "Accepted"
+                        )
+                        .map((offer) => (
+                            <button
+                                key={offer.id}
+                                className={`${
+                                    selectedOffer?.id === offer.id
+                                        ? "bg-green-200"
+                                        : "bg-white"
+                                } rounded-lg shadow-lg p-4 transition duration-300 group hover:shadow-2xl`}
+                                onClick={() => handleOfferClick(offer)}
+                            >
+                                <p className="text-lg mb-2">
+                                    {
+                                        users.filter(
+                                            (user) => user.id === offer.userId
+                                        )[0]?.name
+                                    }{" "}
+                                    {
+                                        users.filter(
+                                            (user) => user.id === offer.userId
+                                        )[0]?.surname
+                                    }
+                                </p>
+                                <p className="text-lg mb-2">
+                                    Offer amount: £{offer.amount}
+                                </p>
+                                <p className="text-lg mb-2">
+                                    Mortgage status: {offer.status}
+                                </p>
+                            </button>
+                        ))}
                 </div>
                 {selectedOffer && (
                     <div className="flex justify-end mt-4">
-                        <button
-                            className="bg-green-500 text-white font-bold py-2 px-4 rounded mr-4"
-                            onClick={handleConfirmClick}
-                        >
-                            Confirm
-                        </button>
-                        <button
-                            className="bg-red-500 text-white font-bold py-2 px-4 rounded"
-                            onClick={handleCancelClick}
-                        >
-                            Cancel
-                        </button>
+                        {selectedOffer.offerStatus === "Pending" && (
+                            <>
+                                <button
+                                    className="bg-green-500 text-white font-bold py-2 px-4 rounded mr-4"
+                                    onClick={handleConfirmClick}
+                                >
+                                    Confirm
+                                </button>
+                                <button
+                                    className="bg-red-500 text-white font-bold py-2 px-4 rounded"
+                                    onClick={handleCancelClick}
+                                >
+                                    Cancel
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
-                
             </div>
         </>
     );

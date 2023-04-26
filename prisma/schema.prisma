@@ -46,14 +46,15 @@ model Property {
 }
 
 model Offer {
-  id            String   @id @default(uuid())
-  amount        String
-  status        String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  property      Property @relation(fields: [propertyId], references: [id])
-  propertyId    String
-  user          User     @relation(fields: [userId], references: [id])
-  userId        String
-  mortgageImage String[]
+  id               String   @id @default(uuid())
+  amount           String
+  status           String
+  offerStatus      String   @default("Pending")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  property         Property @relation(fields: [propertyId], references: [id])
+  propertyId       String
+  user             User     @relation(fields: [userId], references: [id])
+  userId           String
+  mortgageImage    String[]
 }
