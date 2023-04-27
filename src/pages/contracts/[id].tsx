@@ -11,6 +11,9 @@ import Head from "next/head";
 import { getSession, useSession, signOut } from "next-auth/react";
 import NavBar from "../../components/NavBar";
 import blobStream from "blob-stream";
+import { useRef } from "react";
+import WebViewer from "@pdftron/webviewer";
+
 
 interface ContractPageProps {
     offers: Offer[];
@@ -30,44 +33,180 @@ const ContractPage: React.FC<ContractPageProps> = ({
     users,
     property,
 }) => {
-    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const [pdfUrl, setPdfUrl] = useState<string>("");
     const { data: session, status } = useSession();
 
+    const generatePdf = async () => {
+        const pdfDoc = await PDFDocument.create();
+        const form = pdfDoc.getForm()
+        const page = pdfDoc.addPage();
+
+        const textField = form.createTextField('signature')
+        textField.setMaxLength(7)
+        textField.isRequired()
+        
+        const headerText = "RESIDENTIAL LEASE AGREEMENT";
+        const footerText = "Page 1 of 1";
+
+        const terminationReasons = [
+            "Failure to pay rent on time",
+            "Violation of terms of the lease agreement",
+            "Damage to the property",
+            "Noise complaints from neighbors",
+            "Illegal activities on the property",
+            "Subleasing without permission",
+            "Unauthorized pets on the property",
+            "Excessive wear and tear on the property",
+            "Violent or threatening behavior towards other tenants or neighbors",
+            "Health or safety hazards on the property",
+        ];
+
+        // Add header to the PDF document
+        page.drawText(headerText, {
+            x: 100,
+            y: 750,
+            size: 24,
+            font: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
+            color: rgb(0, 0.53, 0.71),
+        });
+
+        // Add property information to the PDF document
+        page.drawText(`Property address: ${property.address}`, {
+            x: 100,
+            y: 700,
+            size: 14,
+            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+            color: rgb(0, 0, 0),
+        });
+
+
+        // Add tenant information to the PDF document
+        page.drawText(`Tenant name: ${users.name} ${users.surname}`, {
+            x: 100,
+            y: 680,
+            size: 14,
+            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+            color: rgb(0, 0, 0),
+        });
+
+        // Add lease terms to the PDF document
+        page.drawText("LEASE TERMS", {
+            x: 100,
+            y: 650,
+            size: 18,
+            font: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
+            color: rgb(0, 0.53, 0.71),
+        });
+
+        // Add rent amount to the PDF document
+        page.drawText(`Rent amount: ${property.rent}`, {
+            x: 100,
+            y: 620,
+            size: 14,
+            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+            color: rgb(0, 0, 0),
+        });
+
+        // Add termination clause to the PDF document
+        page.drawText("TERMINATION", {
+            x: 100,
+            y: 580,
+            size: 18,
+            font: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
+            color: rgb(0, 0.53, 0.71),
+        });
+
+        // Add termination notice period to the PDF document
+        page.drawText(`Termination notice period: 90 days`, {
+            x: 100,
+            y: 560,
+            size: 14,
+            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+            color: rgb(0, 0, 0),
+        });
+
+        // Draw the termination reasons on the page
+        page.drawText("Termination reasons:", {
+            x: 100,
+            y: 540,
+            size: 14,
+            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+            color: rgb(0, 0, 0),
+        });
+        terminationReasons.forEach((reason, index) => {
+            const yCoord = 520 - index * 20;
+            page.drawText(`${index + 1}. ${reason}`, {
+                x: 120,
+                y: yCoord,
+                size: 12,
+                //font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+                color: rgb(0, 0, 0),
+            });
+        });
+
+        // Add signature section to the PDF document
+        page.drawText("SIGNATURES", {
+            x: 100,
+            y: 200,
+            size: 18,
+            font: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
+            color: rgb(0, 0.53, 0.71),
+        });
+
+        page.drawText(`Tenant signature:`, {
+            x: 100,
+            y: 140,
+            size: 14,
+            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+            color: rgb(0, 0, 0),
+        });
+
+        textField.addToPage(page, { x: 220, y: 120 })
+
+
+        // Add footer to the PDF document
+        page.drawText(footerText, {
+            x: 450,
+            y: 50,
+            size: 12,
+            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+            color: rgb(0, 0, 0),
+        });
+
+        
+
+        // End the document and wait for the stream to finish
+        const pdfBytes = await pdfDoc.save();
+        const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+        setPdfUrl(URL.createObjectURL(pdfBlob));
+        console.log(pdfUrl);
+    };
+
+
+    const handleUpload = async () => {
+        const pdfDoc = await PDFDocument.load(pdfUrl);
+        const pdfBytes = await pdfDoc.save();
+        const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+        const pdfFile = new File([pdfBlob], "contract.pdf", {
+            type: "application/pdf",
+        });
+
+        const formData = new FormData();
+        formData.append("file", pdfFile);
+        formData.append("propertyId", property.id);
+        formData.append("userId", users.id);
+
+        const res = await fetch("/api/uploadContract", {
+            method: "POST",
+            body: formData,
+        });
+
+    };
+
+
     useEffect(() => {
-        const generatePdf = async () => {
-            const pdfDoc = await PDFDocument.create();
-            const page = pdfDoc.addPage();
-
-            // Add content to the PDF document here
-            page.drawText("Contract", {
-                x: 100,
-                y: 750,
-                size: 24,
-                font: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
-                color: rgb(0, 0.53, 0.71),
-            });
-            page.drawText(`Property address: ${property.address}`, {
-                x: 100,
-                y: 700,
-                size: 16,
-                font: await pdfDoc.embedFont(StandardFonts.Helvetica),
-                color: rgb(0, 0.53, 0.71),
-            });
-            page.drawText(`Tenant name: ${users.name}`, {
-                x: 100,
-                y: 650,
-                size: 16,
-                font: await pdfDoc.embedFont(StandardFonts.Helvetica),
-                color: rgb(0, 0.53, 0.71),
-            });
-
-            // End the document and wait for the stream to finish
-            const pdfBytes = await pdfDoc.save();
-            const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
-            setPdfUrl(URL.createObjectURL(pdfBlob));
-        };
         generatePdf();
-    }, [offers, property, users]);
+    }, []);
 
     return (
         <div className="h-screen w-full flex flex-col">
@@ -78,7 +217,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
             <main className="flex-grow flex flex-col items-center justify-center ">
                 {pdfUrl ? (
                     <iframe
-                        className="w-full h-full pt-20"
+                        className="w-full h-full pt-24"
                         src={pdfUrl}
                         title="Contract PDF"
                     />
@@ -86,6 +225,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
                     <p>Generating contract...</p>
                 )}
             </main>
+            <button onClick={handleUpload}>Download PDF and upload to database</button>
         </div>
     );
 };
@@ -105,17 +245,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
 
-    // Get the user who made the offer
-    const users = await Promise.all(
-        offers.map(async (offer) => {
-            const user = await prisma.user.findFirst({
-                where: {
-                    id: offer.userId,
-                },
-            });
-            return user;
-        })
+    const acceptedOffer = offers.find(
+        (offer) => offer.offerStatus === "Accepted"
     );
+
+    const users = await prisma.user.findFirst({
+        where: {
+            id: acceptedOffer?.userId,
+        },
+    });
 
     return {
         props: {
