@@ -42,7 +42,6 @@ export default async function handler(
                 file[i].replace(/^data:application\/\w+;base64,/, ""),
                 "base64"
             );
-            console.log("base64 ", base64Data);
 
             const { data, error } = await supabase.storage
                 .from("property-images")

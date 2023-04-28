@@ -15,7 +15,6 @@ import { useRef } from "react";
 import WebViewer from "@pdftron/webviewer";
 import { useFormik } from "formik";
 
-
 interface ContractPageProps {
     offers: Offer[];
     users: User;
@@ -38,6 +37,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
     const [pdfUrl, setPdfUrl] = useState<string>("");
     const { data: session, status } = useSession();
     const [isSigned, setIsSigned] = useState<boolean>(false);
+    const [submitPressed, setSubmitPressed] = useState<boolean>(false);
     let file: string[] = [];
 
     const offerId = acceptedOffer.id;
@@ -50,31 +50,22 @@ const ContractPage: React.FC<ContractPageProps> = ({
             offerId: offerId,
         },
         onSubmit: async (values) => {
-
-            if (values.file.length === 0) {
-                alert("Please upload a file");
-                return;
-            } 
-
             //call the createListing api
             fetch("/api/uploadContract", {
                 method: "POST",
                 body: JSON.stringify(values),
             });
-            
         },
     });
 
-    console.log(formik.values);
-
     const generatePdf = async () => {
         const pdfDoc = await PDFDocument.create();
-        const form = pdfDoc.getForm()
+        const form = pdfDoc.getForm();
         const page = pdfDoc.addPage();
 
-        const textField = form.createTextField('signature')
-        textField.isRequired()
-        
+        const textField = form.createTextField("signature");
+        textField.isRequired();
+
         const headerText = "RESIDENTIAL LEASE AGREEMENT";
         const footerText = "Page 1 of 1";
 
@@ -108,7 +99,6 @@ const ContractPage: React.FC<ContractPageProps> = ({
             font: await pdfDoc.embedFont(StandardFonts.Helvetica),
             color: rgb(0, 0, 0),
         });
-
 
         // Add tenant information to the PDF document
         page.drawText(`Tenant name: ${users.name} ${users.surname}`, {
@@ -191,8 +181,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
             color: rgb(0, 0, 0),
         });
 
-        textField.addToPage(page, { x: 220, y: 120 })
-
+        textField.addToPage(page, { x: 220, y: 120 });
 
         // Add footer to the PDF document
         page.drawText(footerText, {
@@ -203,22 +192,23 @@ const ContractPage: React.FC<ContractPageProps> = ({
             color: rgb(0, 0, 0),
         });
 
-        
-
         // End the document and wait for the stream to finish
         const pdfBytes = await pdfDoc.save();
         const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
         setPdfUrl(URL.createObjectURL(pdfBlob));
     };
 
-
-    async function clickToSign(){
+    async function clickToSign() {
         setIsSigned(true);
-        const existingPdfBytes = await fetch(pdfUrl).then((res) => res.arrayBuffer());
+        const existingPdfBytes = await fetch(pdfUrl).then((res) =>
+            res.arrayBuffer()
+        );
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
-        const form = pdfDoc.getForm()
+        const form = pdfDoc.getForm();
 
-        form.getTextField('signature').setText(users.name + " " + users.surname);
+        form.getTextField("signature").setText(
+            users.name + " " + users.surname
+        );
         form.flatten();
 
         const pdfBytes = await pdfDoc.save();
@@ -227,14 +217,16 @@ const ContractPage: React.FC<ContractPageProps> = ({
     }
 
     async function encodePDF() {
-        const existingPdfBytes = await fetch(pdfUrl).then((res) => res.arrayBuffer());
+        // Change submitPressed to true
+        setSubmitPressed(true);
+        const existingPdfBytes = await fetch(pdfUrl).then((res) =>
+            res.arrayBuffer()
+        );
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
         let readers = [];
 
         const pdfBytes = await pdfDoc.saveAsBase64({ dataUri: true });
-        console.log("pdfBytes ", pdfBytes);
         const pdfString = pdfBytes.toString();
-        console.log("pdfString ", pdfString);
         readers.push(pdfString);
 
         // Use formik to set file value to pdfString
@@ -242,9 +234,6 @@ const ContractPage: React.FC<ContractPageProps> = ({
             ...formik.values,
             file: readers,
         });
-        console.log("formik ", formik.values);
-
-
     }
 
     useEffect(() => {
@@ -268,16 +257,27 @@ const ContractPage: React.FC<ContractPageProps> = ({
                     <p>Generating contract...</p>
                 )}
             </main>
-            {/* If isSigned true then show the submit button but if isSigned is false show sign button */}
-            {isSigned ? (
-                <form
-                    className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
-                    onSubmit={formik.handleSubmit}
-                >
-                    <button onClick={encodePDF} type="submit">Download PDF and upload to database</button>
-                </form>
+
+            {!isSigned ? (
+                <button onClick={clickToSign} className="w-full bg-blue-500 text-white font-bold hover:bg-white hover:text-blue-500 border-2 border-blue-500">Click To Sign</button>
+            ) : !submitPressed ? (
+                <button onClick={encodePDF} type="submit" className="w-full bg-blue-500 text-white font-bold hover:bg-white hover:text-blue-500 border-2 border-blue-500">
+                    Submit
+                </button>
             ) : (
-                <button onClick={clickToSign}>Click To Sign</button>
+                <div className = "grid grid-cols-2 text-center cursor-pointer">
+                    <form
+                        className="w-full bg-green-500 text-white font-bold hover:bg-white hover:text-green-500 border-2 border-green-500"
+                        onSubmit={formik.handleSubmit}
+                    >
+                        <button onClick={encodePDF} type="submit">
+                            Confirm
+                        </button>
+                    </form>
+                    <button onClick={() => setSubmitPressed(false)} className="w-full bg-red-500 text-white font-bold hover:bg-white hover:text-red-500 border-2 border-red-500">
+                        Cancel
+                    </button>
+                </div>
             )}
         </div>
     );

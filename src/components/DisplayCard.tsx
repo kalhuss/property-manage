@@ -29,7 +29,7 @@ const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
                         <p className="mb-4 text-lg">{property.address}</p>
                         
                         <Link href={`/properties/${property.propertyID}`}>
-                            <button className="mb-4 px-8 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-transparent hover:bg-blue-500 hover:text-white border-2 border-blue-500">
+                            <button className="mb-4 px-8 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-blue-500 hover:text-white border-2 border-blue-500">
                                 View Details
                             {/* </div> */}
                             </button>
