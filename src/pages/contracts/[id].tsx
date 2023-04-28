@@ -13,12 +13,14 @@ import NavBar from "../../components/NavBar";
 import blobStream from "blob-stream";
 import { useRef } from "react";
 import WebViewer from "@pdftron/webviewer";
+import { useFormik } from "formik";
 
 
 interface ContractPageProps {
     offers: Offer[];
     users: User;
     property: Property;
+    acceptedOffer: Offer;
 }
 
 type Session = ReturnType<typeof useSession>["data"];
@@ -29,12 +31,41 @@ type sessionProps = {
 };
 
 const ContractPage: React.FC<ContractPageProps> = ({
-    offers,
     users,
     property,
+    acceptedOffer,
 }) => {
     const [pdfUrl, setPdfUrl] = useState<string>("");
     const { data: session, status } = useSession();
+    const [isSigned, setIsSigned] = useState<boolean>(false);
+    let file: string[] = [];
+
+    const offerId = acceptedOffer.id;
+
+    const formik = useFormik({
+        initialValues: {
+            userId: users.id,
+            propertyId: property.id,
+            file: file,
+            offerId: offerId,
+        },
+        onSubmit: async (values) => {
+
+            if (values.file.length === 0) {
+                alert("Please upload a file");
+                return;
+            } 
+
+            //call the createListing api
+            fetch("/api/uploadContract", {
+                method: "POST",
+                body: JSON.stringify(values),
+            });
+            
+        },
+    });
+
+    console.log(formik.values);
 
     const generatePdf = async () => {
         const pdfDoc = await PDFDocument.create();
@@ -42,7 +73,6 @@ const ContractPage: React.FC<ContractPageProps> = ({
         const page = pdfDoc.addPage();
 
         const textField = form.createTextField('signature')
-        textField.setMaxLength(7)
         textField.isRequired()
         
         const headerText = "RESIDENTIAL LEASE AGREEMENT";
@@ -179,30 +209,43 @@ const ContractPage: React.FC<ContractPageProps> = ({
         const pdfBytes = await pdfDoc.save();
         const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
         setPdfUrl(URL.createObjectURL(pdfBlob));
-        console.log(pdfUrl);
     };
 
 
-    const handleUpload = async () => {
-        const pdfDoc = await PDFDocument.load(pdfUrl);
+    async function clickToSign(){
+        setIsSigned(true);
+        const existingPdfBytes = await fetch(pdfUrl).then((res) => res.arrayBuffer());
+        const pdfDoc = await PDFDocument.load(existingPdfBytes);
+        const form = pdfDoc.getForm()
+
+        form.getTextField('signature').setText(users.name + " " + users.surname);
+        form.flatten();
+
         const pdfBytes = await pdfDoc.save();
         const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
-        const pdfFile = new File([pdfBlob], "contract.pdf", {
-            type: "application/pdf",
+        setPdfUrl(URL.createObjectURL(pdfBlob));
+    }
+
+    async function encodePDF() {
+        const existingPdfBytes = await fetch(pdfUrl).then((res) => res.arrayBuffer());
+        const pdfDoc = await PDFDocument.load(existingPdfBytes);
+        let readers = [];
+
+        const pdfBytes = await pdfDoc.saveAsBase64({ dataUri: true });
+        console.log("pdfBytes ", pdfBytes);
+        const pdfString = pdfBytes.toString();
+        console.log("pdfString ", pdfString);
+        readers.push(pdfString);
+
+        // Use formik to set file value to pdfString
+        formik.setValues({
+            ...formik.values,
+            file: readers,
         });
+        console.log("formik ", formik.values);
 
-        const formData = new FormData();
-        formData.append("file", pdfFile);
-        formData.append("propertyId", property.id);
-        formData.append("userId", users.id);
 
-        const res = await fetch("/api/uploadContract", {
-            method: "POST",
-            body: formData,
-        });
-
-    };
-
+    }
 
     useEffect(() => {
         generatePdf();
@@ -225,7 +268,17 @@ const ContractPage: React.FC<ContractPageProps> = ({
                     <p>Generating contract...</p>
                 )}
             </main>
-            <button onClick={handleUpload}>Download PDF and upload to database</button>
+            {/* If isSigned true then show the submit button but if isSigned is false show sign button */}
+            {isSigned ? (
+                <form
+                    className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
+                    onSubmit={formik.handleSubmit}
+                >
+                    <button onClick={encodePDF} type="submit">Download PDF and upload to database</button>
+                </form>
+            ) : (
+                <button onClick={clickToSign}>Click To Sign</button>
+            )}
         </div>
     );
 };
@@ -260,6 +313,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             offers: JSON.parse(JSON.stringify(offers)),
             users: JSON.parse(JSON.stringify(users)),
             property: JSON.parse(JSON.stringify(property)),
+            acceptedOffer: JSON.parse(JSON.stringify(acceptedOffer)),
         },
     };
 };

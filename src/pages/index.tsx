@@ -17,13 +17,11 @@ type sessionProps = {
 // TODO: Find a way to speed up image loading
 // TODO: Find a way to load the new listing without refreshing the page
 // TODO: Add a map to the property page
-// TODO: Implement the offer system
 // TODO: Error handle all the new listing inputs -> make sure that the correct types and update the database
 // TODO: Add a way to edit/delete the listing -> only the user who created the listing can edit/delete it
 // TODO: Let users edit their profile details
 // TODO: Add a filter system to the properties page
-// TODO: Add a payment system
-// TODO: Add a digital contract and a way to sign it
+// TODO: Add a payment system~
 // TODO: Change the X button on the KeyFeaturesInput 
 // TODO: If the user has put an offer on a property, they should not be able to put another offer on the same property
 // TODO: Upload contract to the database and send to email

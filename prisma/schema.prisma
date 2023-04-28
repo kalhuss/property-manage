@@ -18,6 +18,7 @@ model User {
   password    String
   properties Property[]
   offers     Offer[]
+  contracts  Contract[]
 }
 
 model Property {
@@ -43,6 +44,7 @@ model Property {
   user             User     @relation(fields: [userId], references: [id])
   userId           String
   offers           Offer[]
+  contracts        Contract[]
 }
 
 model Offer {
@@ -50,6 +52,19 @@ model Offer {
   amount           String
   status           String
   offerStatus      String   @default("Pending")
+  signed           Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  property         Property @relation(fields: [propertyId], references: [id])
+  propertyId       String
+  user             User     @relation(fields: [userId], references: [id])
+  userId           String
+  mortgageImage    String[]
+}
+
+model Contract {
+  id               String   @id @default(uuid())
+  paid             Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   property         Property @relation(fields: [propertyId], references: [id])
