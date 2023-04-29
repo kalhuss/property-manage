@@ -71,5 +71,5 @@ model Contract {
   propertyId       String
   user             User     @relation(fields: [userId], references: [id])
   userId           String
-  mortgageImage    String[]
+  contractPDF      String[]
 }

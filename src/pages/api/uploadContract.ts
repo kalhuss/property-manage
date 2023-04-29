@@ -64,7 +64,7 @@ export default async function handler(
             data: {
                 propertyId,
                 userId,
-                mortgageImage: await uploadFile(file),
+                contractPDF: await uploadFile(file),
                 paid: false,
             },
         })
@@ -90,5 +90,5 @@ export default async function handler(
                 .json({ message: "Error updating offer status" });
         });
 
-    return res.status(200).json({ contract: contract });
+    return res.status(200).json({ contract: contract, signed: updateOffer });
 }

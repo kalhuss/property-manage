@@ -217,7 +217,6 @@ const ContractPage: React.FC<ContractPageProps> = ({
     }
 
     async function encodePDF() {
-        // Change submitPressed to true
         setSubmitPressed(true);
         const existingPdfBytes = await fetch(pdfUrl).then((res) =>
             res.arrayBuffer()
@@ -265,12 +264,12 @@ const ContractPage: React.FC<ContractPageProps> = ({
                     Submit
                 </button>
             ) : (
-                <div className = "grid grid-cols-2 text-center cursor-pointer">
+                <div className = "grid grid-cols-2 text-center">
                     <form
-                        className="w-full bg-green-500 text-white font-bold hover:bg-white hover:text-green-500 border-2 border-green-500"
+                        
                         onSubmit={formik.handleSubmit}
                     >
-                        <button onClick={encodePDF} type="submit">
+                        <button onClick={encodePDF} type="submit" className="w-full bg-green-500 text-white font-bold hover:bg-white hover:text-green-500 border-2 border-green-500">
                             Confirm
                         </button>
                     </form>

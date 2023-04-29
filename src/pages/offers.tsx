@@ -1,7 +1,6 @@
 import { useSession, getSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import Head from "next/head";
-import Image from "next/image";
 import { NextPage } from "next";
 import Link from "next/link";
 import { GetServerSideProps } from "next";
@@ -12,6 +11,7 @@ import Background from "@/components/Backgrounds";
 import { Offer } from "@prisma/client";
 import { Property } from "@prisma/client";
 import BackArrow from "@/components/BackArrow";
+import { Contract } from "@prisma/client";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -20,10 +20,28 @@ interface OffersPageProps {
     user: User;
     offers: Offer[];
     properties: Property[];
+    contracts: Contract[];
 }
 
-const Offers: NextPage<OffersPageProps> = ({ user, offers, properties }) => {
+const Offers: NextPage<OffersPageProps> = ({
+    user,
+    offers,
+    properties,
+    contracts,
+}) => {
     const { data: session, status } = useSession();
+    const CDN =
+        "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
+    const [contractUrl, setContractUrl] = useState<Contract | null>(null);
+
+    function handleContract(propertyId: string) {
+        const contract = contracts.find(
+            (contract) => contract.propertyId === propertyId
+        );
+        if (contract) {
+            setContractUrl(contract);
+        }
+    }
 
     return (
         <>
@@ -60,18 +78,41 @@ const Offers: NextPage<OffersPageProps> = ({ user, offers, properties }) => {
                                         <p className="mt-4 text-xl">
                                             {offer.amount}
                                         </p>
-                                        {offer.offerStatus === "Accepted" && (
-                                            <Link href={`/contracts/${property.id}`}>
-                                                <div
-                                                    onClick={() => {
-                                                        // TODO: handle click on contract button
-                                                    }}
+                                        {offer.offerStatus === "Accepted" &&
+                                            !offer.signed && (
+                                                <Link
+                                                    href={`/contracts/${property.id}`}
+                                                >
+                                                    <div
+                                                        onClick={() => {
+                                                            // TODO: handle click on contract button
+                                                        }}
+                                                        className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600"
+                                                    >
+                                                        View Contract
+                                                    </div>
+                                                </Link>
+                                            )}
+                                        {offer.signed && (
+                                            <Link
+                                                href={
+                                                    CDN +
+                                                    contractUrl?.contractPDF
+                                                }
+                                            >
+                                                <button
+                                                    onClick={() =>
+                                                        handleContract(
+                                                            property.id
+                                                        )
+                                                    }
                                                     className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600"
                                                 >
-                                                    View Contract
-                                                </div>
+                                                    Download Contract
+                                                </button>
                                             </Link>
                                         )}
+
                                         <p className="mt-4 text-xl">
                                             {offer.status}
                                         </p>
@@ -111,11 +152,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
 
+    // Get the contracts
+    const contracts = await prisma.contract.findMany({
+        where: {
+            userId: user?.id,
+        },
+    });
+
     return {
         props: {
             offers: JSON.parse(JSON.stringify(offers)),
             user: JSON.parse(JSON.stringify(user)),
             properties: JSON.parse(JSON.stringify(properties)),
+            contracts: JSON.parse(JSON.stringify(contracts)),
         },
     };
 };
