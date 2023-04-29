@@ -22,6 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             offerStatus: "Accepted",
         },
     });
+    
 
     // Update the rest of the offers to be rejected
     const rejectedOffers = await prisma.offer.updateMany({

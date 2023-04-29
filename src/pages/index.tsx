@@ -24,13 +24,12 @@ type sessionProps = {
 // TODO: Add a payment system~
 // TODO: Change the X button on the KeyFeaturesInput 
 // TODO: If the user has put an offer on a property, they should not be able to put another offer on the same property
-// TODO: Upload contract to the database and send to email
 // TODO: If a contract has been signed the listing should be removed from the properties page - maybe add a sold tag
-// TODO: Figure out how to save the pdf file when the user signs it
 // TODO: Payment system
 // TODO: Editing the listing data
 // TODO: If the property is rented, the user should not be able to put an offer on it
 // TODO: If the property is for sale, the user should not be able to rent it
+// TODO: When paid it should no longer say pay
 
 export default function Home() {
     const { data: session, status } = useSession();

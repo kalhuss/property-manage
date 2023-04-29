@@ -12,6 +12,7 @@ import { Offer } from "@prisma/client";
 import { Property } from "@prisma/client";
 import BackArrow from "@/components/BackArrow";
 import { Contract } from "@prisma/client";
+import { useEffect } from "react";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -33,6 +34,7 @@ const Offers: NextPage<OffersPageProps> = ({
     const CDN =
         "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
     const [contractUrl, setContractUrl] = useState<Contract | null>(null);
+    console.log(contractUrl);
 
     function handleContract(propertyId: string) {
         const contract = contracts.find(
@@ -41,6 +43,32 @@ const Offers: NextPage<OffersPageProps> = ({
         if (contract) {
             setContractUrl(contract);
         }
+        return contract?.id;
+    }
+
+    function handlePayment(amount: number, propertyId: string) {
+        fetch("/api/payment", {
+            method: "POST",
+            body: JSON.stringify({
+                amount: amount * 100,
+                currency: "gbp",
+                userId: user.id,
+                contractId: handleContract(propertyId),
+            }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error("Network response was not ok.");
+            })
+            .then((data) => {
+                console.log(data);
+                window.location.href = data.url;
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     }
 
     return (
@@ -60,64 +88,82 @@ const Offers: NextPage<OffersPageProps> = ({
                 <BackArrow label="Back" />
                 <div className="flex flex-wrap justify-around max-w-4xl mt-6 sm:w-full">
                     {properties.map((property) => (
-                        <div className="p-6 mt-6 text-left border w-96 rounded-xl bg-white hover:text-blue-600 focus:text-blue-600">
-                            <Link href={`/properties/${property.propertyID}`}>
-                                <h3 className="text-2xl font-bold">
-                                    {property.address}
-                                </h3>
-                            </Link>
+                        <div className="p-6 mt-6 text-left border w-96 rounded-xl bg-white">
+                            <h3 className="text-2xl font-bold">
+                                {property.address}
+                            </h3>
                             {offers
                                 .filter(
                                     (offer) => offer.propertyId === property.id
                                 )
-                                .map((offer) => (
-                                    <div
-                                        className="flex flex-col"
-                                        key={offer.id}
-                                    >
-                                        <p className="mt-4 text-xl">
-                                            {offer.amount}
-                                        </p>
-                                        {offer.offerStatus === "Accepted" &&
-                                            !offer.signed && (
-                                                <Link
-                                                    href={`/contracts/${property.id}`}
-                                                >
-                                                    <div
-                                                        onClick={() => {
-                                                            // TODO: handle click on contract button
-                                                        }}
-                                                        className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600"
+                                .map((offer) => {
+                                    const contract = contracts.find(
+                                        (contract) =>
+                                            contract.propertyId === property.id
+                                    );
+                                    return (
+                                        <div
+                                            className="flex flex-col"
+                                            key={offer.id}
+                                        >
+                                            <p className="mt-4 text-xl">
+                                                Offer price: {offer.amount}
+                                            </p>
+                                            <p className="mt-4 text-xl">
+                                                Offer status:{" "}
+                                                {offer.offerStatus}
+                                            </p>
+                                            {offer.offerStatus === "Accepted" &&
+                                                !offer.signed && (
+                                                    <Link
+                                                        href={`/contracts/${property.id}`}
                                                     >
-                                                        View Contract
-                                                    </div>
-                                                </Link>
+                                                        <div
+                                                            onClick={() => {
+                                                                // TODO: handle click on contract button
+                                                            }}
+                                                            className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600"
+                                                        >
+                                                            View Contract
+                                                        </div>
+                                                    </Link>
+                                                )}
+                                            {offer.signed && (
+                                                <>
+                                                    <Link
+                                                        href={
+                                                            CDN +
+                                                            contract?.contractPDF
+                                                        }
+                                                    >
+                                                        <div className="px-4 py-2 mt-4 text-center text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600">
+                                                            Download Contract
+                                                        </div>
+                                                    </Link>
+                                                    {!contract?.paid ? (
+                                                        <button
+                                                            onClick={() =>
+                                                                handlePayment(
+                                                                    Number(
+                                                                        offer.amount
+                                                                    ),
+                                                                    property.id
+                                                                )
+                                                            }
+                                                            className="px-4 py-2 mt-4 text-center text-white bg-green-500 rounded hover:bg-green-600 focus:bg-green-600"
+                                                        >
+                                                            Pay
+                                                        </button>
+                                                    ) : (
+                                                        <p className="mt-4 text-xl">
+                                                            Paid
+                                                        </p>
+                                                    )}
+                                                </>
                                             )}
-                                        {offer.signed && (
-                                            <Link
-                                                href={
-                                                    CDN +
-                                                    contractUrl?.contractPDF
-                                                }
-                                            >
-                                                <button
-                                                    onClick={() =>
-                                                        handleContract(
-                                                            property.id
-                                                        )
-                                                    }
-                                                    className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600"
-                                                >
-                                                    Download Contract
-                                                </button>
-                                            </Link>
-                                        )}
-
-                                        <p className="mt-4 text-xl">
-                                            {offer.status}
-                                        </p>
-                                    </div>
-                                ))}
+                                        </div>
+                                    );
+                                })}
                         </div>
                     ))}
                 </div>
