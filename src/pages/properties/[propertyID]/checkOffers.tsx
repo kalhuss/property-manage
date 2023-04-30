@@ -49,6 +49,7 @@ const checkOffers: NextPage<CheckOffersPageProps> = ({
             method: "POST",
             body: JSON.stringify({ offerId: selectedOffer?.id }),
         });
+        Router.reload();
     }
 
     const handleCancelClick = () => {

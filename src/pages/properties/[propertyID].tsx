@@ -7,11 +7,13 @@ import NavBar from "../../components/NavBar";
 import { BsArrowLeft } from "react-icons/bs";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Background from "@/components/Backgrounds";
 import PanoramaViewer from "@/components/PanoramaViewer";
 import { User } from "@prisma/client";
 import BackArrow from "@/components/BackArrow";
+import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
+import { useMemo } from "react";
 
 interface PropertyPageProps {
     property: Property;
@@ -33,6 +35,49 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [currentFloorPlanIndex, setCurrentFloorPlanIndex] = useState(0);
     const [offerValue, setOfferValue] = useState("");
+
+    const libraries = useMemo(() => ["places"], []);
+
+    const [mapCenter, setMapCenter] = useState<{
+        lat: number;
+        lng: number;
+    }>({ lat: 0, lng: 0 });
+
+    const mapOptions = useMemo<google.maps.MapOptions>(
+        () => ({
+            disableDefaultUI: true,
+            clickableIcons: true,
+            scrollwheel: false,
+        }),
+        []
+    );
+
+    const { isLoaded, loadError } = useLoadScript({
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY as string,
+        libraries: libraries as any,
+    });
+
+    const address = `${property.address} ${property.postcode}`;
+    console.log(address);
+
+    useEffect(() => {
+        if (isLoaded && property.address && property.postcode) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode(
+                { address: address.toLocaleLowerCase() },
+                (results, status) => {
+                    if (status === "OK") {
+                        const { lat, lng } = results![0].geometry.location;
+                        setMapCenter({ lat: lat(), lng: lng() });
+                    }
+                }
+            );
+        }
+    }, [isLoaded, property.address, property.postcode]);
+
+    if (!isLoaded) {
+        return <p>Loading...</p>;
+    }
 
     const imageSliderLength =
         property.images.length + property.panoramicImages.length;
@@ -71,7 +116,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
             <Background />
             <NavBar isLoggedIn={!!session} />
             <div className="container mx-auto px-4 pt-20">
-                <BackArrow label="Back to properties" url="/properties"/>
+                <BackArrow label="Back to properties" url="/properties" />
                 <div className="grid grid-cols-2 gap-2">
                     <div className="grid grid-flow-row mb-3">
                         <div className="relative">
@@ -88,7 +133,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                     priority={true}
                                 />
                             ) : property.panoramicImages.length > 0 &&
-                                currentImageIndex >= property.images.length ? (
+                              currentImageIndex >= property.images.length ? (
                                 <PanoramaViewer
                                     image={
                                         CDN +
@@ -127,12 +172,12 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                         <div className="bg-white shadow-lg p-4 mb- h-fit flex-col">
                             {property.tenure === "to rent" ? (
                                 <p className="text-2xl font-extrabold mb-2">
-                                £{property.rent} per month
+                                    £{property.rent} per month
                                 </p>
                             ) : (
-                            <p className="text-2xl font-extrabold mb-2">
-                                £{property.price}
-                            </p>
+                                <p className="text-2xl font-extrabold mb-2">
+                                    £{property.price}
+                                </p>
                             )}
                             <p className="text-2xl font-semibold mb-2">
                                 {property.address}
@@ -193,47 +238,49 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                         </div>
                         {/* if there is a floor plan show otherwise do not show anything */}
                         {property.floorPlan.length > 0 && (
-                        <div className="relative bg-white shadow-lg p-4">
-                            <Image
-                                src={
-                                    CDN +
-                                    property.floorPlan[currentFloorPlanIndex]
-                                }
-                                alt={property.address}
-                                width="0"
-                                height="0"
-                                sizes="100vw"
-                                className="w-full h-auto object-scale-down aspect-square -z-10"
-                            />
-                            {property.floorPlan.length > 1 && (
-                                <div className="absolute top-1/2 left-0 right-0 bottom-0">
-                                    <button
-                                        onClick={() =>
-                                            handlePrevImage("floorPlan")
-                                        }
-                                        className="text-white bg-gray-700 opacity-80 hover:opacity-100 py-2 px-4 rounded-full mr-2 focus:outline-none absolute left-2"
-                                    >
-                                        {"<"}
-                                    </button>
+                            <div className="relative bg-white shadow-lg p-4">
+                                <Image
+                                    src={
+                                        CDN +
+                                        property.floorPlan[
+                                            currentFloorPlanIndex
+                                        ]
+                                    }
+                                    alt={property.address}
+                                    width="0"
+                                    height="0"
+                                    sizes="100vw"
+                                    className="w-full h-auto object-scale-down aspect-square -z-10"
+                                />
+                                {property.floorPlan.length > 1 && (
+                                    <div className="absolute top-1/2 left-0 right-0 bottom-0">
+                                        <button
+                                            onClick={() =>
+                                                handlePrevImage("floorPlan")
+                                            }
+                                            className="text-white bg-gray-700 opacity-80 hover:opacity-100 py-2 px-4 rounded-full mr-2 focus:outline-none absolute left-2"
+                                        >
+                                            {"<"}
+                                        </button>
 
-                                    <button
-                                        onClick={() =>
-                                            handleNextImage("floorPlan")
-                                        }
-                                        className="text-white bg-gray-700 opacity-80 hover:opacity-100 py-2 px-4 rounded-full mr-2 focus:outline-none absolute -right-0"
-                                    >
-                                        {">"}
-                                    </button>
-                                    <div className="absolute bottom-2 left-2 text-white bg-gray-700 bg-opacity-50 p-2">
-                                        {currentFloorPlanIndex + 1} /{" "}
-                                        {floorPlanSliderLength}
+                                        <button
+                                            onClick={() =>
+                                                handleNextImage("floorPlan")
+                                            }
+                                            className="text-white bg-gray-700 opacity-80 hover:opacity-100 py-2 px-4 rounded-full mr-2 focus:outline-none absolute -right-0"
+                                        >
+                                            {">"}
+                                        </button>
+                                        <div className="absolute bottom-2 left-2 text-white bg-gray-700 bg-opacity-50 p-2">
+                                            {currentFloorPlanIndex + 1} /{" "}
+                                            {floorPlanSliderLength}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
                         )}
                     </div>
-                    
+
                     <div className="grid grid-flow-row mb-3">
                         <div className="">
                             <div className="bg-white shadow-lg p-4 mb-4 h-fit">
@@ -294,24 +341,25 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                                     <Link
                                                         href={`/properties/${property.propertyID}/createOffer?offerValue=${offerValue}`}
                                                     >
-                                                        {property.tenure === "to rent" ? (
+                                                        {property.tenure ===
+                                                        "to rent" ? (
                                                             <button
-                                                            className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
-                                                            disabled={
-                                                                !offerValue
-                                                            }
-                                                        >
-                                                            Offer Deopsit
-                                                        </button>
+                                                                className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                                                disabled={
+                                                                    !offerValue
+                                                                }
+                                                            >
+                                                                Offer Deopsit
+                                                            </button>
                                                         ) : (
-                                                        <button
-                                                            className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
-                                                            disabled={
-                                                                !offerValue
-                                                            }
-                                                        >
-                                                            Make Offer
-                                                        </button>
+                                                            <button
+                                                                className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                                                disabled={
+                                                                    !offerValue
+                                                                }
+                                                            >
+                                                                Make Offer
+                                                            </button>
                                                         )}
                                                     </Link>
                                                 </>
@@ -325,6 +373,28 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                            <div className="">
+                                <GoogleMap
+                                    options={mapOptions}
+                                    zoom={14}
+                                    center={mapCenter}
+                                    mapTypeId={google.maps.MapTypeId.ROADMAP}
+                                    mapContainerStyle={{
+                                        width: "800px",
+                                        height: "800px",
+                                    }}
+                                    onLoad={() =>
+                                        console.log("Map Component Loaded...")
+                                    }
+                                >
+                                    <MarkerF
+                                        position={mapCenter}
+                                        onLoad={() =>
+                                            console.log("Marker Loaded")
+                                        }
+                                    />
+                                </GoogleMap>
                             </div>
                         </div>
                     </div>

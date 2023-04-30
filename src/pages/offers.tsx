@@ -13,6 +13,7 @@ import { Property } from "@prisma/client";
 import BackArrow from "@/components/BackArrow";
 import { Contract } from "@prisma/client";
 import { useEffect } from "react";
+import Router from "next/router";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -34,7 +35,6 @@ const Offers: NextPage<OffersPageProps> = ({
     const CDN =
         "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
     const [contractUrl, setContractUrl] = useState<Contract | null>(null);
-    console.log(contractUrl);
 
     function handleContract(propertyId: string) {
         const contract = contracts.find(
@@ -69,6 +69,24 @@ const Offers: NextPage<OffersPageProps> = ({
             .catch((error) => {
                 console.error("Error:", error);
             });
+    }
+
+    function handleCancel(offerId: string){
+
+        const response = fetch("/api/cancelOffer", {
+            method: "POST",
+            body: JSON.stringify({
+                offerId: offerId,
+            }),
+        }).then((response) => {
+            if (response.ok) {
+                Router.reload();
+                return response.json();
+            }
+            throw new Error("Network response was not ok.");
+        }
+        )
+
     }
 
     return (
@@ -115,6 +133,7 @@ const Offers: NextPage<OffersPageProps> = ({
                                             </p>
                                             {offer.offerStatus === "Accepted" &&
                                                 !offer.signed && (
+                                                    <>
                                                     <Link
                                                         href={`/contracts/${property.id}`}
                                                     >
@@ -127,6 +146,15 @@ const Offers: NextPage<OffersPageProps> = ({
                                                             View Contract
                                                         </div>
                                                     </Link>
+                                                    <button 
+                                                    onClick={() => {
+                                                        handleCancel(offer.id)
+                                                    }}
+                                                    className="px-4 py-2 mt-4 text-center text-white bg-red-500 rounded hover:bg-red-600 focus:bg-red-600"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                </>
                                                 )}
                                             {offer.signed && (
                                                 <>

@@ -11,6 +11,7 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { useState } from "react";
 
+
 interface PropertyProps {
     properties: Property[];
 }
@@ -29,7 +30,7 @@ interface Query {
 
 const Properties: NextPage<PropertyProps> = ({ properties }) => {
     const { data: session, status } = useSession();
-
+    
     // State variables for filters
     const [bedrooms, setBedrooms] = useState("");
     const [bathrooms, setBathrooms] = useState("");
@@ -223,8 +224,10 @@ const Properties: NextPage<PropertyProps> = ({ properties }) => {
                     )}
                 </div>
                 <DisplayCard properties={filteredProperties} />
+                </div>
             </div>
-        </div>
+
+        
     );
 };
 

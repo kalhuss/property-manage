@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import Router from "next/router";
 import { useEffect, useState } from "react";
 import handlebars from "handlebars";
 import { degrees, PDFDocument, rgb, StandardFonts } from "pdf-lib";
@@ -51,10 +51,17 @@ const ContractPage: React.FC<ContractPageProps> = ({
         },
         onSubmit: async (values) => {
             //call the createListing api
-            fetch("/api/uploadContract", {
+            const response = fetch("/api/uploadContract", {
                 method: "POST",
                 body: JSON.stringify(values),
             });
+
+            if ((await response).ok) {
+                Router.push("/offers");
+            }
+            
+
+
         },
     });
 
@@ -233,6 +240,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
             ...formik.values,
             file: readers,
         });
+        
     }
 
     useEffect(() => {
@@ -268,7 +276,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
                     <form
                         
                         onSubmit={formik.handleSubmit}
-                    >
+                    >   
                         <button onClick={encodePDF} type="submit" className="w-full bg-green-500 text-white font-bold hover:bg-white hover:text-green-500 border-2 border-green-500">
                             Confirm
                         </button>

@@ -13,23 +13,11 @@ type sessionProps = {
 
 // TODO: Fix Register page -> the input fields are going outside of the container
 // TODO: When user does incorrect login details, it should not show the error message but instead just let them try again
-// TODO: Fix the user hover in the navbar
-// TODO: Find a way to speed up image loading
 // TODO: Find a way to load the new listing without refreshing the page
-// TODO: Add a map to the property page
 // TODO: Error handle all the new listing inputs -> make sure that the correct types and update the database
-// TODO: Add a way to edit/delete the listing -> only the user who created the listing can edit/delete it
-// TODO: Let users edit their profile details
-// TODO: Add a filter system to the properties page
-// TODO: Add a payment system~
 // TODO: Change the X button on the KeyFeaturesInput 
-// TODO: If the user has put an offer on a property, they should not be able to put another offer on the same property
 // TODO: If a contract has been signed the listing should be removed from the properties page - maybe add a sold tag
-// TODO: Payment system
-// TODO: Editing the listing data
-// TODO: If the property is rented, the user should not be able to put an offer on it
-// TODO: If the property is for sale, the user should not be able to rent it
-// TODO: When paid it should no longer say pay
+// TODO: Cancel page for payment
 
 export default function Home() {
     const { data: session, status } = useSession();

@@ -55,7 +55,7 @@ export default async function handler(
         floorPlan: string[];
         email: string;
     } = JSON.parse(req.body);
-
+    console.log(email, price, bedrooms, bathrooms, houseType, address, postcode, tenure, taxBand, rent, keyFeatures, description, contactNumber, contactEmail);
     // Check if user is logged in
     if (!email) {
         return res.status(400).json({ message: "No current session" });

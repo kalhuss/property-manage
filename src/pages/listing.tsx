@@ -53,8 +53,13 @@ const Listing: FC<sessionProps> = () => {
             fetch("/api/createListing", {
                 method: "POST",
                 body: JSON.stringify(values),
+            })
+            // wait for the response and then redirect to the properties page
+            .then((res) => {
+                if (res.status === 200) {
+                    Router.push("/properties");
+                }
             });
-            Router.push("/properties");
         },
     });
 
@@ -204,14 +209,28 @@ const Listing: FC<sessionProps> = () => {
                                 }
                             }}
                         >
-                            {/* Price */}
-                            <div className={formik.values.tenure === "to rent" ? "hidden" : "block"}>
+                            {/* Tenure */}
                             <ListingInput
                                 getFieldProps={formik.getFieldProps}
-                                labelName="Price"
-                                inputType="text"
-                                formikName="price"
+                                labelName="Tenure"
+                                inputType="dropdown"
+                                formikName="tenure"
                             />
+
+                            {/* Price */}
+                            <div
+                                className={
+                                    formik.values.tenure === "to rent"
+                                        ? "hidden"
+                                        : "block"
+                                }
+                            >
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Price"
+                                    inputType="text"
+                                    formikName="price"
+                                />
                             </div>
 
                             {/* Bedrooms */}
@@ -254,14 +273,6 @@ const Listing: FC<sessionProps> = () => {
                                 formikName="postcode"
                             />
 
-                            {/* Tenure */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Tenure"
-                                inputType="dropdown"
-                                formikName="tenure"
-                            />
-
                             {/* Tax Band */}
                             <ListingInput
                                 getFieldProps={formik.getFieldProps}
@@ -271,13 +282,19 @@ const Listing: FC<sessionProps> = () => {
                             />
 
                             {/* Rent */}
-                            <div className={formik.values.tenure === "to rent" ? "block" : "hidden"}>
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Rent"
-                                inputType="text"
-                                formikName="rent"
-                            />
+                            <div
+                                className={
+                                    formik.values.tenure === "to rent"
+                                        ? "block"
+                                        : "hidden"
+                                }
+                            >
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Rent"
+                                    inputType="text"
+                                    formikName="rent"
+                                />
                             </div>
 
                             {/* Key Features */}
