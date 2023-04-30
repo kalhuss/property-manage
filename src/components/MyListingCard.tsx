@@ -2,6 +2,7 @@ import React from "react";
 import { Property } from "@prisma/client";
 import Link from "next/link";
 import Image from "next/image";
+import Router from "next/router";
 
 interface PropertyProps {
     properties: Property[];
@@ -10,7 +11,17 @@ interface PropertyProps {
 let CDN =
     "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
 
-const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
+const MyListingCard: React.FC<PropertyProps> = ({ properties }) => {
+
+    const handleDelete = async (propertyId: string) => {
+        const res = await fetch(`/api/deleteProperty`, {
+            method: "DELETE",
+            body: JSON.stringify({ propertyId }),
+        });
+        Router.push("/myListings");
+    }
+
+
     return (
         <div className="grid grid-cols-1 gap-6 font-mono">
             {properties.map((property) => (
@@ -41,13 +52,29 @@ const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
                         )}
                         <p className="text-gray-600 mb-4">{`${property.bedrooms} bed, ${property.bathrooms} bathroom ${property.houseType} ${property.tenure}`}</p>
                         <p className="mb-4 text-lg">{property.address}</p>
-
+                        
+                        <div className="grid grid-cols-2">
                         <Link href={`/properties/${property.propertyID}`}>
-                            <button className="mb-4 px-8 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-blue-500 hover:text-white border-2 border-blue-500">
+                            <button className="w-3/4 mb-4 px-4 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-blue-500 hover:text-white border-2 border-blue-500">
                                 View Details
-                                {/* </div> */}
                             </button>
                         </Link>
+                        <Link href={`/properties/${property.propertyID}/checkOffers`}>
+                            <button className="w-3/4 mb-4 px-4 py-3 bg-white bg-opacity-75 text-blue-500 font-bold rounded-md hover:bg-blue-500 hover:text-white border-2 border-blue-500">
+                                Check Offers
+                            </button>
+                        </Link>
+                        </div>
+                        <div className="grid grid-cols-2">
+                        <Link href={`/properties/${property.propertyID}/edit`}>
+                            <button className="w-3/4 mb-4 px-4 py-3 bg-white bg-opacity-75 text-green-500 font-bold rounded-md hover:bg-green-500 hover:text-white border-2 border-green-500">
+                                Edit
+                            </button>
+                        </Link>
+                            <button onClick = {() => handleDelete(property.id)} className="w-3/4 mb-4 px-4 py-3 bg-white bg-opacity-75 text-red-500 font-bold rounded-md hover:bg-red-500 hover:text-white border-2 border-red-500">
+                                Delete
+                            </button>
+                        </div>
                         <p className="mb-4 text-sm text-gray-600">
                             Listed on:{" "}
                             {property.createdAt
@@ -64,4 +91,4 @@ const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
     );
 };
 
-export default DisplayCard;
+export default MyListingCard;

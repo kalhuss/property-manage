@@ -7,17 +7,22 @@ import { useRouter } from "next/router";
 
 interface BackArrowProps {
     label: string;
+    url: string;
 }
 
-const BackArrow = ({ label }: BackArrowProps) => {
+const BackArrow = ({ label, url }: BackArrowProps) => {
     const router = useRouter();
 
-    const handleClick = () => {
-        router.back();
+    const handleClick = (url: string) => {
+        if(url === "back"){
+            router.back();
+        } else {
+            router.push(url);
+        }
     };
 
     return (
-        <button className="flex pb-5" onClick={handleClick}>
+        <button className="flex pb-5" onClick={() => handleClick(url)}>
             <span className="text-2xl font-bold mr-2">
                 <BsArrowLeft className="group"/>
             </span>

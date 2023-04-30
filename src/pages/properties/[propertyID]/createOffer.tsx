@@ -94,7 +94,7 @@ const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
         <div>
             <Head>
                 <title>{property.address}</title>
-                <meta name="description" content={property.description} />
+                <meta name="description"/>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Background />

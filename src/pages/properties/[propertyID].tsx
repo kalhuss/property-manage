@@ -71,7 +71,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
             <Background />
             <NavBar isLoggedIn={!!session} />
             <div className="container mx-auto px-4 pt-20">
-                <BackArrow label="Back to properties"/>
+                <BackArrow label="Back to properties" url="/properties"/>
                 <div className="grid grid-cols-2 gap-2">
                     <div className="grid grid-flow-row mb-3">
                         <div className="relative">
@@ -125,9 +125,15 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                         </div>
 
                         <div className="bg-white shadow-lg p-4 mb- h-fit flex-col">
+                            {property.tenure === "to rent" ? (
+                                <p className="text-2xl font-extrabold mb-2">
+                                £{property.rent} per month
+                                </p>
+                            ) : (
                             <p className="text-2xl font-extrabold mb-2">
                                 £{property.price}
                             </p>
+                            )}
                             <p className="text-2xl font-semibold mb-2">
                                 {property.address}
                             </p>
@@ -185,6 +191,8 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                     )}
                             </p>
                         </div>
+                        {/* if there is a floor plan show otherwise do not show anything */}
+                        {property.floorPlan.length > 0 && (
                         <div className="relative bg-white shadow-lg p-4">
                             <Image
                                 src={
@@ -223,7 +231,9 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                 </div>
                             )}
                         </div>
+                        )}
                     </div>
+                    
                     <div className="grid grid-flow-row mb-3">
                         <div className="">
                             <div className="bg-white shadow-lg p-4 mb-4 h-fit">
@@ -282,8 +292,18 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                                         }
                                                     />
                                                     <Link
-                                                        href={`/properties/${property.propertyID}/offer?offerValue=${offerValue}`}
+                                                        href={`/properties/${property.propertyID}/createOffer?offerValue=${offerValue}`}
                                                     >
+                                                        {property.tenure === "to rent" ? (
+                                                            <button
+                                                            className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                                            disabled={
+                                                                !offerValue
+                                                            }
+                                                        >
+                                                            Offer Deopsit
+                                                        </button>
+                                                        ) : (
                                                         <button
                                                             className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
                                                             disabled={
@@ -292,6 +312,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                                         >
                                                             Make Offer
                                                         </button>
+                                                        )}
                                                     </Link>
                                                 </>
                                             )

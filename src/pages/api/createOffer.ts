@@ -41,17 +41,38 @@ export default async function handler(
         },
     });
 
-    // Check if offer from user already exists
+    // Get property id
+    const property = await prisma.property.findUnique({
+        where: {
+            propertyID: parseInt(propertyId),
+        },
+    });
+
+
+     // Check if offer from user already exists
     const offerExists = await prisma.offer.findFirst({
         where: {
             AND: [
                 { userId: userID?.id },
-                { propertyId: propertyId.toString() },
+                { propertyId: property?.id },
             ],
         },
     });
 
     if (offerExists) {
+
+        const updatedOffer = await prisma.offer.update({
+            where: {
+                id: offerExists.id
+            },
+            data: {
+                amount: offerValue,
+                status: offerExists.status,
+                offerStatus: offerExists.offerStatus,
+                mortgageImage: await uploadImages(mortgage)
+            }
+        });
+
         return res.status(400).json({ message: "Offer already exists" });
     }
 

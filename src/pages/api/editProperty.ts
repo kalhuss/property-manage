@@ -35,6 +35,7 @@ export default async function handler(
         panoramicImages,
         floorPlan,
         email,
+        propertyId,
     }: {
         price: string;
         bedrooms: string;
@@ -54,8 +55,9 @@ export default async function handler(
         panoramicImages: string[];
         floorPlan: string[];
         email: string;
+        propertyId: string;
     } = JSON.parse(req.body);
-
+    console.log("req body: ", propertyId);
     // Check if user is logged in
     if (!email) {
         return res.status(400).json({ message: "No current session" });
@@ -68,16 +70,12 @@ export default async function handler(
         },
     });
 
-    //Check if listing already exists
-    const listingExists = await prisma.property.findUnique({
+    // Check if the property belongs to the user
+    const property = await prisma.property.findUnique({
         where: {
-            address: address,
+            id: propertyId,
         },
     });
-
-    if (listingExists) {
-        return res.status(400).json({ message: "Listing already exists" });
-    }
 
     // Decide the image type
     function getImageType(image: string) {
@@ -182,41 +180,48 @@ export default async function handler(
         return dataArray;
     }
 
-    // Create listing
-    const listing = await prisma.property
-        .create({
-            data: {
-                price: price,
-                bedrooms: bedrooms,
-                bathrooms: bathrooms,
-                houseType: houseType,
-                address: address,
-                postcode: postcode,
-                tenure: tenure,
-                taxBand: taxBand,
-                rent: rent,
-                keyFeatures: keyFeatures,
-                description: description,
-                contactNumber: contactNumber,
-                contactEmail: contactEmail,
-                images: await uploadImages(images, exteriorImage),
-                panoramicImages: await uploadPanoramicImages(panoramicImages),
-                floorPlan: await uploadFloorPlan(floorPlan),
-                user: {
-                    connect: {
-                        id: userID?.id,
+    // Update listing
+    if(property?.userId === userID?.id){
+        const updateListing = await prisma.property
+            .update({
+                where: {
+                    id: propertyId,
+                },
+                data: {
+                    price: price,
+                    bedrooms: bedrooms,
+                    bathrooms: bathrooms,
+                    houseType: houseType,
+                    address: address,
+                    postcode: postcode,
+                    tenure: tenure,
+                    taxBand: taxBand,
+                    rent: rent,
+                    keyFeatures: keyFeatures,
+                    description: description,
+                    contactNumber: contactNumber,
+                    contactEmail: contactEmail,
+                    images: await uploadImages(images, exteriorImage),
+                    panoramicImages: await uploadPanoramicImages(panoramicImages),
+                    floorPlan: await uploadFloorPlan(floorPlan),
+                    user: {
+                        connect: {
+                            id: userID?.id,
+                        },
                     },
                 },
-            },
-        })
-        .catch((err) => {
-            return res
-                .status(500)
-                .json({ message: "Error adding entry to database" });
-        });
+            })
+            .catch((err) => {
+                return res
+                    .status(500)
+                    .json({ message: "Error adding entry to database" });
+            });
+    } else {
+        return res.status(400).json({ message: "Property does not belong to user" });
+    }
 
-    // Return listing
-    return res.status(200).json({ listing: listing });
+    return res.status(200).json({ message: "Property updated" }
+    );
 }
 
 export const config = {

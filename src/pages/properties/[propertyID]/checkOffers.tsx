@@ -64,7 +64,7 @@ const checkOffers: NextPage<CheckOffersPageProps> = ({
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <div className="container mx-auto p-5 pt-20">
-                <BackArrow label="Back" />
+                <BackArrow label="Back" url="back"/>
                 <h1 className="text-4xl font-bold text-center mb-5">Offers</h1>
                 <div className="bg-white rounded-lg shadow-lg p-4 mb-4 w-auto">
                     <h2 className="text-2xl font-bold mb-4">

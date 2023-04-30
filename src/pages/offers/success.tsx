@@ -58,7 +58,7 @@ const SuccessPage: NextPage<SuccessPageProps> = ({
             <Background />
             <NavBar isLoggedIn={!!session} />
             <div className="container mx-auto p-5 pt-20 flex flex-col">
-                <BackArrow label="Back" />
+                <BackArrow label="Back" url="/" />
                 <h1 className="text-4xl font-bold text-center mb-5">
                     Payment Successful!
                 </h1>

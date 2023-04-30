@@ -10,6 +10,7 @@ import KeyFeaturesInput from "../components/KeyFeaturesInput";
 import { useState } from "react";
 import ListingInput from "../components/ListingInput";
 import ListingFileUpload from "../components/ListingFileUpload";
+import Background from "@/components/Backgrounds";
 
 type Session = ReturnType<typeof useSession>["data"];
 type SessionNoNull = NonNullable<Session>;
@@ -24,7 +25,7 @@ const Listing: FC<sessionProps> = () => {
     let images: string[] = [];
     let floorPlans: string[] = [];
     let panoramicImages: string[] = [];
-    
+
     const formik = useFormik({
         initialValues: {
             price: "",
@@ -33,6 +34,7 @@ const Listing: FC<sessionProps> = () => {
             bathrooms: "",
             houseType: "",
             address: "",
+            postcode: "",
             tenure: "",
             taxBand: "",
             rent: "",
@@ -55,7 +57,6 @@ const Listing: FC<sessionProps> = () => {
             Router.push("/properties");
         },
     });
-
 
     function readFileAsText(file: File) {
         return new Promise(function (resolve, reject) {
@@ -96,7 +97,6 @@ const Listing: FC<sessionProps> = () => {
             }));
         });
     }
-
 
     async function encodeImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
@@ -146,7 +146,6 @@ const Listing: FC<sessionProps> = () => {
         });
     }
 
-
     async function encodeFloorPlan(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
         let readers = [];
@@ -185,97 +184,164 @@ const Listing: FC<sessionProps> = () => {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <div className="relative">
-                <NavBar isLoggedIn={!!session} />
+            <Background />
+            <NavBar isLoggedIn={!!session} />
+            <div className="flex flex-col items-center justify-center pt-20">
+                <div className=" min-h-fit p-5 w-3/6 bg-white rounded-lg shadow-lg ">
+                    {/* Title */}
+                    <h1 className="text-4xl font-bold text-center">
+                        Create a new listing
+                    </h1>
 
-                <Image
-                    src="/assets/interiorform.jpg"
-                    alt="Interior Design Form"
-                    width="0"
-                    height="0"
-                    sizes="100vw"
-                    className="w-full h-screen bg-repeat absolute -z-10"
-                />
-                <div className="relative w-full items-center justify-center flex flex-col pt-24">
-                    <div className="p-5 w-3/6 bg-white rounded-lg shadow-lg flex flex-col">
-                        <div className="flex flex-col">
-                            {/* Title */}
-                            <h1 className="text-4xl font-bold text-center">
-                                Create a new listing
-                            </h1>
+                    <section className="w-3/4 mx-auto flex flex-col">
+                        {/* Form */}
+                        <form
+                            className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
+                            onSubmit={formik.handleSubmit}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                }
+                            }}
+                        >
+                            {/* Price */}
+                            <div className={formik.values.tenure === "to rent" ? "hidden" : "block"}>
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Price"
+                                inputType="text"
+                                formikName="price"
+                            />
+                            </div>
 
-                            <section className="w-3/4 mx-auto flex flex-col">
-                                {/* Form */}
-                                <form
-                                    className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
-                                    onSubmit={formik.handleSubmit}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault();
-                                        }
-                                    }}
-                                >
-                                    {/* Price */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Price" inputType="text" formikName="price" />
+                            {/* Bedrooms */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Bedrooms"
+                                inputType="text"
+                                formikName="bedrooms"
+                            />
 
-                                    {/* Bedrooms */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Bedrooms" inputType="text" formikName="bedrooms" />
+                            {/* Bathrooms */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Bathrooms"
+                                inputType="text"
+                                formikName="bathrooms"
+                            />
 
-                                    {/* Bathrooms */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Bathrooms" inputType="text" formikName="bathrooms" />
+                            {/* House Type */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="House Type"
+                                inputType="text"
+                                formikName="houseType"
+                            />
 
-                                    {/* House Type */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="House Type" inputType="text" formikName="houseType" />
+                            {/* Address */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Address"
+                                inputType="text"
+                                formikName="address"
+                            />
 
-                                    {/* Address */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Address" inputType="text" formikName="address" />
+                            {/* Postcode */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Postcode"
+                                inputType="text"
+                                formikName="postcode"
+                            />
 
-                                    {/* Tenure */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Tenure" inputType="dropdown" formikName="tenure" />
+                            {/* Tenure */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Tenure"
+                                inputType="dropdown"
+                                formikName="tenure"
+                            />
 
-                                    {/* Tax Band */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Tax Band" inputType="text" formikName="taxBand" />
+                            {/* Tax Band */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Tax Band"
+                                inputType="text"
+                                formikName="taxBand"
+                            />
 
-                                    {/* Rent */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Rent" inputType="text" formikName="rent" />
-                                    
-                                    {/* Key Features */}
-                                    <KeyFeaturesInput setFieldValue={formik.setFieldValue}/>
+                            {/* Rent */}
+                            <div className={formik.values.tenure === "to rent" ? "block" : "hidden"}>
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Rent"
+                                inputType="text"
+                                formikName="rent"
+                            />
+                            </div>
 
-                                    {/* Description */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Description" inputType="textarea" formikName="description" />
+                            {/* Key Features */}
+                            <KeyFeaturesInput
+                                setFieldValue={formik.setFieldValue}
+                            />
 
-                                    {/* Contact Number */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Contact Number" inputType="text" formikName="contactNumber" />
+                            {/* Description */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Description"
+                                inputType="textarea"
+                                formikName="description"
+                            />
 
-                                    {/* Contact Email */}
-                                    <ListingInput getFieldProps={formik.getFieldProps} labelName="Contact Email" inputType="text" formikName="contactEmail" />
-                                    
-                                    {/* Exterior Images */}
-                                    <ListingFileUpload labelName="Exterior Image" onChange={encodeExteriorImage} />
+                            {/* Contact Number */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Contact Number"
+                                inputType="text"
+                                formikName="contactNumber"
+                            />
 
+                            {/* Contact Email */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Contact Email"
+                                inputType="text"
+                                formikName="contactEmail"
+                            />
 
-                                    {/* Images */}
-                                    <ListingFileUpload labelName="Images" onChange={encodeImage} />
+                            {/* Exterior Images */}
+                            <ListingFileUpload
+                                labelName="Exterior Image"
+                                onChange={encodeExteriorImage}
+                            />
 
+                            {/* Images */}
+                            <ListingFileUpload
+                                labelName="Images"
+                                onChange={encodeImage}
+                            />
 
-                                    {/* Panoramic Images */}
-                                    <ListingFileUpload labelName="Panoramic Images" onChange={encodePanoramicImage} />
+                            {/* Panoramic Images */}
+                            <ListingFileUpload
+                                labelName="Panoramic Images"
+                                onChange={encodePanoramicImage}
+                            />
 
-                                    {/* Floor Plan */}
-                                    <ListingFileUpload labelName="Floor Plan" onChange={encodeFloorPlan} />
+                            {/* Floor Plan */}
+                            <ListingFileUpload
+                                labelName="Floor Plan"
+                                onChange={encodeFloorPlan}
+                            />
 
-                                    {/* Submit */}
-                                    <button
-                                        className="p-4 col-span-2 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
-                                        type="submit"
-                                    >
-                                        Submit
-                                    </button>
-                                </form>
-                            </section>
-                        </div>
-                    </div>
+                            {/* Submit */}
+                            <button
+                                className="p-4 col-span-2 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                type="submit"
+                            >
+                                Submit
+                            </button>
+                        </form>
+                    </section>
                 </div>
             </div>
         </>

@@ -29,6 +29,7 @@ model Property {
   bathrooms        String
   houseType        String
   address          String   @unique
+  postcode         String
   tenure           String
   taxBand          String
   rent             String

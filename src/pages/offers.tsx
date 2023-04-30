@@ -85,7 +85,7 @@ const Offers: NextPage<OffersPageProps> = ({
             <NavBar isLoggedIn={!!session} />
             <div className="container mx-auto p-5 pt-20">
                 <h1 className="text-4xl font-bold text-center mb-5">Offers</h1>
-                <BackArrow label="Back" />
+                <BackArrow label="Back" url="back" />
                 <div className="flex flex-wrap justify-around max-w-4xl mt-6 sm:w-full">
                     {properties.map((property) => (
                         <div className="p-6 mt-6 text-left border w-96 rounded-xl bg-white">
