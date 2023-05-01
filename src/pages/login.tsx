@@ -55,7 +55,7 @@ const Login: FC = () => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <section className="w-3/4 mx-auto flex flex-col gap-10">
+            <section className="w-3/4 mx-auto flex flex-col gap-10 items-center justify-center">
                 {/* Title */}
                 <div className="title">
                     <h1 className="text-gray-800 text-4xl font-bold py-4">
@@ -112,11 +112,11 @@ const Login: FC = () => {
                         </span>
                     </div>
 
-                    {/* {formik.touched.password && formik.errors.password ? (
+                    {formik.touched.password && formik.errors.password ? (
                         <div className="text-red-500 text-sm">
                             {formik.errors.password}
                         </div>
-                    ) : null} */}
+                    ) : null}
 
                     {/* Login buttons */}
                     <div className="input-button">

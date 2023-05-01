@@ -54,7 +54,7 @@ export default function Register() {
                 />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <section className="w-3/4 mx-auto flex flex-col gap-10">
+            <section className="w-3/4 h-full mx-auto flex flex-col">
                 {/* Title */}
                 <div className="title">
                     <h1 className="text-gray-800 text-4xl font-bold py-4">
