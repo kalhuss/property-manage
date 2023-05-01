@@ -29,6 +29,15 @@ export default async function handler(
         },
     });
 
+    const updatedProperty = await prisma.property.update({
+        where: {
+            id: updatedOffer.propertyId,
+        },
+        data: {
+            sold: true,
+        },
+    });
+
     // Update the rest of the offers to be rejected
     const rejectedOffers = await prisma.offer.updateMany({
         where: {
@@ -43,5 +52,5 @@ export default async function handler(
     });
 
     // Return rejectedOffers
-    return res.status(200).json({ rejectedOffers });
+    return res.status(200).json({ updatedOffer, updatedProperty , rejectedOffers });
 }

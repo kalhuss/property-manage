@@ -24,7 +24,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                         <div className={styles.layoutImg}></div>
                     </div>
 
-                    <div className="right flex flex-col justify-evenly overflow-hidden">
+                    <div className="right flex flex-col justify-evenly overflow-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300 scrollbar-thumb-rounded-full">
                         <div className="text-center py-10">{children}</div>
                     </div>
                 </div>

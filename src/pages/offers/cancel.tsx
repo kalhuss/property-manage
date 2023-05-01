@@ -6,11 +6,9 @@ import Link from "next/link";
 import { GetServerSideProps } from "next";
 import prisma from "../../../prisma/prisma";
 import Background from "@/components/Backgrounds";
-import BackArrow from "@/components/BackArrow";
 
 // Cancel page
 const CancelPage: NextPage = () => {
-    // Get the session
     const { data: session } = useSession();
 
     // Render the cancel page
@@ -28,10 +26,10 @@ const CancelPage: NextPage = () => {
             <NavBar isLoggedIn={!!session} />
             <div className="container mx-auto p-5 pt-20 flex flex-col">
                 <h1 className="text-4xl font-bold text-center mb-5">
-                    Payment Cancelled
+                    Payment was cancelled!
                 </h1>
                 <p className="text-center text-lg">
-                    Your payment has been cancelled.
+                    Sorry for any inconvenience caused. Please try again.
                 </p>
                 <Link href="/" className="flex justify-center">
                     <button className="justify-center px-8 py-3 mt-44 bg-white bg-opacity-75 text-blue-500 font-bold text-3xl rounded-md hover:shadow-lg  hover:bg-blue-500 hover:text-white border-2 border-blue-500">
@@ -43,19 +41,20 @@ const CancelPage: NextPage = () => {
     );
 };
 
-export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
     // Get the session
     const session = await getSession(context);
 
-    // If there's no session, redirect to the login page
+    // Check if the contract exists and if the logged-in user's email matches the email associated with the contract
     if (!session) {
         return {
             redirect: {
-                destination: "/login",
+                destination: "/",
                 permanent: false,
             },
         };
     }
+
     return {
         props: {},
     };

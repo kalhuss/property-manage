@@ -4,12 +4,6 @@ import { useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import Image from "next/image";
 
-// TODO: Fix Register page -> the input fields are going outside of the container
-// TODO: When user does incorrect login details, it should not show the error message but instead just let them try again
-// TODO: Find a way to load the new listing without refreshing the page
-// TODO: Error handle all the new listing inputs -> make sure that the correct types and update the database
-// TODO: Change the X button on the KeyFeaturesInput
-// TODO: If a contract has been signed the listing should be removed from the properties page - maybe add a sold tag
 // TODO: Cancel page for payment
 
 // Home page

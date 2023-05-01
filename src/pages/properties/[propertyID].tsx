@@ -125,7 +125,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                 <BackArrow label="Back to properties" url="/properties" />
                 <div className="grid grid-cols-2 gap-2">
                     <div className="grid grid-flow-row mb-3">
-                        <div className="relative">
+                        <div className="relative container">
                             {currentImageIndex < property.images.length ? (
                                 <Image
                                     src={
@@ -135,7 +135,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                     width="0"
                                     height="0"
                                     sizes="100vw"
-                                    className="w-full h-auto object-cover -z-10"
+                                    className="w-full h-auto object-cover -z-10 aspect-square"
                                     priority={true}
                                 />
                             ) : property.panoramicImages.length > 0 &&

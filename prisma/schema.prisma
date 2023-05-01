@@ -39,6 +39,7 @@ model Property {
   description      String   @db.Text
   contactNumber    String
   contactEmail     String
+  sold             Boolean  @default(false)
   images           String[]
   floorPlan        String[]
   panoramicImages  String[]

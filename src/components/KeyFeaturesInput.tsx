@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 
 // Props for the element
 interface KeyFeaturesInputProps {
@@ -55,18 +56,7 @@ const KeyFeaturesInput: React.FC<KeyFeaturesInputProps> = ({
                             onClick={() => handleTagRemove(tag)}
                         >
                             <span className="sr-only">Remove tag</span>
-                            <svg
-                                className="w-5 h-5"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.707-9.293a1 1 0 011.414 0L10 10.586l1.293-1.293a1 1 0 011.414 1.414L11.414 12l1.293 1.293a1 1 0 01-1.414 1.414L10 13.414l-1.293 1.293a1 1 0 01-1.414-1.414L8.586 12 7.293 10.707a1 1 0 010-1.414z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
+                            <Image src="/assets/x-circle.svg" width={20} height={20} alt="x circle" /> 
                         </button>
                     </span>
                 ))}
