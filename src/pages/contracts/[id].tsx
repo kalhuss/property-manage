@@ -246,7 +246,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
     // Generate the PDF document on page load
     useEffect(() => {
         generatePdf();
-    },[generatePdf]);
+    }, []);
 
     // Render the page
     return (
@@ -333,14 +333,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const acceptedOffer = offers.find(
         (offer) => offer.offerStatus === "Accepted"
     );
-    console.log("accepted: ", acceptedOffer);
-
-    const sessionUser = await prisma.user.findFirst({
-        where: {
-            email: session?.user?.email!,
-        },
-    });
-    console.log("session user: ", sessionUser);
 
     // Get the user data from the database
     const users = await prisma.user.findFirst({
@@ -348,10 +340,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             id: acceptedOffer?.userId,
         },
     });
-    console.log("accepted user: ", users);
 
     // If the user is not logged in or is not the tenant, redirect to the homepage
-    if (acceptedOffer?.userId !== sessionUser?.id) {
+    if (users?.email !== session?.user?.email) {
         return {
             redirect: {
                 destination: "/",
