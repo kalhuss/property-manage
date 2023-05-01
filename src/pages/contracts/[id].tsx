@@ -246,7 +246,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
     // Generate the PDF document on page load
     useEffect(() => {
         generatePdf();
-    },);
+    },[generatePdf]);
 
     // Render the page
     return (
