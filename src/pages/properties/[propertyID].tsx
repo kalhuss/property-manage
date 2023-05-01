@@ -74,7 +74,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                 }
             );
         }
-    }, [isLoaded, property.address, property.postcode]);
+    }, [isLoaded, address, property.address, property.postcode]);
 
     // If the session is loading, show a loading message
     if (!isLoaded) {
