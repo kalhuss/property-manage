@@ -41,8 +41,8 @@ export default async function handler(
             },
         ],
         mode: "payment",
-        success_url: `http://localhost:3000/offers/success?id=${contractId}`,
-        cancel_url: `http://localhost:3000/offers/cancel`,
+        success_url: `https://property-manage.vercel.app/offers/success?id=${contractId}`,
+        cancel_url: `https://property-manage.vercel.app/offers/cancel`,
     });
 
     // Return the url to the client
