@@ -8,6 +8,8 @@ import KeyFeaturesInput from "../components/KeyFeaturesInput";
 import ListingInput from "../components/ListingInput";
 import ListingFileUpload from "../components/ListingFileUpload";
 import Background from "@/components/Backgrounds";
+import { GetServerSideProps } from "next";
+import { getSession } from "next-auth/react";
 
 // Listing page
 const Listing: FC = () => {
@@ -363,6 +365,24 @@ const Listing: FC = () => {
             </div>
         </>
     );
+};
+
+export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
+    // Get the session
+    const session = await getSession(context);
+
+    // If there's no session, redirect to the login page
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+    return {
+        props: {},
+    };
 };
 
 export default Listing;

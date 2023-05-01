@@ -41,8 +41,8 @@ export default async function handler(
             },
         ],
         mode: "payment",
-        success_url: `/offers/success?id=${contractId}`, // removed localhost:3000
-        cancel_url: `/offers/cancel?id=${contractId}`,
+        success_url: `http://localhost:3000/offers/success?id=${contractId}`,
+        cancel_url: `http://localhost:3000/offers/cancel`,
     });
 
     // Return the url to the client

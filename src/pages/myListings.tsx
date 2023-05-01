@@ -41,7 +41,18 @@ const MyListings: NextPage<PropertyProps> = ({ properties }) => {
 
 // Get the user and property data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Get the session
     const session = await getSession(context);
+
+    // If there's no session, redirect to the login page
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
 
     // Get the user
     const user = await prisma.user.findUnique({

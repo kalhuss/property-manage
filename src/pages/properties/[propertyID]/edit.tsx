@@ -377,8 +377,9 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
 
 // Get the property and user data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const id = context.params?.propertyID;
+    // Get the session
     const session = await getSession(context);
+    const id = context.params?.propertyID;
 
     // Get the property and user data
     const property = await prisma.property.findFirst({
@@ -392,6 +393,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             email: session?.user?.email!,
         },
     });
+
+    // If the user is not logged in, redirect to the home page
+    if (user?.id !== property?.userId) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+            },
+        };
+    }
 
     return {
         props: {

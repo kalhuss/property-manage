@@ -10,6 +10,7 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import NavBar from "../../components/NavBar";
 import { useFormik } from "formik";
+import { getSession } from "next-auth/react";
 
 // Props for the contract page
 interface ContractPageProps {
@@ -311,6 +312,8 @@ const ContractPage: React.FC<ContractPageProps> = ({
 
 // Get the property and offer data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Get the session
+    const session = await getSession(context);
     const id = context.params?.id;
 
     // Get the property and offer data from the database
@@ -337,6 +340,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             id: acceptedOffer?.userId,
         },
     });
+
+    // Do a check where if the contract userid does not match the session userid, redirect to the homepage
+    if (users?.email !== session?.user?.email) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+            },
+        };
+    }
 
     return {
         props: {

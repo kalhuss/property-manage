@@ -209,7 +209,19 @@ const Offers: NextPage<OffersPageProps> = ({
 
 // Get the user, offers and properties data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Get the session
     const session = await getSession(context);
+
+    // If there's no session, redirect to the login page
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
     const email = session?.user?.email;
 
     // Get the user

@@ -10,6 +10,7 @@ import { useState } from "react";
 import Background from "@/components/Backgrounds";
 import Router from "next/router";
 import BackArrow from "@/components/BackArrow";
+import { getSession } from "next-auth/react";
 
 // Props for the check offers page
 interface CheckOffersPageProps {
@@ -137,6 +138,18 @@ const CheckOffers: NextPage<CheckOffersPageProps> = ({
 
 // Get the offers and users for the property
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Get the session
+    const session = await getSession(context);
+
+    // If there's no session, redirect to the login page
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
     const id = context.params?.propertyID;
 
     // Get the property, offers and users

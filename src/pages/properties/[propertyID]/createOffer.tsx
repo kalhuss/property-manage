@@ -10,6 +10,7 @@ import { useFormik } from "formik";
 import Router from "next/router";
 import { ChangeEvent } from "react";
 import FileUpload from "../../../components/FileUpload";
+import { getSession } from "next-auth/react";
 
 // Props for the check offers page
 interface OfferPageProps {
@@ -159,6 +160,19 @@ const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
 
 // Get the property data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Get the session
+    const session = await getSession(context);
+
+    // If there's no session, redirect to the login page
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
     const id = context.params?.propertyID;
     const offerValue = context.query.offerValue;
 

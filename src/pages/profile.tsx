@@ -305,6 +305,17 @@ const Guest: NextPage = () => {
 // Get the user data from the database
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
     const session = await getSession(context);
+
+    // If there's no session, redirect to the login page
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
+
     const email = session?.user?.email;
 
     // Get the user
