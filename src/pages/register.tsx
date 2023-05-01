@@ -9,6 +9,8 @@ import { useFormik } from "formik";
 import { validateRegister } from "lib/validate";
 import { FaCalendarAlt } from "react-icons/fa";
 import { AiFillPhone } from "react-icons/ai";
+import { GetServerSideProps } from "next";
+import { getSession } from "next-auth/react";
 
 // Register page
 export default function Register() {
@@ -217,3 +219,23 @@ export default function Register() {
         </Layout>
     );
 }
+
+// Get the offers and users for the property
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Get the session
+    const session = await getSession(context);
+
+    // If the user is logged in, redirect to the home page
+    if (session) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+            },
+        };
+    }
+
+    return {
+        props: {},
+    };
+};

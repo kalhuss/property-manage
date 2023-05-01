@@ -341,7 +341,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
 
-    // Do a check where if the contract userid does not match the session userid, redirect to the homepage
+    // If the user is not logged in or is not the tenant, redirect to the homepage
     if (users?.email !== session?.user?.email) {
         return {
             redirect: {

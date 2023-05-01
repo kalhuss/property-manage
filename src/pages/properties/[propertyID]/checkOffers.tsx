@@ -140,16 +140,6 @@ const CheckOffers: NextPage<CheckOffersPageProps> = ({
 export const getServerSideProps: GetServerSideProps = async (context) => {
     // Get the session
     const session = await getSession(context);
-
-    // If there's no session, redirect to the login page
-    if (!session) {
-        return {
-            redirect: {
-                destination: "/login",
-                permanent: false,
-            },
-        };
-    }
     const id = context.params?.propertyID;
 
     // Get the property, offers and users
@@ -165,6 +155,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
 
+    // Get the user
+    const user = await prisma.user.findFirst({
+        where: {
+            email: session?.user?.email!,
+        },
+    });
+
+    // Get all the users that have made an offer on the property
     const users = await prisma.user.findMany({
         where: {
             id: {
@@ -172,6 +170,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         },
     });
+
+    // If there's no session or the user isn't the owner of the property, redirect to the homepage
+    if (!session || user?.id !== property?.userId) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+            },
+        };
+    }
+    
 
     return {
         props: {
