@@ -10,8 +10,11 @@ import { validateRegister } from "lib/validate";
 import { FaCalendarAlt } from "react-icons/fa";
 import { AiFillPhone } from "react-icons/ai";
 
+// Register page
 export default function Register() {
     const [show, setShow] = useState({ password: false, cpassword: false });
+
+    // Setup formik for form validation
     const formik = useFormik({
         initialValues: {
             name: "",
@@ -24,7 +27,7 @@ export default function Register() {
         },
         validate: validateRegister,
         onSubmit: async (values) => {
-            //call the signUp api
+            // Call the signUp API
             fetch("/api/auth/signUp", {
                 method: "POST",
                 body: JSON.stringify(values),
@@ -34,6 +37,7 @@ export default function Register() {
         },
     });
 
+    // Render the register page
     return (
         <Layout>
             <Head>
@@ -112,7 +116,6 @@ export default function Register() {
                             <FaCalendarAlt size={20} />
                         </span>
                     </div>
-                    
 
                     {/* Phone Number */}
                     <div className={styles.input_group}>
@@ -131,7 +134,6 @@ export default function Register() {
                             {formik.errors.phoneNumber}
                         </div>
                     ) : null}
-
 
                     {/* Email */}
                     <div className={styles.input_group}>

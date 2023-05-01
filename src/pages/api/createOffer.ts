@@ -3,11 +3,13 @@ import prisma from "../../../prisma/prisma";
 import { createClient } from "@supabase/supabase-js";
 import { nanoid } from "nanoid";
 
+// Supabase client
 const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_APIKEY!
 );
 
+// Handler for /api/createOffer
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -17,6 +19,7 @@ export default async function handler(
         return res.status(405).json({ message: "Method not allowed" });
     }
 
+    // Get data from request body
     const {
         offerValue,
         mortgage,
@@ -48,31 +51,28 @@ export default async function handler(
         },
     });
 
-
-     // Check if offer from user already exists
+    // Check if offer from user already exists
     const offerExists = await prisma.offer.findFirst({
         where: {
-            AND: [
-                { userId: userID?.id },
-                { propertyId: property?.id },
-            ],
+            AND: [{ userId: userID?.id }, { propertyId: property?.id }],
         },
     });
 
+    // If offer exists, update the offer
     if (offerExists) {
-
         const updatedOffer = await prisma.offer.update({
             where: {
-                id: offerExists.id
+                id: offerExists.id,
             },
             data: {
                 amount: offerValue,
                 status: offerExists.status,
                 offerStatus: offerExists.offerStatus,
-                mortgageImage: await uploadImages(mortgage)
-            }
+                mortgageImage: await uploadImages(mortgage),
+            },
         });
 
+        // Return listing
         return res.status(400).json({ message: "Offer already exists" });
     }
 
@@ -111,14 +111,17 @@ export default async function handler(
         return dataArray;
     }
 
+    // Check if property exists
     const propertyExists = await prisma.property.findUnique({
         where: { propertyID: parseInt(propertyId) },
     });
 
+    // If property does not exist, return error
     if (!propertyExists) {
         return res.status(400).json({ message: "Property does not exist" });
     }
 
+    // Create new offer
     try {
         const newOffer = await prisma.offer.create({
             data: {
@@ -147,10 +150,11 @@ export default async function handler(
     }
 }
 
+// Set body size limit to 50mb
 export const config = {
     api: {
         bodyParser: {
-            sizeLimit: "50mb", // Set desired value here
+            sizeLimit: "50mb",
         },
     },
 };

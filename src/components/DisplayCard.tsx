@@ -3,21 +3,30 @@ import { Property } from "@prisma/client";
 import Link from "next/link";
 import Image from "next/image";
 
+// Props for the DisplayCard component
 interface PropertyProps {
     properties: Property[];
 }
 
+// CDN for the property images
 let CDN =
     "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
 
+
+// DisplayCard component
 const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
+
+    // Return the DisplayCard component
     return (
         <div className="grid grid-cols-1 gap-6 font-mono">
+            
+            {/* Map through the properties */}
             {properties.map((property) => (
                 <div
                     key={property.id}
                     className="bg-white p-6 rounded-lg shadow-lg mb-6 cursor-default grid grid-cols-2 group hover:drop-shadow-md w-4/12 md:mx-auto"
                 >
+                    {/* Image of the property */}
                     <div className="relative h-48 w-48 md:h-64 md:w-64 rounded-t-lg overflow-hidden mb-4 place-items-center mx-auto">
                         <Image
                             src={CDN + property.images[0]}
@@ -29,6 +38,8 @@ const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
                             priority={true}
                         />
                     </div>
+
+                    {/* Details of the property */}
                     <div className="flex flex-col flex-grow justify-center">
                         {property.tenure === "to rent" ? (
                             <h1 className="text-2xl font-medium mb-2">

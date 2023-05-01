@@ -1,20 +1,17 @@
 import Router from "next/router";
 import { useEffect, useState } from "react";
-import handlebars from "handlebars";
-import { degrees, PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import prisma from "../../../prisma/prisma";
-import { GetServerSideProps, NextPage } from "next";
+import { GetServerSideProps } from "next";
 import { Property } from "@prisma/client";
 import { User } from "@prisma/client";
 import { Offer } from "@prisma/client";
 import Head from "next/head";
-import { getSession, useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import NavBar from "../../components/NavBar";
-import blobStream from "blob-stream";
-import { useRef } from "react";
-import WebViewer from "@pdftron/webviewer";
 import { useFormik } from "formik";
 
+// Props for the contract page
 interface ContractPageProps {
     offers: Offer[];
     users: User;
@@ -22,26 +19,22 @@ interface ContractPageProps {
     acceptedOffer: Offer;
 }
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
-type sessionProps = {
-    session: Session;
-};
-
+// Contract page
 const ContractPage: React.FC<ContractPageProps> = ({
     users,
     property,
     acceptedOffer,
 }) => {
+    // Get the session
+    const { data: session } = useSession();
     const [pdfUrl, setPdfUrl] = useState<string>("");
-    const { data: session, status } = useSession();
     const [isSigned, setIsSigned] = useState<boolean>(false);
     const [submitPressed, setSubmitPressed] = useState<boolean>(false);
     let file: string[] = [];
 
     const offerId = acceptedOffer.id;
 
+    // Get the contract file from the server
     const formik = useFormik({
         initialValues: {
             userId: users.id,
@@ -59,23 +52,24 @@ const ContractPage: React.FC<ContractPageProps> = ({
             if ((await response).ok) {
                 Router.push("/offers");
             }
-            
-
-
         },
     });
 
+    // Generate the PDF document
     const generatePdf = async () => {
+        // Create a new PDFDocument
         const pdfDoc = await PDFDocument.create();
         const form = pdfDoc.getForm();
         const page = pdfDoc.addPage();
 
+        // Add the signature field to the PDF document
         const textField = form.createTextField("signature");
         textField.isRequired();
 
         const headerText = "RESIDENTIAL LEASE AGREEMENT";
         const footerText = "Page 1 of 1";
 
+        // Termination reasons
         const terminationReasons = [
             "Failure to pay rent on time",
             "Violation of terms of the lease agreement",
@@ -166,7 +160,6 @@ const ContractPage: React.FC<ContractPageProps> = ({
                 x: 120,
                 y: yCoord,
                 size: 12,
-                //font: await pdfDoc.embedFont(StandardFonts.Helvetica),
                 color: rgb(0, 0, 0),
             });
         });
@@ -205,32 +198,39 @@ const ContractPage: React.FC<ContractPageProps> = ({
         setPdfUrl(URL.createObjectURL(pdfBlob));
     };
 
+    // Handle the click event on the "Sign" button
     async function clickToSign() {
         setIsSigned(true);
+        // Generate the PDF document
         const existingPdfBytes = await fetch(pdfUrl).then((res) =>
             res.arrayBuffer()
         );
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
         const form = pdfDoc.getForm();
 
+        // Fill the signature field
         form.getTextField("signature").setText(
             users.name + " " + users.surname
         );
         form.flatten();
 
+        // Save the PDF document
         const pdfBytes = await pdfDoc.save();
         const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
         setPdfUrl(URL.createObjectURL(pdfBlob));
     }
 
+    // Handle submit event
     async function encodePDF() {
         setSubmitPressed(true);
+        // Generate the PDF document
         const existingPdfBytes = await fetch(pdfUrl).then((res) =>
             res.arrayBuffer()
         );
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
         let readers = [];
 
+        // Convert the PDF document as a base64 string
         const pdfBytes = await pdfDoc.saveAsBase64({ dataUri: true });
         const pdfString = pdfBytes.toString();
         readers.push(pdfString);
@@ -240,17 +240,23 @@ const ContractPage: React.FC<ContractPageProps> = ({
             ...formik.values,
             file: readers,
         });
-        
     }
 
+    // Generate the PDF document on page load
     useEffect(() => {
         generatePdf();
     }, []);
 
+    // Render the page
     return (
         <div className="h-screen w-full flex flex-col">
             <Head>
                 <title>Contract</title>
+                <meta
+                    name="description"
+                    content="Generated by create next app"
+                />
+                <link rel="icon" href="/favicon.ico" />
             </Head>
             <NavBar isLoggedIn={!!session} />
             <main className="flex-grow flex flex-col items-center justify-center ">
@@ -266,22 +272,35 @@ const ContractPage: React.FC<ContractPageProps> = ({
             </main>
 
             {!isSigned ? (
-                <button onClick={clickToSign} className="w-full bg-blue-500 text-white font-bold hover:bg-white hover:text-blue-500 border-2 border-blue-500">Click To Sign</button>
+                <button
+                    onClick={clickToSign}
+                    className="w-full bg-blue-500 text-white font-bold hover:bg-white hover:text-blue-500 border-2 border-blue-500"
+                >
+                    Click To Sign
+                </button>
             ) : !submitPressed ? (
-                <button onClick={encodePDF} type="submit" className="w-full bg-blue-500 text-white font-bold hover:bg-white hover:text-blue-500 border-2 border-blue-500">
+                <button
+                    onClick={encodePDF}
+                    type="submit"
+                    className="w-full bg-blue-500 text-white font-bold hover:bg-white hover:text-blue-500 border-2 border-blue-500"
+                >
                     Submit
                 </button>
             ) : (
-                <div className = "grid grid-cols-2 text-center">
-                    <form
-                        
-                        onSubmit={formik.handleSubmit}
-                    >   
-                        <button onClick={encodePDF} type="submit" className="w-full bg-green-500 text-white font-bold hover:bg-white hover:text-green-500 border-2 border-green-500">
+                <div className="grid grid-cols-2 text-center">
+                    <form onSubmit={formik.handleSubmit}>
+                        <button
+                            onClick={encodePDF}
+                            type="submit"
+                            className="w-full bg-green-500 text-white font-bold hover:bg-white hover:text-green-500 border-2 border-green-500"
+                        >
                             Confirm
                         </button>
                     </form>
-                    <button onClick={() => setSubmitPressed(false)} className="w-full bg-red-500 text-white font-bold hover:bg-white hover:text-red-500 border-2 border-red-500">
+                    <button
+                        onClick={() => setSubmitPressed(false)}
+                        className="w-full bg-red-500 text-white font-bold hover:bg-white hover:text-red-500 border-2 border-red-500"
+                    >
                         Cancel
                     </button>
                 </div>
@@ -290,9 +309,11 @@ const ContractPage: React.FC<ContractPageProps> = ({
     );
 };
 
+// Get the property and offer data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const id = context.params?.id;
 
+    // Get the property and offer data from the database
     const property = await prisma.property.findFirst({
         where: {
             id: id?.toString(),
@@ -305,10 +326,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
 
+    // Get the accepted offer data from the database
     const acceptedOffer = offers.find(
         (offer) => offer.offerStatus === "Accepted"
     );
 
+    // Get the user data from the database
     const users = await prisma.user.findFirst({
         where: {
             id: acceptedOffer?.userId,

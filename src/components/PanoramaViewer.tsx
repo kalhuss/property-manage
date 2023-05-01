@@ -2,15 +2,18 @@ import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
+// Props for the component
 interface PanoramicImage {
     image: string;
 }
 
+// PanoramaViewer component
 const PanoramaViewer: React.FC<PanoramicImage> = ({ image }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [texture, setTexture] = useState<THREE.Texture | null>(null);
     const [isLoading, setLoading] = useState<boolean>(false);
 
+    // Load the image
     useEffect(() => {
         // Create the scene
         const scene = new THREE.Scene();
@@ -62,25 +65,27 @@ const PanoramaViewer: React.FC<PanoramicImage> = ({ image }) => {
         render();
     }, [texture]);
 
+    // Load the texture
     useEffect(() => {
         setLoading(true);
         const loader = new THREE.TextureLoader();
         loader.load(
             image,
-            texture => {
+            (texture) => {
                 setTexture(texture);
                 setLoading(false);
             },
-            xhr => {
+            (xhr) => {
                 console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
             },
-            error => {
+            (error) => {
                 console.log("An error happened: " + error);
                 setLoading(false);
             }
         );
     }, [image]);
 
+    // Return the PanoramaViewer component
     return (
         <div className="w-full h-auto aspect-square -z-10">
             <canvas ref={canvasRef} className="w-full h-full aspect-video" />

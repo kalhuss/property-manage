@@ -1,21 +1,31 @@
-import Stripe from 'stripe';
+import Stripe from "stripe";
 import { NextApiRequest, NextApiResponse } from "next";
 
+// Handler for /api/payment
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
+    // Only allow POST requests
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method not allowed" });
     }
 
+    // Create a new Stripe instance
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
         apiVersion: "2022-11-15",
     });
 
-    const { amount, currency, contractId,  }: { amount: number, currency: string, contractId: string } = JSON.parse(req.body);
-    console.log(amount, currency, contractId);
+    // Get data from request body
+    const {
+        amount,
+        currency,
+        contractId,
+    }: { amount: number; currency: string; contractId: string } = JSON.parse(
+        req.body
+    );
 
+    // Create a new checkout session
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
@@ -31,8 +41,8 @@ export default async function handler(
             },
         ],
         mode: "payment",
-        success_url: `http://localhost:3000/offers/success?id=${contractId}`,
-        cancel_url: `http://localhost:3000`,
+        success_url: `/offers/success?id=${contractId}`, // removed localhost:3000
+        cancel_url: `/offers/cancel?id=${contractId}`,
     });
 
     // Return the url to the client

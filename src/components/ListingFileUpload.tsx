@@ -1,11 +1,14 @@
 import React from "react";
 
+// Props for the input
 interface InputProps {
     labelName: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
+// Function to generate the input
 const ListingFileUpload: React.FC<InputProps> = ({ labelName, onChange }) => {
+    // Custom file upload input
     return (
         <div className="flex flex-col">
             <label htmlFor={labelName} className="font-bold">

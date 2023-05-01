@@ -4,46 +4,37 @@ import { User } from "@prisma/client";
 import { Offer } from "@prisma/client";
 import prisma from "../../../../prisma/prisma";
 import Head from "next/head";
-import { getSession, useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import NavBar from "../../../components/NavBar";
 import { useState } from "react";
 import Background from "@/components/Backgrounds";
-import { useFormik } from "formik";
 import Router from "next/router";
-import { ChangeEvent } from "react";
-import FileUpload from "../../../components/FileUpload";
-import { useEffect } from "react";
-import DisplayCard from "../../../components/DisplayCard";
-import { BsArrowLeft } from "react-icons/bs";
-import Link from "next/link";
 import BackArrow from "@/components/BackArrow";
 
+// Props for the check offers page
 interface CheckOffersPageProps {
     offers: Offer[];
     users: User[];
     property: Property;
 }
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
-type sessionProps = {
-    session: Session;
-};
-
-const checkOffers: NextPage<CheckOffersPageProps> = ({
+// Check offers page
+const CheckOffers: NextPage<CheckOffersPageProps> = ({
     offers,
     users,
     property,
 }) => {
-    const { data: session, status } = useSession();
+    // Get the session
+    const { data: session } = useSession();
     const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
     const [offersValue, setOffers] = useState<Offer[]>(offers);
 
+    // Handle the click of an offer
     const handleOfferClick = (offer: Offer) => {
         setSelectedOffer(offer);
     };
 
+    // Handle the click of the confirm button
     async function handleConfirmClick() {
         fetch("/api/updateOffers", {
             method: "POST",
@@ -52,20 +43,23 @@ const checkOffers: NextPage<CheckOffersPageProps> = ({
         Router.reload();
     }
 
+    // Handle the click of the cancel button
     const handleCancelClick = () => {
         setSelectedOffer(null);
     };
+
+    // Render the check offers page
     return (
         <>
-            <Background />
-            <NavBar isLoggedIn={!!session} />
             <Head>
                 <title>Check Offers</title>
                 <meta name="description" content={property.description} />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
+            <Background />
+            <NavBar isLoggedIn={!!session} />
             <div className="container mx-auto p-5 pt-20">
-                <BackArrow label="Back" url="back"/>
+                <BackArrow label="Back" url="back" />
                 <h1 className="text-4xl font-bold text-center mb-5">Offers</h1>
                 <div className="bg-white rounded-lg shadow-lg p-4 mb-4 w-auto">
                     <h2 className="text-2xl font-bold mb-4">
@@ -141,9 +135,11 @@ const checkOffers: NextPage<CheckOffersPageProps> = ({
     );
 };
 
+// Get the offers and users for the property
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const id = context.params?.propertyID;
 
+    // Get the property, offers and users
     const property = await prisma.property.findFirst({
         where: {
             propertyID: Number(id),
@@ -173,4 +169,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 };
 
-export default checkOffers;
+export default CheckOffers;

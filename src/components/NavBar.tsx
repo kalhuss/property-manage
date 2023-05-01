@@ -4,13 +4,16 @@ import { useState } from "react";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import Router from "next/router";
 
+// Props for the Navbar component
 type NavbarProps = {
     isLoggedIn: boolean;
 };
 
+// Navbar component
 const Navbar: React.FC<NavbarProps> = ({ isLoggedIn }) => {
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+    // Open and close the profile menu
     const handleProfileMenuOpen = () => {
         setIsProfileMenuOpen(true);
     };
@@ -19,6 +22,7 @@ const Navbar: React.FC<NavbarProps> = ({ isLoggedIn }) => {
         setIsProfileMenuOpen(false);
     };
 
+    // Return the Navbar component
     return (
         <nav className="flex items-center justify-between flex-wrap bg-white bg-opacity-80 p-6 px-10 w-full fixed z-20">
             <div className="flex items-center flex-shrink-0 text-black mr-6">

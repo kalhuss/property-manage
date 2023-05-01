@@ -2,9 +2,8 @@ import { GetServerSideProps, NextPage } from "next";
 import { Property } from "@prisma/client";
 import prisma from "../../../prisma/prisma";
 import Head from "next/head";
-import { getSession, useSession, signOut } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import NavBar from "../../components/NavBar";
-import { BsArrowLeft } from "react-icons/bs";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -15,34 +14,34 @@ import BackArrow from "@/components/BackArrow";
 import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
 import { useMemo } from "react";
 
+// Props for the property page
 interface PropertyPageProps {
     property: Property;
     user: User;
 }
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
-type sessionProps = {
-    session: Session;
-};
-
+// CDN for images
 let CDN =
     "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
 
+// Property page
 const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
-    const { data: session, status } = useSession();
+    // Get the session
+    const { data: session } = useSession();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [currentFloorPlanIndex, setCurrentFloorPlanIndex] = useState(0);
     const [offerValue, setOfferValue] = useState("");
 
+    // libraries for google maps
     const libraries = useMemo(() => ["places"], []);
 
+    // State for the map
     const [mapCenter, setMapCenter] = useState<{
         lat: number;
         lng: number;
     }>({ lat: 0, lng: 0 });
 
+    // Map options
     const mapOptions = useMemo<google.maps.MapOptions>(
         () => ({
             disableDefaultUI: true,
@@ -52,14 +51,16 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
         []
     );
 
-    const { isLoaded, loadError } = useLoadScript({
+    // Load the google maps script
+    const { isLoaded } = useLoadScript({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY as string,
         libraries: libraries as any,
     });
 
+    // Get the address
     const address = `${property.address} ${property.postcode}`;
-    console.log(address);
 
+    // Get the location of the property and set the map center
     useEffect(() => {
         if (isLoaded && property.address && property.postcode) {
             const geocoder = new google.maps.Geocoder();
@@ -75,14 +76,17 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
         }
     }, [isLoaded, property.address, property.postcode]);
 
+    // If the session is loading, show a loading message
     if (!isLoaded) {
         return <p>Loading...</p>;
     }
 
+    // Calculate the length of the image sliders
     const imageSliderLength =
         property.images.length + property.panoramicImages.length;
     const floorPlanSliderLength = property.floorPlan.length;
 
+    // Handle the next image
     function handleNextImage(imageType: string) {
         if (imageType === "image") {
             setCurrentImageIndex((currentImageIndex + 1) % imageSliderLength);
@@ -93,6 +97,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
         }
     }
 
+    // Handle the previous image
     function handlePrevImage(imageType: string): void {
         if (imageType === "image") {
             setCurrentImageIndex(
@@ -106,6 +111,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
         }
     }
 
+    // Return the property page
     return (
         <div>
             <Head>
@@ -133,7 +139,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                     priority={true}
                                 />
                             ) : property.panoramicImages.length > 0 &&
-                              currentImageIndex >= property.images.length ? (
+                                currentImageIndex >= property.images.length ? (
                                 <PanoramaViewer
                                     image={
                                         CDN +
@@ -404,15 +410,19 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
     );
 };
 
+// Get the property data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const id = context.params?.propertyID;
     const session = await getSession(context);
+
+    // Get the property data from the database
     const property = await prisma.property.findFirst({
         where: {
             propertyID: parseInt(id as string),
         },
     });
 
+    // Get the user data from the database
     const user = await prisma.user.findFirst({
         where: {
             email: session?.user?.email!,

@@ -1,13 +1,22 @@
 import { useState } from "react";
 
+// Props for the element
 interface KeyFeaturesInputProps {
-    setFieldValue: (field: string, value: any, shouldValidate?: boolean | undefined) => void;
+    setFieldValue: (
+        field: string,
+        value: any,
+        shouldValidate?: boolean | undefined
+    ) => void;
 }
 
-const KeyFeaturesInput: React.FC<KeyFeaturesInputProps> = ({setFieldValue}) => {
+// Function to generate the elements
+const KeyFeaturesInput: React.FC<KeyFeaturesInputProps> = ({
+    setFieldValue,
+}) => {
     const [tags, setTags] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState<string>("");
 
+    // Event handlers
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
     };
@@ -26,10 +35,14 @@ const KeyFeaturesInput: React.FC<KeyFeaturesInputProps> = ({setFieldValue}) => {
         setTags(tags.filter((tag) => tag !== tagToRemove));
     };
 
+    // Return the KeyFeaturesInput component
     return (
         <div className="flex flex-col items-start w-full">
-            <label className="mb-1 font-bold" htmlFor="keyFeatures">Key Features</label>
+            <label className="mb-1 font-bold" htmlFor="keyFeatures">
+                Key Features
+            </label>
             <div className="flex flex-wrap items-center w-full py-2 px-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900">
+                {/* Map the tags */}
                 {tags.map((tag) => (
                     <span
                         key={tag}

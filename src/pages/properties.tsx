@@ -5,32 +5,20 @@ import { Property } from "@prisma/client";
 import DisplayCard from "../components/DisplayCard";
 import Head from "next/head";
 import NavBar from "../components/NavBar";
-import { getSession, useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Background from "../components/Backgrounds";
-import { GetServerSideProps } from "next";
-import Router from "next/router";
 import { useState } from "react";
 
-
+// Props for the properties page
 interface PropertyProps {
     properties: Property[];
 }
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
-type sessionProps = {
-    session: Session;
-};
-
-interface Query {
-    bedrooms?: string;
-    bathrooms?: string;
-}
-
+// Properties page
 const Properties: NextPage<PropertyProps> = ({ properties }) => {
+    // Get the session
     const { data: session, status } = useSession();
-    
+
     // State variables for filters
     const [bedrooms, setBedrooms] = useState("");
     const [bathrooms, setBathrooms] = useState("");
@@ -85,6 +73,7 @@ const Properties: NextPage<PropertyProps> = ({ properties }) => {
             return true;
         });
 
+    // Render the properties page
     return (
         <div>
             <Head>
@@ -224,13 +213,12 @@ const Properties: NextPage<PropertyProps> = ({ properties }) => {
                     )}
                 </div>
                 <DisplayCard properties={filteredProperties} />
-                </div>
             </div>
-
-        
+        </div>
     );
 };
 
+// Get all properties from the database
 export async function getServerSideProps() {
     const properties = await prisma.property.findMany();
     return {

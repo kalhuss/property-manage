@@ -3,20 +3,23 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { nanoid } from "nanoid";
 
+// Supabase client
 const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_APIKEY!
 );
 
+// Handler for /api/uploadContract
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
+    // Only allow POST requests
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method not allowed" });
     }
 
-    // Get the request body values
+    // Get data from request body
     const {
         propertyId,
         userId,
@@ -36,13 +39,17 @@ export default async function handler(
 
     // Upload the file to supabase storage
     async function uploadFile(file: string[]) {
+        // Array to store image paths
         let dataArray = [];
+
         for (let i = 0; i < file.length; i++) {
+            // Convert base64 string to buffer
             const base64Data = Buffer.from(
                 file[i].replace(/^data:application\/\w+;base64,/, ""),
                 "base64"
             );
 
+            // Upload the file to supabase storage
             const { data, error } = await supabase.storage
                 .from("property-images")
                 .upload(`${userId}/contracts/${nanoid(10)}`, base64Data, {
@@ -90,5 +97,6 @@ export default async function handler(
                 .json({ message: "Error updating offer status" });
         });
 
+    // Return the contract and updated offer
     return res.status(200).json({ contract: contract, signed: updateOffer });
 }

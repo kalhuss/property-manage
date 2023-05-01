@@ -3,11 +3,13 @@ import prisma from "../../../prisma/prisma";
 import { createClient } from "@supabase/supabase-js";
 import { nanoid } from "nanoid";
 
+// Supabase client
 const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_APIKEY!
 );
 
+// Handler for /api/createListing
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -16,6 +18,8 @@ export default async function handler(
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method not allowed" });
     }
+
+    // Get data from request body
     const {
         price,
         bedrooms,
@@ -55,7 +59,7 @@ export default async function handler(
         floorPlan: string[];
         email: string;
     } = JSON.parse(req.body);
-    console.log(email, price, bedrooms, bathrooms, houseType, address, postcode, tenure, taxBand, rent, keyFeatures, description, contactNumber, contactEmail);
+
     // Check if user is logged in
     if (!email) {
         return res.status(400).json({ message: "No current session" });
@@ -75,6 +79,7 @@ export default async function handler(
         },
     });
 
+    // If listing exists, return error
     if (listingExists) {
         return res.status(400).json({ message: "Listing already exists" });
     }
@@ -88,10 +93,12 @@ export default async function handler(
         }
     }
 
-    // Upload exterior image to supabase
+    // Upload panoramic images to supabase
     async function uploadPanoramicImages(panoramicImages: string[]) {
+        // Array to store image paths
         let dataArray = [];
         for (let i = 0; i < panoramicImages.length; i++) {
+            // Convert base64 string to buffer
             const panoramicImagesFile = Buffer.from(
                 panoramicImages[i].replace(/^data:image\/\w+;base64,/, ""),
                 "base64"
@@ -114,15 +121,19 @@ export default async function handler(
         return dataArray;
     }
 
+    // Upload interior and exterior images to supabase
     async function uploadImages(images: string[], exteriorImage: string[]) {
+        // Array to store image paths
         let dataArray = [];
-        // Upload exterior image first so that it will always be the first image in the array and then upload the rest of the images from images array
+        // Exterior image uploaded first
         for (let i = 0; i < exteriorImage.length; i++) {
+            // Convert base64 string to buffer
             const exteriorImageFile = Buffer.from(
                 exteriorImage[i].replace(/^data:image\/\w+;base64,/, ""),
                 "base64"
             );
 
+            // Upload exterior images to supabase
             const { data, error } = await supabase.storage
                 .from("property-images")
                 .upload(
@@ -137,12 +148,16 @@ export default async function handler(
                 console.log(error);
             }
         }
+
+        // Interior images uploaded after exterior image
         for (let i = 0; i < images.length; i++) {
+            // Convert base64 string to buffer
             const imageFile = Buffer.from(
                 images[i].replace(/^data:image\/\w+;base64,/, ""),
                 "base64"
             );
 
+            // Upload interior images to supabase
             const { data, error } = await supabase.storage
                 .from("property-images")
                 .upload(`${userID?.id}/images/${nanoid(10)}`, imageFile, {
@@ -160,13 +175,17 @@ export default async function handler(
 
     // Upload floorplans to supabase
     async function uploadFloorPlan(floorPlan: string[]) {
+        // Array to store image paths
         let dataArray = [];
+
         for (let i = 0; i < floorPlan.length; i++) {
+            // Convert base64 string to buffer
             const imageFile = Buffer.from(
                 floorPlan[i].replace(/^data:image\/\w+;base64,/, ""),
                 "base64"
             );
 
+            // Upload floorplans to supabase
             const { data, error } = await supabase.storage
                 .from("property-images")
                 .upload(`${userID?.id}/floorplans/${nanoid(10)}`, imageFile, {
@@ -219,10 +238,11 @@ export default async function handler(
     return res.status(200).json({ listing: listing });
 }
 
+// Set body size limit to 50mb
 export const config = {
     api: {
         bodyParser: {
-            sizeLimit: "50mb", // Set desired value here
+            sizeLimit: "50mb",
         },
     },
 };

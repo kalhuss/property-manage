@@ -1,30 +1,31 @@
 import React from "react";
-import { Property } from "@prisma/client";
-import Link from "next/link";
-import Image from "next/image";
 import { BsArrowLeft } from "react-icons/bs";
 import { useRouter } from "next/router";
 
+// Props for the BackArrow component
 interface BackArrowProps {
     label: string;
     url: string;
 }
 
+// BackArrow component
 const BackArrow = ({ label, url }: BackArrowProps) => {
     const router = useRouter();
 
+    // Function to handle the click on the back arrow
     const handleClick = (url: string) => {
-        if(url === "back"){
+        if (url === "back") {
             router.back();
         } else {
             router.push(url);
         }
     };
 
+    // Return the BackArrow component
     return (
         <button className="flex pb-5" onClick={() => handleClick(url)}>
             <span className="text-2xl font-bold mr-2">
-                <BsArrowLeft className="group"/>
+                <BsArrowLeft className="group" />
             </span>
             <div className="block group text-lg mt-4 lg:inline-block lg:mt-0 font-bold text-black relative">
                 {label}

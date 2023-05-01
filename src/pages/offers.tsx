@@ -12,12 +12,9 @@ import { Offer } from "@prisma/client";
 import { Property } from "@prisma/client";
 import BackArrow from "@/components/BackArrow";
 import { Contract } from "@prisma/client";
-import { useEffect } from "react";
 import Router from "next/router";
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
+// Props for the offers page
 interface OffersPageProps {
     user: User;
     offers: Offer[];
@@ -25,17 +22,23 @@ interface OffersPageProps {
     contracts: Contract[];
 }
 
+// Offers page
 const Offers: NextPage<OffersPageProps> = ({
     user,
     offers,
     properties,
     contracts,
 }) => {
+    // Get the session
     const { data: session, status } = useSession();
+
+    // CDN for images
     const CDN =
         "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
+
     const [contractUrl, setContractUrl] = useState<Contract | null>(null);
 
+    // Handle the click of a contract
     function handleContract(propertyId: string) {
         const contract = contracts.find(
             (contract) => contract.propertyId === propertyId
@@ -46,7 +49,9 @@ const Offers: NextPage<OffersPageProps> = ({
         return contract?.id;
     }
 
+    // Handle click of payment button
     function handlePayment(amount: number, propertyId: string) {
+        // Call the payment API
         fetch("/api/payment", {
             method: "POST",
             body: JSON.stringify({
@@ -71,8 +76,9 @@ const Offers: NextPage<OffersPageProps> = ({
             });
     }
 
-    function handleCancel(offerId: string){
-
+    // Handle click of cancel button
+    function handleCancel(offerId: string) {
+        // Call the cancelOffer API
         const response = fetch("/api/cancelOffer", {
             method: "POST",
             body: JSON.stringify({
@@ -84,11 +90,10 @@ const Offers: NextPage<OffersPageProps> = ({
                 return response.json();
             }
             throw new Error("Network response was not ok.");
-        }
-        )
-
+        });
     }
 
+    // Render the offers page
     return (
         <>
             <Head>
@@ -125,7 +130,7 @@ const Offers: NextPage<OffersPageProps> = ({
                                             key={offer.id}
                                         >
                                             <p className="mt-4 text-xl">
-                                                Offer price: {offer.amount}
+                                                Offer price: £{offer.amount}
                                             </p>
                                             <p className="mt-4 text-xl">
                                                 Offer status:{" "}
@@ -134,27 +139,29 @@ const Offers: NextPage<OffersPageProps> = ({
                                             {offer.offerStatus === "Accepted" &&
                                                 !offer.signed && (
                                                     <>
-                                                    <Link
-                                                        href={`/contracts/${property.id}`}
-                                                    >
-                                                        <div
-                                                            onClick={() => {
-                                                                // TODO: handle click on contract button
-                                                            }}
-                                                            className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600"
+                                                        <Link
+                                                            href={`/contracts/${property.id}`}
                                                         >
-                                                            View Contract
-                                                        </div>
-                                                    </Link>
-                                                    <button 
-                                                    onClick={() => {
-                                                        handleCancel(offer.id)
-                                                    }}
-                                                    className="px-4 py-2 mt-4 text-center text-white bg-red-500 rounded hover:bg-red-600 focus:bg-red-600"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                </>
+                                                            <div
+                                                                onClick={() => {
+                                                                    // TODO: handle click on contract button
+                                                                }}
+                                                                className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600"
+                                                            >
+                                                                View Contract
+                                                            </div>
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => {
+                                                                handleCancel(
+                                                                    offer.id
+                                                                );
+                                                            }}
+                                                            className="px-4 py-2 mt-4 text-center text-white bg-red-500 rounded hover:bg-red-600 focus:bg-red-600"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </>
                                                 )}
                                             {offer.signed && (
                                                 <>
@@ -200,22 +207,26 @@ const Offers: NextPage<OffersPageProps> = ({
     );
 };
 
+// Get the user, offers and properties data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const session = await getSession(context);
     const email = session?.user?.email;
 
+    // Get the user
     const user = await prisma.user.findFirst({
         where: {
             email: email as string,
         },
     });
 
+    // Get the offers
     const offers = await prisma.offer.findMany({
         where: {
             userId: user?.id,
         },
     });
 
+    // Get the properties
     const properties = await prisma.property.findMany({
         where: {
             offers: {

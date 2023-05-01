@@ -6,7 +6,6 @@ import Link from "next/link";
 import { GetServerSideProps } from "next";
 import prisma from "../../../prisma/prisma";
 import { User } from "@prisma/client";
-import { useState } from "react";
 import Background from "@/components/Backgrounds";
 import { Offer } from "@prisma/client";
 import { Property } from "@prisma/client";
@@ -14,27 +13,19 @@ import BackArrow from "@/components/BackArrow";
 import { Contract } from "@prisma/client";
 import { useRouter } from "next/router";
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
+// Props for the success page
 interface SuccessPageProps {
     user: User;
-    offers: Offer[];
-    properties: Property[];
-    contracts: Contract[];
 }
 
-const SuccessPage: NextPage<SuccessPageProps> = ({
-    user,
-    offers,
-    properties,
-    contracts,
-}) => {
-    const { data: session, status } = useSession();
+// Success page
+const SuccessPage: NextPage<SuccessPageProps> = ({ user }) => {
+    // Get the session
+    const { data: session } = useSession();
     const router = useRouter();
     const { id } = router.query;
 
-    // Call your API to update the user's paid status
+    // Call updatePaid API if the user is logged in
     if (session) {
         fetch("/api/updatePaid", {
             method: "POST",
@@ -45,6 +36,7 @@ const SuccessPage: NextPage<SuccessPageProps> = ({
         });
     }
 
+    // Render the success page
     return (
         <>
             <Head>
@@ -75,45 +67,22 @@ const SuccessPage: NextPage<SuccessPageProps> = ({
     );
 };
 
+// Get the user from the session
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Get the session
     const session = await getSession(context);
     const email = session?.user?.email;
 
+    // Get the user from the database
     const user = await prisma.user.findFirst({
         where: {
             email: email as string,
         },
     });
 
-    const offers = await prisma.offer.findMany({
-        where: {
-            userId: user?.id,
-        },
-    });
-
-    const properties = await prisma.property.findMany({
-        where: {
-            offers: {
-                some: {
-                    userId: user?.id,
-                },
-            },
-        },
-    });
-
-    // Get the contracts
-    const contracts = await prisma.contract.findMany({
-        where: {
-            userId: user?.id,
-        },
-    });
-
     return {
         props: {
-            offers: JSON.parse(JSON.stringify(offers)),
             user: JSON.parse(JSON.stringify(user)),
-            properties: JSON.parse(JSON.stringify(properties)),
-            contracts: JSON.parse(JSON.stringify(contracts)),
         },
     };
 };

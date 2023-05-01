@@ -2,7 +2,7 @@ import { GetServerSideProps, NextPage } from "next";
 import { Property } from "@prisma/client";
 import prisma from "../../../../prisma/prisma";
 import Head from "next/head";
-import { getSession, useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import NavBar from "../../../components/NavBar";
 import { useState } from "react";
 import Background from "@/components/Backgrounds";
@@ -10,25 +10,21 @@ import { useFormik } from "formik";
 import Router from "next/router";
 import { ChangeEvent } from "react";
 import FileUpload from "../../../components/FileUpload";
-import { useEffect } from "react";
 
+// Props for the check offers page
 interface OfferPageProps {
     property: Property;
     offerValue: string;
 }
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
-type sessionProps = {
-    session: Session;
-};
-
+//
 const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
-    const { data: session, status } = useSession();
+    // Get the session
+    const { data: session } = useSession();
     const [value, setOfferValue] = useState(offerValue);
     let mortgageImage: string[] = [];
 
+    // Set up formik
     const formik = useFormik({
         initialValues: {
             offerValue: value,
@@ -37,12 +33,12 @@ const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
             propertyId: property.propertyID,
         },
         onSubmit: async (values) => {
-            console.log(values);
-            //call the createOffer api
+            // Call the createOffer API
             fetch("/api/createOffer", {
                 method: "POST",
                 body: JSON.stringify(values),
             });
+            // Redirect to the property page
             Router.push(
                 "/properties/[propertyID]",
                 `/properties/${property.propertyID}`
@@ -50,7 +46,9 @@ const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
         },
     });
 
+    // Read the file as text and return a promise
     function readFileAsText(file: File) {
+        // Return a Promise that resolves when the file is read
         return new Promise(function (resolve, reject) {
             let fr = new FileReader();
 
@@ -66,6 +64,7 @@ const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
         });
     }
 
+    // Encode the image as a base64 string
     async function encodeImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
         let readers = [];
@@ -90,11 +89,12 @@ const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
         });
     }
 
+    // Render the check offers page
     return (
         <div>
             <Head>
                 <title>{property.address}</title>
-                <meta name="description"/>
+                <meta name="description" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Background />
@@ -157,10 +157,12 @@ const Offer: NextPage<OfferPageProps> = ({ property, offerValue }) => {
     );
 };
 
+// Get the property data from the database
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const id = context.params?.propertyID;
     const offerValue = context.query.offerValue;
 
+    // Get the property from the database
     const property = await prisma.property.findFirst({
         where: {
             propertyID: parseInt(id as string),

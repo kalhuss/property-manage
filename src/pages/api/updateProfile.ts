@@ -1,14 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../prisma/prisma";
 
+// Handler for /api/updateProfile
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
+    // Only allow POST requests
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method not allowed" });
     }
 
+    // Get data from request body
     const {
         userId,
         name,
@@ -24,11 +27,13 @@ export default async function handler(
         email: string;
         phoneNumber: string;
     } = JSON.parse(req.body);
-    console.log("req body: ", req.body);
+
+    // Check if user is logged in
     if (!userId) {
         return res.status(400).json({ message: "No user" });
     }
 
+    // Update user
     const updateProfile = await prisma.user
         .update({
             where: {
@@ -48,5 +53,6 @@ export default async function handler(
                 .json({ message: "Error adding entry to database" });
         });
 
-    res.status(200).json({ message: "Update successfull" });
+    // Return updated user
+    res.status(200).json({ updateProfile });
 }

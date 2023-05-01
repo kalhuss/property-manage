@@ -3,7 +3,6 @@ import Layout from "../layout/layout";
 import { FC } from "react";
 import Link from "next/link";
 import styles from "../styles/Form.module.css";
-import Image from "next/image";
 import { HiAtSymbol } from "react-icons/hi";
 import { FaLock } from "react-icons/fa";
 import { useState } from "react";
@@ -12,10 +11,12 @@ import { useFormik } from "formik";
 import { validateLogin } from "lib/validate";
 import { useRouter } from "next/router";
 
+// Login page
 const Login: FC = () => {
     const [show, setShow] = useState(false);
     const router = useRouter();
-    // Formik form
+
+    // Setup formik for form validation
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -23,18 +24,20 @@ const Login: FC = () => {
         },
         validate: validateLogin,
         onSubmit: async (values) => {
+            // Sign in user
             const result = await signIn("credentials", {
                 callbackUrl: "/",
                 email: values.email,
                 password: values.password,
             });
 
-            if(result!.ok){
+            if (result!.ok) {
                 router.push(result!.url!);
             }
         },
     });
 
+    // Render the login page
     return (
         <Layout>
             <Head>
@@ -56,7 +59,9 @@ const Login: FC = () => {
                     <h1 className="text-gray-800 text-4xl font-bold py-4">
                         Login
                     </h1>
-                    <p className="w-3/4 mx-auto text-gray-400">Explore homes that fit your lifestyle</p>
+                    <p className="w-3/4 mx-auto text-gray-400">
+                        Explore homes that fit your lifestyle
+                    </p>
                 </div>
 
                 {/* Form */}
@@ -65,7 +70,13 @@ const Login: FC = () => {
                     onSubmit={formik.handleSubmit}
                 >
                     {/* Email */}
-                    <div className={`${styles.input_group} ${formik.errors.email && formik.touched.email ? "border-red-600" : ""}`}>
+                    <div
+                        className={`${styles.input_group} ${
+                            formik.errors.email && formik.touched.email
+                                ? "border-red-600"
+                                : ""
+                        }`}
+                    >
                         <input
                             className={styles.input_text}
                             type="email"
@@ -78,7 +89,13 @@ const Login: FC = () => {
                     </div>
 
                     {/* Password */}
-                    <div className={`${styles.input_group} ${formik.errors.password && formik.touched.password ? "border-red-600" : ""}`}>
+                    <div
+                        className={`${styles.input_group} ${
+                            formik.errors.password && formik.touched.password
+                                ? "border-red-600"
+                                : ""
+                        }`}
+                    >
                         <input
                             className={styles.input_text}
                             type={show ? "text" : "password"}
@@ -105,7 +122,6 @@ const Login: FC = () => {
                             Login
                         </button>
                     </div>
-
                 </form>
 
                 <p className="text-center text-gray-400">

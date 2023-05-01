@@ -1,6 +1,7 @@
 import React from "react";
 import { useFormik } from "formik";
 
+// Props for the ListingInput component
 interface InputProps {
     getFieldProps: ReturnType<typeof useFormik>["getFieldProps"];
     labelName: string;
@@ -8,6 +9,7 @@ interface InputProps {
     formikName: string;
 }
 
+// ListingInput component
 const ListingInput: React.FC<InputProps> = ({
     getFieldProps,
     labelName,
@@ -16,6 +18,7 @@ const ListingInput: React.FC<InputProps> = ({
 }) => {
     return (
         <>
+            {/* Different input field depending on type */}
             {inputType === "textarea" ? (
                 <div className="flex flex-col row-span-2">
                     <label htmlFor={labelName} className="font-bold">

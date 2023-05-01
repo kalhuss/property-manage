@@ -1,5 +1,4 @@
 import NextAuth from "next-auth/next";
-import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "../../../../prisma/prisma";
 import { compare } from "bcrypt";
@@ -8,16 +7,16 @@ import { User } from "next-auth";
 export default NextAuth({
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-        async session({ session, token, user }) {
+        async session({ session }) {
             return session; // The return type will match the one returned in `useSession()`
         },
-        async jwt({ token, user, account, profile, isNewUser }) {
+        async jwt({ token }) {
             return token; // The return type will match the one returned in `getToken()`
         },
     },
 
     providers: [
-
+        // Email login with credentials
         CredentialsProvider({
             name: "Credentials",
             credentials: {

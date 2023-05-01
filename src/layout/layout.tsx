@@ -4,20 +4,15 @@ import styles from "../styles/Layout.module.css";
 import NavBar from "@/components/NavBar";
 import { useSession } from "next-auth/react";
 
+// Props for the Layout component
 interface LayoutProps {
     children: React.ReactNode;
 }
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
-type sessionProps = {
-    session: Session;
-};
-
+// Layout component
 const Layout: FC<LayoutProps> = ({ children }) => {
-
-    const { data: session, status } = useSession();
+    // Get the session
+    const { data: session } = useSession();
 
     return (
         <>

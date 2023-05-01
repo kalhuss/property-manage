@@ -1,14 +1,20 @@
 import prisma from "../../../prisma/prisma";
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-
+// Handler for /api/updateOffers
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse
+) {
+    // Only allow POST requests
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method not allowed" });
     }
 
+    // Get data from request body
     const { offerId }: { offerId: string } = JSON.parse(req.body);
 
+    // Check if user is logged in
     if (!offerId) {
         return res.status(400).json({ message: "No offer id" });
     }
@@ -22,7 +28,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             offerStatus: "Accepted",
         },
     });
-    
 
     // Update the rest of the offers to be rejected
     const rejectedOffers = await prisma.offer.updateMany({
@@ -37,6 +42,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
     });
 
-    return res.status(200).json({ message: "Offer updated" });
+    // Return rejectedOffers
+    return res.status(200).json({ rejectedOffers });
 }
-

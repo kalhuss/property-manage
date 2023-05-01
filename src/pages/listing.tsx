@@ -1,31 +1,24 @@
 import { ChangeEvent, FC } from "react";
 import Head from "next/head";
 import { useFormik } from "formik";
-import { useEffect } from "react";
-import { getSession, useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
-import Image from "next/image";
 import Router from "next/router";
 import KeyFeaturesInput from "../components/KeyFeaturesInput";
-import { useState } from "react";
 import ListingInput from "../components/ListingInput";
 import ListingFileUpload from "../components/ListingFileUpload";
 import Background from "@/components/Backgrounds";
 
-type Session = ReturnType<typeof useSession>["data"];
-type SessionNoNull = NonNullable<Session>;
-
-type sessionProps = {
-    session: Session;
-};
-
-const Listing: FC<sessionProps> = () => {
-    const { data: session, status } = useSession();
+// Listing page
+const Listing: FC = () => {
+    // Get the session
+    const { data: session } = useSession();
     let exteriorImage: string[] = [];
     let images: string[] = [];
     let floorPlans: string[] = [];
     let panoramicImages: string[] = [];
 
+    // Set the initial values for the form
     const formik = useFormik({
         initialValues: {
             price: "",
@@ -49,21 +42,23 @@ const Listing: FC<sessionProps> = () => {
             email: session?.user?.email,
         },
         onSubmit: async (values) => {
-            //call the createListing api
+            //call the createListing API
             fetch("/api/createListing", {
                 method: "POST",
                 body: JSON.stringify(values),
             })
-            // wait for the response and then redirect to the properties page
-            .then((res) => {
-                if (res.status === 200) {
-                    Router.push("/properties");
-                }
-            });
+                // Redirect to the properties page
+                .then((res) => {
+                    if (res.status === 200) {
+                        Router.push("/properties");
+                    }
+                });
         },
     });
 
+    // Read the file as text and return a promise
     function readFileAsText(file: File) {
+        // Return a Promise that resolves when the file is read
         return new Promise(function (resolve, reject) {
             let fr = new FileReader();
 
@@ -79,6 +74,7 @@ const Listing: FC<sessionProps> = () => {
         });
     }
 
+    // Encode the exterior image as a base64 string
     async function encodeExteriorImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
         let readers = [];
@@ -103,6 +99,7 @@ const Listing: FC<sessionProps> = () => {
         });
     }
 
+    // Encode the image as a base64 string
     async function encodeImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
         let readers = [];
@@ -127,6 +124,7 @@ const Listing: FC<sessionProps> = () => {
         });
     }
 
+    // Encode the panoramic image as a base64 string
     async function encodePanoramicImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
         let readers = [];
@@ -151,6 +149,7 @@ const Listing: FC<sessionProps> = () => {
         });
     }
 
+    // Encode the floor plan as a base64 string
     async function encodeFloorPlan(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
         let readers = [];
@@ -175,6 +174,7 @@ const Listing: FC<sessionProps> = () => {
         });
     }
 
+    // Render the listing page
     return (
         <>
             <Head>
