@@ -65,6 +65,18 @@ export default async function handler(
         return dataArray;
     }
 
+    // Check if contract already exists
+    const contractExists = await prisma.contract.findFirst({
+        where: {
+            propertyId: propertyId,
+            userId: userId,
+        },
+    });
+
+    // If contract exists, return error
+    if(contractExists) {
+        return res.status(400).json({ message: "Contract already exists" });
+    } 
     // Create a new contract
     const contract = await prisma.contract
         .create({

@@ -10,6 +10,7 @@ import ListingFileUpload from "../components/ListingFileUpload";
 import Background from "@/components/Backgrounds";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
+import imageCompression from "browser-image-compression";
 
 // Listing page
 const Listing: FC = () => {
@@ -44,6 +45,26 @@ const Listing: FC = () => {
             email: session?.user?.email,
         },
         onSubmit: async (values) => {
+            // Calculate the total size of all the images in bytes
+            const totalSize =
+                values.exteriorImage.reduce((acc, img) => acc + img.length, 0) +
+                values.images.reduce((acc, img) => acc + img.length, 0) +
+                values.panoramicImages.reduce(
+                    (acc, img) => acc + img.length,
+                    0
+                ) +
+                values.floorPlan.reduce((acc, img) => acc + img.length, 0);
+            
+            // Convert the total size to MB
+            const totalSizeMB = totalSize / 1024 / 1024;
+            console.log("size: ", totalSizeMB);
+            // Check if the total size is greater than 4.5MB
+            if (totalSizeMB > 4.5) {
+                alert(
+                    "The total size of the images exceeds the limit of 4.5MB."
+                );
+                return;
+            }
             //call the createListing API
             fetch("/api/createListing", {
                 method: "POST",
@@ -76,6 +97,23 @@ const Listing: FC = () => {
         });
     }
 
+    async function compressAndEncodeImage(file: File): Promise<string> {
+        const options = {
+            maxSizeMB: 1, // max size in MB
+            maxWidthOrHeight: 1920, // max width/height
+            useWebWorker: true, // use WebWorker for faster compression
+        };
+
+        try {
+            const compressedFile = await imageCompression(file, options);
+            const base64String = await readFileAsText(compressedFile);
+            return base64String as string;
+        } catch (error) {
+            console.log(error);
+            return "";
+        }
+    }
+
     // Encode the exterior image as a base64 string
     async function encodeExteriorImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
@@ -86,7 +124,7 @@ const Listing: FC = () => {
 
         // Store promises in array
         for (let i = 0; i < files.length; i++) {
-            readers.push(readFileAsText(files[i]));
+            readers.push(compressAndEncodeImage(files[i]));
         }
 
         // Trigger Promises
@@ -111,7 +149,7 @@ const Listing: FC = () => {
 
         // Store promises in array
         for (let i = 0; i < files.length; i++) {
-            readers.push(readFileAsText(files[i]));
+            readers.push(compressAndEncodeImage(files[i]));
         }
 
         // Trigger Promises
@@ -136,7 +174,7 @@ const Listing: FC = () => {
 
         // Store promises in array
         for (let i = 0; i < files.length; i++) {
-            readers.push(readFileAsText(files[i]));
+            readers.push(compressAndEncodeImage(files[i]));
         }
 
         // Trigger Promises
@@ -161,7 +199,7 @@ const Listing: FC = () => {
 
         // Store promises in array
         for (let i = 0; i < files.length; i++) {
-            readers.push(readFileAsText(files[i]));
+            readers.push(compressAndEncodeImage(files[i]));
         }
 
         // Trigger Promises

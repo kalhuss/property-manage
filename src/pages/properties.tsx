@@ -71,6 +71,13 @@ const Properties: NextPage<PropertyProps> = ({ properties }) => {
                 );
             }
             return true;
+        })
+        // Sort by date added
+        .sort((a, b) => {
+            return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            );
         });
 
     // Render the properties page
