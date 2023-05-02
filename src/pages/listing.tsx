@@ -12,6 +12,8 @@ import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import imageCompression from "browser-image-compression";
 import { validateListing } from "lib/validate";
+import { useState } from "react";
+import Spinner from "@/components/Spinner";
 
 // Listing page
 const Listing: FC = () => {
@@ -21,6 +23,7 @@ const Listing: FC = () => {
     let images: string[] = [];
     let floorPlans: string[] = [];
     let panoramicImages: string[] = [];
+    const [isLoading, setIsLoading] = useState(false);
 
     // Set the initial values for the form
     const formik = useFormik({
@@ -47,6 +50,8 @@ const Listing: FC = () => {
         },
         validate: validateListing,
         onSubmit: async (values) => {
+            // Show the loading spinner or modal
+            setIsLoading(true);
             // Calculate the total size of all the images in bytes
             const totalSize =
                 values.exteriorImage.reduce((acc, img) => acc + img.length, 0) +
@@ -74,6 +79,8 @@ const Listing: FC = () => {
             })
                 // Redirect to the properties page
                 .then((res) => {
+                    // Hide the loading spinner or modal
+                    setIsLoading(false);
                     if (res.status === 200) {
                         Router.push("/properties");
                     }
@@ -233,6 +240,7 @@ const Listing: FC = () => {
             </Head>
             <Background />
             <NavBar isLoggedIn={!!session} />
+            {isLoading && <Spinner />}
             <div className="flex flex-col items-center justify-center pt-20">
                 <div className=" min-h-fit p-5 w-3/6 bg-white rounded-lg shadow-lg ">
                     {/* Title */}
@@ -312,14 +320,15 @@ const Listing: FC = () => {
 
                             {/* Bedrooms */}
                             <div>
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Bedrooms"
-                                inputType="text"
-                                formikName="bedrooms"
-                                isRequired={true}
-                            />
-                            {formik.touched.bedrooms && formik.errors.bedrooms ? (
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Bedrooms"
+                                    inputType="text"
+                                    formikName="bedrooms"
+                                    isRequired={true}
+                                />
+                                {formik.touched.bedrooms &&
+                                formik.errors.bedrooms ? (
                                     <div className="text-red-500 text-sm">
                                         {formik.errors.bedrooms}
                                     </div>
@@ -327,18 +336,19 @@ const Listing: FC = () => {
                             </div>
 
                             <div>
-                            {/* Bathrooms */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Bathrooms"
-                                inputType="text"
-                                formikName="bathrooms"
-                                isRequired={true}
-                            />
-                            {formik.touched.bathrooms && formik.errors.bathrooms ? (
+                                {/* Bathrooms */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Bathrooms"
+                                    inputType="text"
+                                    formikName="bathrooms"
+                                    isRequired={true}
+                                />
+                                {formik.touched.bathrooms &&
+                                formik.errors.bathrooms ? (
                                     <div className="text-red-500 text-sm">
                                         {formik.errors.bathrooms}
-                                    </div>  
+                                    </div>
                                 ) : null}
                             </div>
 

@@ -12,6 +12,10 @@ import ListingInput from "@/components/ListingInput";
 import ListingFileUpload from "@/components/ListingFileUpload";
 import KeyFeaturesInput from "@/components/KeyFeaturesInput";
 import { User } from "@prisma/client";
+import Spinner from "@/components/Spinner";
+import { validateListing } from "lib/validate";
+import imageCompression from "browser-image-compression";
+import { useState } from "react";
 
 // Props for the edit property page
 interface PropertyProps {
@@ -26,6 +30,7 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
     let images: string[] = [];
     let floorPlans: string[] = [];
     let panoramicImages: string[] = [];
+    const [isLoading, setIsLoading] = useState(false);
 
     // Set up formik and populate the form with the property's data
     const formik = useFormik({
@@ -47,11 +52,33 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
             images: images,
             panoramicImages: panoramicImages,
             floorPlan: floorPlans,
-            email: session?.user?.email,
+            email: session?.user?.email!,
             propertyId: property.id,
         },
-
+        validate: validateListing,
         onSubmit: async (values) => {
+            // Show the loading spinner or modal
+            setIsLoading(true);
+            // Calculate the total size of all the images in bytes
+            const totalSize =
+                values.exteriorImage.reduce((acc, img) => acc + img.length, 0) +
+                values.images.reduce((acc, img) => acc + img.length, 0) +
+                values.panoramicImages.reduce(
+                    (acc, img) => acc + img.length,
+                    0
+                ) +
+                values.floorPlan.reduce((acc, img) => acc + img.length, 0);
+
+            // Convert the total size to MB
+            const totalSizeMB = totalSize / 1024 / 1024;
+            console.log("size: ", totalSizeMB);
+            // Check if the total size is greater than 4.5MB
+            if (totalSizeMB > 4.5) {
+                alert(
+                    "The total size of the images exceeds the limit of 4.5MB."
+                );
+                return;
+            }
             // Call the editProperty API
             const res = await fetch("/api/editProperty", {
                 method: "POST",
@@ -59,6 +86,8 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
             });
             // Redirect to the property page
             if (res.status === 200) {
+                // Hide the loading spinner or modal
+                setIsLoading(false);
                 Router.push(`/properties/${property.propertyID}`);
             }
         },
@@ -82,6 +111,23 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
         });
     }
 
+    async function compressAndEncodeImage(file: File): Promise<string> {
+        const options = {
+            maxSizeMB: 1, // max size in MB
+            maxWidthOrHeight: 1920, // max width/height
+            useWebWorker: true, // use WebWorker for faster compression
+        };
+
+        try {
+            const compressedFile = await imageCompression(file, options);
+            const base64String = await readFileAsText(compressedFile);
+            return base64String as string;
+        } catch (error) {
+            console.log(error);
+            return "";
+        }
+    }
+
     // Encode the exterior image as a base64 string
     async function encodeExteriorImage(e: ChangeEvent<HTMLInputElement>) {
         let files = e.target.files!;
@@ -92,7 +138,7 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
 
         // Store promises in array
         for (let i = 0; i < files.length; i++) {
-            readers.push(readFileAsText(files[i]));
+            readers.push(compressAndEncodeImage(files[i]));
         }
 
         // Trigger Promises
@@ -117,7 +163,7 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
 
         // Store promises in array
         for (let i = 0; i < files.length; i++) {
-            readers.push(readFileAsText(files[i]));
+            readers.push(compressAndEncodeImage(files[i]));
         }
 
         // Trigger Promises
@@ -142,7 +188,7 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
 
         // Store promises in array
         for (let i = 0; i < files.length; i++) {
-            readers.push(readFileAsText(files[i]));
+            readers.push(compressAndEncodeImage(files[i]));
         }
 
         // Trigger Promises
@@ -167,7 +213,7 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
 
         // Store promises in array
         for (let i = 0; i < files.length; i++) {
-            readers.push(readFileAsText(files[i]));
+            readers.push(compressAndEncodeImage(files[i]));
         }
 
         // Trigger Promises
@@ -183,10 +229,11 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
     }
 
     // Render the page
+    // Render the listing page
     return (
         <>
             <Head>
-                <title>Edit Listing</title>
+                <title>Edit listing</title>
                 <meta
                     name="description"
                     content="Generated by create next app"
@@ -199,6 +246,7 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
             </Head>
             <Background />
             <NavBar isLoggedIn={!!session} />
+            {isLoading && <Spinner />}
             <div className="flex flex-col items-center justify-center pt-20">
                 <div className=" min-h-fit p-5 w-3/6 bg-white rounded-lg shadow-lg ">
                     {/* Title */}
@@ -217,6 +265,15 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
                                 }
                             }}
                         >
+                            {/* Tenure */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Tenure"
+                                inputType="dropdown"
+                                formikName="tenure"
+                                isRequired={true}
+                            />
+
                             {/* Price */}
                             <div
                                 className={
@@ -230,64 +287,17 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
                                     labelName="Price"
                                     inputType="text"
                                     formikName="price"
+                                    isRequired={
+                                        formik.values.tenure !== "to rent"
+                                    }
                                 />
+
+                                {formik.touched.price && formik.errors.price ? (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.price}
+                                    </div>
+                                ) : null}
                             </div>
-
-                            {/* Bedrooms */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Bedrooms"
-                                inputType="text"
-                                formikName="bedrooms"
-                            />
-
-                            {/* Bathrooms */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Bathrooms"
-                                inputType="text"
-                                formikName="bathrooms"
-                            />
-
-                            {/* House Type */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="House Type"
-                                inputType="text"
-                                formikName="houseType"
-                            />
-
-                            {/* Address */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Address"
-                                inputType="text"
-                                formikName="address"
-                            />
-
-                            {/* Postcode */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Postcode"
-                                inputType="text"
-                                formikName="postcode"
-                            />
-
-                            {/* Tenure */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Tenure"
-                                inputType="dropdown"
-                                formikName="tenure"
-                            />
-
-                            {/* Tax Band */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Tax Band"
-                                inputType="text"
-                                formikName="taxBand"
-                            />
 
                             {/* Rent */}
                             <div
@@ -302,8 +312,87 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
                                     labelName="Rent"
                                     inputType="text"
                                     formikName="rent"
+                                    isRequired={
+                                        formik.values.tenure === "to rent"
+                                    }
                                 />
+
+                                {formik.touched.rent && formik.errors.rent ? (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.rent}
+                                    </div>
+                                ) : null}
                             </div>
+
+                            {/* Bedrooms */}
+                            <div>
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Bedrooms"
+                                    inputType="text"
+                                    formikName="bedrooms"
+                                    isRequired={true}
+                                />
+                                {formik.touched.bedrooms &&
+                                formik.errors.bedrooms ? (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.bedrooms}
+                                    </div>
+                                ) : null}
+                            </div>
+
+                            <div>
+                                {/* Bathrooms */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Bathrooms"
+                                    inputType="text"
+                                    formikName="bathrooms"
+                                    isRequired={true}
+                                />
+                                {formik.touched.bathrooms &&
+                                formik.errors.bathrooms ? (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.bathrooms}
+                                    </div>
+                                ) : null}
+                            </div>
+
+                            {/* House Type */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="House Type"
+                                inputType="text"
+                                formikName="houseType"
+                                isRequired={true}
+                            />
+
+                            {/* Address */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Address"
+                                inputType="text"
+                                formikName="address"
+                                isRequired={true}
+                            />
+
+                            {/* Postcode */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Postcode"
+                                inputType="text"
+                                formikName="postcode"
+                                isRequired={true}
+                            />
+
+                            {/* Tax Band */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Tax Band"
+                                inputType="text"
+                                formikName="taxBand"
+                                isRequired={true}
+                            />
 
                             {/* Key Features */}
                             <KeyFeaturesInput
@@ -316,6 +405,7 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
                                 labelName="Description"
                                 inputType="textarea"
                                 formikName="description"
+                                isRequired={true}
                             />
 
                             {/* Contact Number */}
@@ -324,6 +414,7 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
                                 labelName="Contact Number"
                                 inputType="text"
                                 formikName="contactNumber"
+                                isRequired={true}
                             />
 
                             {/* Contact Email */}
@@ -332,32 +423,39 @@ const EditProperty: NextPage<PropertyProps> = ({ property, user }) => {
                                 labelName="Contact Email"
                                 inputType="text"
                                 formikName="contactEmail"
+                                isRequired={true}
                             />
+
                             <p className="col-span-2 w-full text-center">
                                 You must re-upload images
                             </p>
+
                             {/* Exterior Images */}
                             <ListingFileUpload
                                 labelName="Exterior Image"
                                 onChange={encodeExteriorImage}
+                                isRequired={true}
                             />
 
                             {/* Images */}
                             <ListingFileUpload
                                 labelName="Images"
                                 onChange={encodeImage}
+                                isRequired={true}
                             />
 
                             {/* Panoramic Images */}
                             <ListingFileUpload
                                 labelName="Panoramic Images"
                                 onChange={encodePanoramicImage}
+                                isRequired={false}
                             />
 
                             {/* Floor Plan */}
                             <ListingFileUpload
                                 labelName="Floor Plan"
                                 onChange={encodeFloorPlan}
+                                isRequired={false}
                             />
 
                             {/* Submit */}
