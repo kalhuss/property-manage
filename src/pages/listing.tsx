@@ -11,6 +11,7 @@ import Background from "@/components/Backgrounds";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import imageCompression from "browser-image-compression";
+import { validateListing } from "lib/validate";
 
 // Listing page
 const Listing: FC = () => {
@@ -42,8 +43,9 @@ const Listing: FC = () => {
             images: images,
             panoramicImages: panoramicImages,
             floorPlan: floorPlans,
-            email: session?.user?.email,
+            email: session?.user?.email!,
         },
+        validate: validateListing,
         onSubmit: async (values) => {
             // Calculate the total size of all the images in bytes
             const totalSize =
@@ -54,7 +56,7 @@ const Listing: FC = () => {
                     0
                 ) +
                 values.floorPlan.reduce((acc, img) => acc + img.length, 0);
-            
+
             // Convert the total size to MB
             const totalSizeMB = totalSize / 1024 / 1024;
             console.log("size: ", totalSizeMB);
@@ -271,11 +273,45 @@ const Listing: FC = () => {
                                     labelName="Price"
                                     inputType="text"
                                     formikName="price"
-                                    isRequired={formik.values.tenure !== "to rent"}
+                                    isRequired={
+                                        formik.values.tenure !== "to rent"
+                                    }
                                 />
+
+                                {formik.touched.price && formik.errors.price ? (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.price}
+                                    </div>
+                                ) : null}
+                            </div>
+
+                            {/* Rent */}
+                            <div
+                                className={
+                                    formik.values.tenure === "to rent"
+                                        ? "block"
+                                        : "hidden"
+                                }
+                            >
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Rent"
+                                    inputType="text"
+                                    formikName="rent"
+                                    isRequired={
+                                        formik.values.tenure === "to rent"
+                                    }
+                                />
+
+                                {formik.touched.rent && formik.errors.rent ? (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.rent}
+                                    </div>
+                                ) : null}
                             </div>
 
                             {/* Bedrooms */}
+                            <div>
                             <ListingInput
                                 getFieldProps={formik.getFieldProps}
                                 labelName="Bedrooms"
@@ -283,7 +319,14 @@ const Listing: FC = () => {
                                 formikName="bedrooms"
                                 isRequired={true}
                             />
+                            {formik.touched.bedrooms && formik.errors.bedrooms ? (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.bedrooms}
+                                    </div>
+                                ) : null}
+                            </div>
 
+                            <div>
                             {/* Bathrooms */}
                             <ListingInput
                                 getFieldProps={formik.getFieldProps}
@@ -292,6 +335,12 @@ const Listing: FC = () => {
                                 formikName="bathrooms"
                                 isRequired={true}
                             />
+                            {formik.touched.bathrooms && formik.errors.bathrooms ? (
+                                    <div className="text-red-500 text-sm">
+                                        {formik.errors.bathrooms}
+                                    </div>  
+                                ) : null}
+                            </div>
 
                             {/* House Type */}
                             <ListingInput
@@ -328,23 +377,6 @@ const Listing: FC = () => {
                                 formikName="taxBand"
                                 isRequired={true}
                             />
-
-                            {/* Rent */}
-                            <div
-                                className={
-                                    formik.values.tenure === "to rent"
-                                        ? "block"
-                                        : "hidden"
-                                }
-                            >
-                                <ListingInput
-                                    getFieldProps={formik.getFieldProps}
-                                    labelName="Rent"
-                                    inputType="text"
-                                    formikName="rent"
-                                    isRequired={formik.values.tenure === "to rent"}
-                                />
-                            </div>
 
                             {/* Key Features */}
                             <KeyFeaturesInput

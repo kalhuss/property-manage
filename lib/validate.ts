@@ -9,6 +9,50 @@ interface LoginErrors {
     username?: string;
 }
 
+interface ListingErrors {
+    price?: string;
+    bedrooms?: string;
+    bathrooms?: string;
+    houseType?: string;
+    address?: string;
+    postcode?: string;
+    tenure?: string;
+    taxBand?: string;
+    rent?: string;
+    keyFeatures?: string[];
+    description?: string;
+    contactNumber?: string;
+    contactEmail?: string;
+    exteriorImage?: string[];
+    images?: string[];
+    panoramicImages?: string[];
+    floorPlan?: string[];
+    email?: string;
+}
+
+export const validateListing = (values: ListingErrors): ListingErrors => {
+    const errors: ListingErrors = {};
+
+    // If price is not a number, return error
+    if (isNaN(Number(values.price))) {
+        errors.price = "Price must be a number";
+    }
+
+    if (isNaN(Number(values.bedrooms))) {
+        errors.bedrooms = "Bedrooms must be a number";
+    }
+
+    if (isNaN(Number(values.bathrooms))) {
+        errors.bathrooms = "Bathrooms must be a number";
+    }
+
+    if (isNaN(Number(values.rent))) {
+        errors.rent = "Rent must be a number";
+    }
+
+    return errors;
+};
+
 export const validateLogin = (values: LoginErrors): LoginErrors => {
     const errors: LoginErrors = {};
 
