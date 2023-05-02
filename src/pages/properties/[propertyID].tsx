@@ -139,7 +139,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                     priority={true}
                                 />
                             ) : property.panoramicImages.length > 0 &&
-                                currentImageIndex >= property.images.length ? (
+                              currentImageIndex >= property.images.length ? (
                                 <PanoramaViewer
                                     image={
                                         CDN +
@@ -318,7 +318,28 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                         Offer
                                     </p>
                                     <div className="flex mb-2">
-                                        {user ? (
+                                        {!session ? (
+                                            <>
+                                                <input
+                                                    type="text"
+                                                    placeholder="£"
+                                                    className="border border-gray-300 rounded-md p-2 mr-2"
+                                                    value={offerValue}
+                                                    onChange={(e) =>
+                                                        setOfferValue(
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    disabled={true}
+                                                />
+                                                <button
+                                                    className="p-4 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                                    disabled={true}
+                                                >
+                                                    Make Offer
+                                                </button>
+                                            </>
+                                        ) : user ? (
                                             property.userId === user.id ? (
                                                 <Link
                                                     href={`/properties/${property.propertyID}/checkOffers`}
@@ -355,7 +376,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                                                     !offerValue
                                                                 }
                                                             >
-                                                                Offer Deopsit
+                                                                Offer Deposit
                                                             </button>
                                                         ) : (
                                                             <button
