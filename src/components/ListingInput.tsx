@@ -7,6 +7,7 @@ interface InputProps {
     labelName: string;
     inputType: string;
     formikName: string;
+    isRequired?: boolean;
 }
 
 // ListingInput component
@@ -15,6 +16,7 @@ const ListingInput: React.FC<InputProps> = ({
     labelName,
     inputType,
     formikName,
+    isRequired,
 }) => {
     return (
         <>
@@ -27,6 +29,7 @@ const ListingInput: React.FC<InputProps> = ({
                     <textarea
                         className="p-1 border h-full resize-none rounded-lg bg-gray-50 border-gray-300 text-gray-900"
                         {...getFieldProps(formikName)}
+                        required={isRequired}
                     />
                 </div>
             ) : inputType === "dropdown" ? (
@@ -37,6 +40,7 @@ const ListingInput: React.FC<InputProps> = ({
                     <select
                         className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
                         {...getFieldProps(formikName)}
+                        required={isRequired}
                     >
                         <option value="">Select an option</option>
                         <option value="for sale">Sale</option>
@@ -54,6 +58,7 @@ const ListingInput: React.FC<InputProps> = ({
                         className="p-1 border rounded-lg bg-gray-50 border-gray-300 text-gray-900"
                         type={inputType}
                         {...getFieldProps(formikName)}
+                        required={isRequired}
                     />
                 </div>
             )}

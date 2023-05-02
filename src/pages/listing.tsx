@@ -255,6 +255,7 @@ const Listing: FC = () => {
                                 labelName="Tenure"
                                 inputType="dropdown"
                                 formikName="tenure"
+                                isRequired={true}
                             />
 
                             {/* Price */}
@@ -270,6 +271,7 @@ const Listing: FC = () => {
                                     labelName="Price"
                                     inputType="text"
                                     formikName="price"
+                                    isRequired={formik.values.tenure !== "to rent"}
                                 />
                             </div>
 
@@ -279,6 +281,7 @@ const Listing: FC = () => {
                                 labelName="Bedrooms"
                                 inputType="text"
                                 formikName="bedrooms"
+                                isRequired={true}
                             />
 
                             {/* Bathrooms */}
@@ -287,6 +290,7 @@ const Listing: FC = () => {
                                 labelName="Bathrooms"
                                 inputType="text"
                                 formikName="bathrooms"
+                                isRequired={true}
                             />
 
                             {/* House Type */}
@@ -295,6 +299,7 @@ const Listing: FC = () => {
                                 labelName="House Type"
                                 inputType="text"
                                 formikName="houseType"
+                                isRequired={true}
                             />
 
                             {/* Address */}
@@ -303,6 +308,7 @@ const Listing: FC = () => {
                                 labelName="Address"
                                 inputType="text"
                                 formikName="address"
+                                isRequired={true}
                             />
 
                             {/* Postcode */}
@@ -311,6 +317,7 @@ const Listing: FC = () => {
                                 labelName="Postcode"
                                 inputType="text"
                                 formikName="postcode"
+                                isRequired={true}
                             />
 
                             {/* Tax Band */}
@@ -319,6 +326,7 @@ const Listing: FC = () => {
                                 labelName="Tax Band"
                                 inputType="text"
                                 formikName="taxBand"
+                                isRequired={true}
                             />
 
                             {/* Rent */}
@@ -334,6 +342,7 @@ const Listing: FC = () => {
                                     labelName="Rent"
                                     inputType="text"
                                     formikName="rent"
+                                    isRequired={formik.values.tenure === "to rent"}
                                 />
                             </div>
 
@@ -348,6 +357,7 @@ const Listing: FC = () => {
                                 labelName="Description"
                                 inputType="textarea"
                                 formikName="description"
+                                isRequired={true}
                             />
 
                             {/* Contact Number */}
@@ -356,6 +366,7 @@ const Listing: FC = () => {
                                 labelName="Contact Number"
                                 inputType="text"
                                 formikName="contactNumber"
+                                isRequired={true}
                             />
 
                             {/* Contact Email */}
@@ -364,6 +375,7 @@ const Listing: FC = () => {
                                 labelName="Contact Email"
                                 inputType="text"
                                 formikName="contactEmail"
+                                isRequired={true}
                             />
 
                             {/* Exterior Images */}
