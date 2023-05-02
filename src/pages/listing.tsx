@@ -382,24 +382,28 @@ const Listing: FC = () => {
                             <ListingFileUpload
                                 labelName="Exterior Image"
                                 onChange={encodeExteriorImage}
+                                isRequired={true}
                             />
 
                             {/* Images */}
                             <ListingFileUpload
                                 labelName="Images"
                                 onChange={encodeImage}
+                                isRequired={true}
                             />
 
                             {/* Panoramic Images */}
                             <ListingFileUpload
                                 labelName="Panoramic Images"
                                 onChange={encodePanoramicImage}
+                                isRequired={false}
                             />
 
                             {/* Floor Plan */}
                             <ListingFileUpload
                                 labelName="Floor Plan"
                                 onChange={encodeFloorPlan}
+                                isRequired={false}
                             />
 
                             {/* Submit */}
