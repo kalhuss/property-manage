@@ -58,6 +58,13 @@ export default async function handler(
         },
     });
 
+    const deleteContract = await prisma.contract.delete({
+        where: {
+            id: contract?.id,
+        },
+    });
+    
+
     // Return the updated offer
     return res.status(200).json({ cancelOffer });
 }
