@@ -56,7 +56,6 @@ model Property {
 model Offer {
   id               String   @id @default(uuid()) @unique
   amount           String
-  status           String
   offerStatus      String   @default("Pending")
   signed           Boolean  @default(false)
   createdAt        DateTime @default(now())
@@ -65,6 +64,7 @@ model Offer {
   propertyId       String
   user             User     @relation(fields: [userId], references: [id])
   userId           String
+  contract         Contract[]
   mortgageImage    String[]
 }
 
@@ -77,6 +77,8 @@ model Contract {
   propertyId       String
   user             User     @relation(fields: [userId], references: [id])
   userId           String
+  offer            Offer    @relation(fields: [offerId], references: [id])
+  offerId          String
   contractPDF      String[]
 }
 

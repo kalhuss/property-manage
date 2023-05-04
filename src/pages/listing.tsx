@@ -14,9 +14,16 @@ import imageCompression from "browser-image-compression";
 import { validateListing } from "lib/validate";
 import { useState } from "react";
 import Spinner from "@/components/Spinner";
+import prisma from "../../prisma/prisma";
+import { User } from "@prisma/client";
+import Link from "next/link";
+
+interface Props {
+    user: User
+}
 
 // Listing page
-const Listing: FC = () => {
+const Listing: FC<Props> = ({ user }) => {
     // Get the session
     const { data: session } = useSession();
     let exteriorImage: string[] = [];
@@ -241,6 +248,18 @@ const Listing: FC = () => {
             <Background />
             <NavBar isLoggedIn={!!session} />
             {isLoading && <Spinner />}
+            { !user.bankAdded ? (
+                <div className="container mx-auto p-5 pt-20 flex flex-col">
+                <h1 className="text-4xl font-bold text-center mb-5">
+                    You cannot make a listing without adding a bank account
+                </h1>
+                <Link href="/profile" className="flex justify-center">
+                    <button className="justify-center px-8 py-3 mt-44 bg-white bg-opacity-75 text-blue-500 font-bold text-3xl rounded-md hover:shadow-lg  hover:bg-blue-500 hover:text-white border-2 border-blue-500">
+                        Profile
+                    </button>
+                </Link>
+            </div>
+            ) : (
             <div className="flex flex-col items-center justify-center pt-20">
                 <div className=" min-h-fit p-5 w-3/6 bg-white rounded-lg shadow-lg ">
                     {/* Title */}
@@ -459,6 +478,7 @@ const Listing: FC = () => {
                     </section>
                 </div>
             </div>
+            )}
         </>
     );
 };
@@ -466,6 +486,13 @@ const Listing: FC = () => {
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
     // Get the session
     const session = await getSession(context);
+
+    // Get the user
+    const user = await prisma.user.findUnique({
+        where: {
+            email: session?.user?.email!,
+        },
+    });
 
     // If there's no session, redirect to the login page
     if (!session) {
@@ -477,7 +504,9 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
         };
     }
     return {
-        props: {},
+        props: {
+            user: JSON.parse(JSON.stringify(user)),
+        },
     };
 };
 

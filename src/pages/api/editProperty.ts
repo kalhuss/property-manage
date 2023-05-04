@@ -61,7 +61,6 @@ export default async function handler(
         email: string;
         propertyId: string;
     } = JSON.parse(req.body);
-    console.log("req body: ", propertyId);
 
     // Check if user is logged in
     if (!email) {

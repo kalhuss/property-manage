@@ -12,14 +12,11 @@ interface PropertyProps {
 let CDN =
     "https://zqmbrfgddurttslljblz.supabase.co/storage/v1/object/public/property-images/";
 
-
 // DisplayCard component
 const DisplayCard: React.FC<PropertyProps> = ({ properties }) => {
-
     // Return the DisplayCard component
     return (
         <div className="grid grid-cols-1 gap-6 font-mono">
-            
             {/* Map through the properties */}
             {properties.map((property) => (
                 <div

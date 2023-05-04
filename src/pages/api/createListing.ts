@@ -65,8 +65,6 @@ export default async function handler(
         return res.status(400).json({ message: "No current session" });
     }
 
-    console.log(email);
-
     // Get user id
     const userID = await prisma.user.findUnique({
         where: {

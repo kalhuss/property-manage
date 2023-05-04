@@ -8,7 +8,11 @@ interface InputProps {
 }
 
 // Function to generate the input
-const ListingFileUpload: React.FC<InputProps> = ({ labelName, onChange, isRequired }) => {
+const ListingFileUpload: React.FC<InputProps> = ({
+    labelName,
+    onChange,
+    isRequired,
+}) => {
     // Custom file upload input
     return (
         <div className="flex flex-col">

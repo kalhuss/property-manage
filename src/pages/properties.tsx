@@ -228,9 +228,9 @@ const Properties: NextPage<PropertyProps> = ({ properties }) => {
 // Get all properties from the database if they are not sold
 export async function getServerSideProps() {
     const properties = await prisma.property.findMany({
-        where : {
-            sold: false
-        }
+        where: {
+            sold: false,
+        },
     });
 
     return {

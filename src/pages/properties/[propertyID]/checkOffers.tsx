@@ -1,5 +1,5 @@
 import { GetServerSideProps, NextPage } from "next";
-import { Property } from "@prisma/client";
+import { Contract, Property } from "@prisma/client";
 import { User } from "@prisma/client";
 import { Offer } from "@prisma/client";
 import prisma from "../../../../prisma/prisma";
@@ -17,6 +17,7 @@ interface CheckOffersPageProps {
     offers: Offer[];
     users: User[];
     property: Property;
+    contract: Contract;
 }
 
 // Check offers page
@@ -24,6 +25,7 @@ const CheckOffers: NextPage<CheckOffersPageProps> = ({
     offers,
     users,
     property,
+    contract,
 }) => {
     // Get the session
     const { data: session } = useSession();
@@ -66,6 +68,9 @@ const CheckOffers: NextPage<CheckOffersPageProps> = ({
                     <h2 className="text-2xl font-bold mb-4">
                         {property.address}
                     </h2>
+                    <h1 className="text-xl font-bold mb-4">
+                        {property.postcode}
+                    </h1>
                     <p className="text-lg mb-2">Price: £{property.price}</p>
                     <p className="text-lg mb-2">
                         {property.bedrooms} Bedrooms, {property.bathrooms}{" "}
@@ -105,9 +110,25 @@ const CheckOffers: NextPage<CheckOffersPageProps> = ({
                                 <p className="text-lg mb-2">
                                     Offer amount: £{offer.amount}
                                 </p>
-                                <p className="text-lg mb-2">
-                                    Mortgage status: {offer.status}
-                                </p>
+                                {offer.signed ? (
+                                    <p className="text-lg mb-2">
+                                        Signature status: Signed
+                                    </p>
+                                ) : (
+                                    <p className="text-lg mb-2">
+                                        Signature status: Pending
+                                    </p>
+                                )}
+
+                                {contract && contract.paid ? (
+                                    <p className="text-lg mb-2">
+                                        Payment status: Paid
+                                    </p>
+                                ) : (
+                                    <p className="text-lg mb-2">
+                                        Payment status: Pending
+                                    </p>
+                                )}
                             </button>
                         ))}
                 </div>
@@ -171,6 +192,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
 
+    // Get the contract for the property if there is one
+    const contract = await prisma.contract.findFirst({
+        where: {
+            propertyId: property?.id,
+        },
+    });
+
     // If there's no session or the user isn't the owner of the property, redirect to the homepage
     if (!session || user?.id !== property?.userId) {
         return {
@@ -180,13 +208,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         };
     }
-    
 
     return {
         props: {
             offers: JSON.parse(JSON.stringify(offers)),
             users: JSON.parse(JSON.stringify(users)),
             property: JSON.parse(JSON.stringify(property)),
+            contract: JSON.parse(JSON.stringify(contract)),
         },
     };
 };

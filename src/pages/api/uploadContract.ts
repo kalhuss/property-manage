@@ -74,9 +74,9 @@ export default async function handler(
     });
 
     // If contract exists, return error
-    if(contractExists) {
+    if (contractExists) {
         return res.status(400).json({ message: "Contract already exists" });
-    } 
+    }
     // Create a new contract
     const contract = await prisma.contract
         .create({
@@ -85,6 +85,7 @@ export default async function handler(
                 userId,
                 contractPDF: await uploadFile(file),
                 paid: false,
+                offerId,
             },
         })
         .catch((err) => {

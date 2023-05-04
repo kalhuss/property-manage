@@ -56,7 +56,12 @@ const KeyFeaturesInput: React.FC<KeyFeaturesInputProps> = ({
                             onClick={() => handleTagRemove(tag)}
                         >
                             <span className="sr-only">Remove tag</span>
-                            <Image src="/assets/x-circle.svg" width={20} height={20} alt="x circle" /> 
+                            <Image
+                                src="/assets/x-circle.svg"
+                                width={20}
+                                height={20}
+                                alt="x circle"
+                            />
                         </button>
                     </span>
                 ))}

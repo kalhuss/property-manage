@@ -12,6 +12,7 @@ export default async function handler(
         return res.status(405).json({ message: "Method not allowed" });
     }
 
+    // Get data from request body
     const { id }: { id: string } = JSON.parse(req.body);
 
     // Create a new Stripe instance
@@ -19,35 +20,45 @@ export default async function handler(
         apiVersion: "2022-11-15",
     });
 
-    // Get the accountId from the bankDetails database -> First you must get the propertyId from the id -> then get the user that owns the property -> then get the bank details from the user
-    const offer = await prisma.offer.findUnique({
+    // Get the contract from the database
+    const contract = await prisma.contract.findUnique({
         where: {
             id: id,
         },
     });
 
+    // Get the property from the database
     const property = await prisma.property.findUnique({
         where: {
-            id: offer!.propertyId,
+            id: contract!.propertyId,
         },
     });
 
+    // Get the user from the database
     const user = await prisma.user.findUnique({
         where: {
             id: property!.userId,
         },
     });
 
-    const bankDetails = await prisma.bankDetails.findUnique({
+    // Get the bank details from the database
+    const bankDetails = await prisma.bankDetails.findFirst({
         where: {
-            id: user!.id,
+            userId: user!.id,
         },
     });
 
+    // Get the offer from the database
+    const offer = await prisma.offer.findFirst({
+        where: {
+            id: contract!.offerId,
+        },
+    });
 
+    // Create a transfer to the Stripe account
     try {
         const transfer = await stripe.transfers.create({
-            amount: 1000,
+            amount: Number(offer?.amount!) * 100,
             currency: "gbp",
             destination: bankDetails?.accountId!,
         });
@@ -58,8 +69,3 @@ export default async function handler(
         res.status(500).json({ error: "Failed to transfer to Stripe account" });
     }
 }
-
-// On the profile page the user will need to implement their bank details
-// and once they have done this the details will be stored in a bank detail database
-// The user can only create new listings as long as they have bank details
-// One the contract is paid for the money goes to my stripe account and then automatically transfered to the users account

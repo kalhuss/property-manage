@@ -36,6 +36,7 @@ export default async function handler(
         },
     });
 
+    // Update the property to not sold
     const updateProperty = await prisma.property.update({
         where: {
             id: property?.id,
@@ -45,12 +46,12 @@ export default async function handler(
         },
     });
 
+    // Delete the offer
     const deleteOffer = await prisma.offer.delete({
         where: {
             id: cancelOffer?.id,
         },
     });
-
 
     // Return the updated offer
     return res.status(200).json({ cancelOffer });

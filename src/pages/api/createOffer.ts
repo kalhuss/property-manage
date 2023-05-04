@@ -66,7 +66,6 @@ export default async function handler(
             },
             data: {
                 amount: offerValue,
-                status: offerExists.status,
                 offerStatus: offerExists.offerStatus,
                 mortgageImage: await uploadImages(mortgage),
             },
@@ -126,7 +125,6 @@ export default async function handler(
         const newOffer = await prisma.offer.create({
             data: {
                 amount: offerValue,
-                status: "Pending",
                 mortgageImage: await uploadImages(mortgage),
                 property: {
                     connect: {
