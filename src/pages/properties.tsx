@@ -93,7 +93,7 @@ const Properties: NextPage<PropertyProps> = ({ properties }) => {
             </Head>
             <Background />
             <NavBar isLoggedIn={!!session} />
-            <div className="p-5 pt-20">
+            <div className="p-5 pt-24">
                 <h1 className="text-4xl font-bold text-center mb-5">
                     Properties
                 </h1>

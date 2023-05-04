@@ -4,7 +4,10 @@ import { useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import Image from "next/image";
 
-// TODO: Cancel page for payment
+// Write more about payment
+// update diagrams and talk about changes -> site map -> talk about profile page -> database diagram 
+// Add more references
+// Do the testing
 
 // Home page
 export default function Home() {
