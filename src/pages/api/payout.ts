@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { NextApiRequest, NextApiResponse } from "next";
+import prisma from "../../../prisma/prisma";
 
 // Handler for /api/test
 export default async function handler(
@@ -11,18 +12,44 @@ export default async function handler(
         return res.status(405).json({ message: "Method not allowed" });
     }
 
-    const { accountId }: { accountId: string } = JSON.parse(req.body);
+    const { id }: { id: string } = JSON.parse(req.body);
 
     // Create a new Stripe instance
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
         apiVersion: "2022-11-15",
     });
 
+    // Get the accountId from the bankDetails database -> First you must get the propertyId from the id -> then get the user that owns the property -> then get the bank details from the user
+    const offer = await prisma.offer.findUnique({
+        where: {
+            id: id,
+        },
+    });
+
+    const property = await prisma.property.findUnique({
+        where: {
+            id: offer!.propertyId,
+        },
+    });
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: property!.userId,
+        },
+    });
+
+    const bankDetails = await prisma.bankDetails.findUnique({
+        where: {
+            id: user!.id,
+        },
+    });
+
+
     try {
         const transfer = await stripe.transfers.create({
             amount: 1000,
             currency: "gbp",
-            destination: accountId,
+            destination: bankDetails?.accountId!,
         });
 
         res.status(200).json({ transfer });

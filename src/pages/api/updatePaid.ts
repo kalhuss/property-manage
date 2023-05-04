@@ -35,40 +35,6 @@ export default async function handler(
                 .json({ message: "Error adding entry to database" });
         });
 
-    // Get the contract and get the property id from the contract and then get the user that listed it
-    const contract = await prisma.contract.findUnique({
-        where: {
-            id: id,
-        },
-    });
-
-    const property = await prisma.property.findUnique({
-        where: {
-            id: contract?.propertyId,
-        },
-    });
-
-    const user = await prisma.user.findUnique({
-        where: {
-            id: property?.userId,
-        },
-    });
-
-    // Get the back details from the user
-    const bankDetails = await prisma.bankDetails.findFirst({
-        where: {
-            userId: user?.id,
-        },
-    });
-
-
-    const accountId = bankDetails?.accountId;
-
-    fetch("/api/payment", {
-        method: "POST",
-        body: JSON.stringify({ accountId}),
-    });
-
     // Return updated contract
     res.status(200).json({ updateContract });
 }

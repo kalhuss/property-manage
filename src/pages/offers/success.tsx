@@ -22,6 +22,11 @@ const SuccessPage: NextPage = () => {
                 id: id,
             }),
         });
+
+        fetch("/api/payment", {
+            method: "POST",
+            body: JSON.stringify({ id }),
+        });
     }
 
     // Render the success page
