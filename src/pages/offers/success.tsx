@@ -76,14 +76,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
 
     // Check if the contract exists and if the logged-in user's email matches the email associated with the contract
-    if (!contract || contract.userId !== user?.id) {
-        return {
-            redirect: {
-                destination: "/",
-                permanent: false,
-            },
-        };
-    }
+    // if (!contract || contract.userId !== user?.id) {
+    //     return {
+    //         redirect: {
+    //             destination: "/",
+    //             permanent: false,
+    //         },
+    //     };
+    // }
 
     return {
         props: {

@@ -29,6 +29,35 @@ export default async function handler(
             res.status(500).json({ message: "Error deleting entry" });
         });
 
+    // Get the property and change the sold to false
+    const property = await prisma.property.findUnique({
+        where: {
+            id: cancelOffer?.propertyId,
+        },
+    });
+
+    const updateProperty = await prisma.property.update({
+        where: {
+            id: property?.id,
+        },
+        data: {
+            sold: false,
+        },
+    });
+
+    // Get the contract and offer and delete them
+    const contract = await prisma.contract.findUnique({
+        where: {
+            id: cancelOffer?.id,
+        },
+    });
+
+    const deleteOffer = await prisma.offer.delete({
+        where: {
+            id: cancelOffer?.id,
+        },
+    });
+
     // Return the updated offer
     return res.status(200).json({ cancelOffer });
 }

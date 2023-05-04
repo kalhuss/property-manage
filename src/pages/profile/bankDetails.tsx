@@ -1,0 +1,263 @@
+// import { ChangeEvent, FC } from "react";
+// import Head from "next/head";
+// import { useFormik } from "formik";
+// import { useSession } from "next-auth/react";
+// import NavBar from "@/components/NavBar";
+// import Router from "next/router";
+// import KeyFeaturesInput from "@/components/KeyFeaturesInput";
+// import ListingInput from "@/components/ListingInput";
+// import ListingFileUpload from "@/components/ListingFileUpload";
+// import Background from "@/components/Backgrounds";
+// import { GetServerSideProps } from "next";
+// import { getSession } from "next-auth/react";
+// import imageCompression from "browser-image-compression";
+// import { validateListing } from "lib/validate";
+// import { useState } from "react";
+// import Spinner from "@/components/Spinner";
+
+// const IndexPage = () => {
+//     // Get the session
+//     const { data: session } = useSession();
+//     const [email, setEmail] = useState("");
+//     const [result, setResult] = useState("");
+//     const [isLoading, setIsLoading] = useState(false);
+
+//     // Set the initial values for the form
+//     const formik = useFormik({
+//         initialValues: {
+//             email: session?.user?.email!,
+//             name:
+//         },
+//         validate: validateListing,
+//         onSubmit: async (values) => {
+//             setIsLoading(true);
+//             const response = await fetch("/api/connectStripeAccount", {
+//                 method: "POST",
+//                 body: JSON.stringify({ values }),
+//             });
+//     const createStripeAccount = async () => {
+//         try {
+//             const response = await fetch("/api/connectStripeAccount", {
+//                 method: "POST",
+//                 body: JSON.stringify({ email }),
+//             });
+
+//             console.log(email);
+
+//             const data = await response.json();
+
+//             if (response.ok) {
+//                 setResult(`Stripe account created with ID ${data.accountId}`);
+//             } else {
+//                 setResult(`Failed to create Stripe account: ${data.error}`);
+//             }
+//         } catch (err) {
+//             console.error(err);
+//             setResult("Failed to create Stripe account");
+//         }
+//     };
+
+//     const payout = async () => {
+//         try {
+//             const response = await fetch("/api/payout", {
+//                 method: "POST",
+//             });
+
+//             const data = await response.json();
+//             if (response.ok) {
+//                 setResult(`Stripe account connected with ID ${data.accountId}`);
+//             } else {
+//                 setResult(`Failed to connect Stripe account: ${data.error}`);
+//             }
+//         } catch (err) {
+//             console.error(err);
+//             setResult("Failed to connect Stripe account");
+//         }
+//     };
+
+//     return (
+//         <>
+//         </>
+//     );
+// };
+
+// export default IndexPage;
+
+import { useState } from "react";
+import { useEffect } from "react";
+import { getSession, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { User } from "@prisma/client";
+import { BankDetails } from "@prisma/client";
+import { NextPage } from "next";
+import { GetServerSideProps } from "next";
+import prisma from "../../../prisma/prisma";
+import { useFormik } from "formik";
+import ListingInput from "@/components/ListingInput";
+import NavBar from "@/components/NavBar";
+import Head from "next/head";
+import Background from "@/components/Backgrounds";
+import Spinner from "@/components/Spinner";
+
+interface BankDetailProps {
+    user: User;
+}
+
+const BankDetailsPage: NextPage<BankDetailProps> = ({ user }) => {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    console.log(user);
+    const formik = useFormik({
+        initialValues: {
+            address: "",
+            city: "",
+            postcode: "",
+            sortCode: "",
+            accountNumber: "",
+            name: user.name,
+            surname: user.surname,
+            email: user.email,
+            dobDay: user.dob.split("-")[2],
+            dobMonth: user.dob.split("-")[1],
+            dobYear: user.dob.split("-")[0],
+            phoneNumber: user.phoneNumber,
+        },
+        onSubmit: async (values) => {
+            setIsLoading(true);
+            fetch(`/api/connectStripeAccount`, {
+                method: "POST",
+                body: JSON.stringify(values),
+            }).then((res) => {
+                if (res.ok) {
+                    router.push("/profile");
+                } else {
+                    alert("Something went wrong");
+                }
+            }
+            );
+        },
+    });
+
+    return (
+        <>
+            <Head>
+                <title>Bank Details</title>
+                <meta
+                    name="description"
+                    content="Generated by create next app"
+                />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1"
+                />
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
+            <Background />
+            <NavBar isLoggedIn={!!session} />
+            {isLoading && <Spinner />}
+            <div className="flex flex-col items-center justify-center pt-20">
+                <div className=" min-h-fit p-5 w-3/6 bg-white rounded-lg shadow-lg ">
+                    {/* Title */}
+                    <h1 className="text-4xl font-bold text-center">
+                        Bank Details
+                    </h1>
+
+                    <section className="w-3/4 mx-auto flex flex-col">
+                        {/* Form */}
+                        <form
+                            className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
+                            onSubmit={formik.handleSubmit}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                }
+                            }}
+                        >
+                            {/* Tenure */}
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Address"
+                                inputType="text"
+                                formikName="address"
+                                isRequired={true}
+                            />
+
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="City"
+                                inputType="text"
+                                formikName="city"
+                                isRequired={true}
+                            />
+
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Postcode"
+                                inputType="text"
+                                formikName="postcode"
+                                isRequired={true}
+                            />
+
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Sort Code"
+                                inputType="text"
+                                formikName="sortCode"
+                                isRequired={true}
+                            />
+
+                            <ListingInput
+                                getFieldProps={formik.getFieldProps}
+                                labelName="Account Number
+                                "
+                                inputType="text"
+                                formikName="accountNumber"
+                                isRequired={true}
+                            />
+
+                            {/* Submit */}
+                            <button
+                                className="p-4 col-span-2 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                type="submit"
+                            >
+                                Submit
+                            </button>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </>
+    );
+};
+
+// Get the user data from the database
+export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
+    const session = await getSession(context);
+
+    // If there's no session, redirect to the login page
+    // if (!session) {
+    //     return {
+    //         redirect: {
+    //             destination: "/login",
+    //             permanent: false,
+    //         },
+    //     };
+    // }
+
+    const email = session?.user?.email;
+    // Get the user
+    const user = await prisma.user.findUnique({
+        where: {
+            email: email as string,
+        },
+    });
+
+    return {
+        props: {
+            user,
+        },
+    };
+};
+
+export default BankDetailsPage;

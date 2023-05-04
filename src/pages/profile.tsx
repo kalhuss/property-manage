@@ -7,16 +7,18 @@ import Link from "next/link";
 import { GetServerSideProps } from "next";
 import prisma from "../../prisma/prisma";
 import { User } from "@prisma/client";
+import { BankDetails } from "@prisma/client";
 import { useState } from "react";
 import Router from "next/router";
 
 // Props for the profile page
 interface UserProps {
     user: User;
+    bankDetails: BankDetails;
 }
 
 // Profile page
-const Profile: NextPage<UserProps> = ({ user }) => {
+const Profile: NextPage<UserProps> = ({ user, bankDetails }) => {
     const { data: session, status } = useSession();
     const [isEditing, setIsEditing] = useState(false);
     const [name, setName] = useState(user.name);
@@ -94,7 +96,7 @@ const Profile: NextPage<UserProps> = ({ user }) => {
                 <div className="pt-20 w-full flex justify-center">
                     {/* If the user is logged in */}
                     {session ? (
-                        <>
+                        <div className="grid grid-cols-2 gap-10">
                             {!isEditing ? (
                                 <UserDisplay
                                     user={user}
@@ -116,7 +118,70 @@ const Profile: NextPage<UserProps> = ({ user }) => {
                                     handleCancel={handleCancel}
                                 />
                             )}
-                        </>
+
+                            <div className="flex flex-col justify-center items-center">
+                                <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col flex-space gap-4 w-full h-full ">
+                                    {user.bankAdded ? (
+                                        <div className="m-auto">
+                                            <div className="grid grid-cols-2 items-center">
+                                                <h1 className="text-2xl font-bold text-black mr-4">
+                                                    Address:
+                                                </h1>
+                                                <p className="w-full px-4 py-2 text-2xl">
+                                                    {bankDetails.address}
+                                                </p>
+                                            </div>
+                                            <div className="grid grid-cols-2 items-center">
+                                                <h1 className="text-2xl font-bold text-black mr-4">
+                                                    City:
+                                                </h1>
+                                                <p className="w-full px-4 py-2 text-2xl">
+                                                    {bankDetails.city}
+                                                </p>
+                                            </div>
+                                            <div className="grid grid-cols-2 items-center">
+                                                <h1 className="text-2xl font-bold text-black mr-4">
+                                                    Postcode:
+                                                </h1>
+                                                <p className="w-full px-4 py-2 text-2xl">
+                                                    {bankDetails.postcode}
+                                                </p>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 items-center">
+                                                <h1 className="text-2xl font-bold text-black mr-4">
+                                                    Sortcode:
+                                                </h1>
+                                                <p className="w-full px-4 py-2 text-2xl">
+                                                    {bankDetails.sortCode}
+                                                </p>
+                                            </div>
+                                            <div className="grid grid-cols-2 items-center">
+                                                <h1 className="text-2xl font-bold text-black mr-4">
+                                                    Account Number:
+                                                </h1>
+                                                <p className="w-full px-4 py-2 text-2xl">
+                                                    {bankDetails.accountNumber}
+                                                </p>
+                                            </div>
+                                            <Link href="/profile/bankDetails/edit">
+                                                <button className="mt-5 w-full p-4 font-bold border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg">
+                                                    Edit Bank Details
+                                                </button>
+                                            </Link>
+                                        </div>
+                                    ) : (
+                                        <div className="m-auto">
+                                            <Link href="/profile/bankDetails">
+                                                <button className=" p-4 font-bold border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg">
+                                                    Add Bank Details
+                                                </button>
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     ) : (
                         <Guest />
                     )}
@@ -134,45 +199,51 @@ const UserDisplay: NextPage<{ user: User; handleEdit: () => void }> = ({
     // Render the user display
     return (
         <>
-            <div className="flex flex-col items-center justify-center space-y-4 bg-white p-5 rounded-md shadow-md">
-                <div className="flex flex-col items-center justify-center space-y-4">
-                    <div className="flex items-center justify-center space-x-2">
-                        <h1 className="text-2xl font-bold text-black">Name:</h1>
-                        <p className="text-2xl text-black">{user.name}</p>
+            <div className="flex flex-col justify-center items-center">
+                <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col flex-space gap-4">
+                    <div className="grid grid-cols-2 items-center">
+                        <h1 className="text-2xl font-bold text-black mr-4">
+                            Name:
+                        </h1>
+                        <p className="w-full px-4 py-2 text-2xl">{user.name}</p>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
-                        <h1 className="text-2xl font-bold text-black">
+                    <div className="grid grid-cols-2 items-center">
+                        <h1 className="text-2xl font-bold text-black mr-4">
                             Surname:
                         </h1>
-                        <p className="text-2xl text-black">{user.surname}</p>
+                        <p className="w-full px-4 py-2 text-2xl">
+                            {user.surname}
+                        </p>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
-                        <h1 className="text-2xl font-bold text-black">
+                    <div className="grid grid-cols-2 items-center">
+                        <h1 className="text-2xl font-bold text-black mr-4">
                             Date of Birth:
                         </h1>
-                        <p className="text-2xl text-black">{user.dob}</p>
+                        <p className="w-full px-4 py-2 text-2xl">{user.dob}</p>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
-                        <h1 className="text-2xl font-bold text-black">
+                    <div className="grid grid-cols-2 items-center">
+                        <h1 className="text-2xl font-bold text-black mr-4">
                             Email:
                         </h1>
-                        <p className="text-2xl text-black">{user.email}</p>
+                        <p className="w-full px-4 py-2 text-2xl">
+                            {user.email}
+                        </p>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
-                        <h1 className="text-2xl font-bold text-black">
+                    <div className="grid grid-cols-2 items-center">
+                        <h1 className="text-2xl font-bold text-black mr-4">
                             Phone Number:
                         </h1>
-                        <p className="text-2xl text-black">
+                        <p className="w-full px-4 py-2 text-2xl">
                             {user.phoneNumber}
                         </p>
                     </div>
+                    <button
+                        className="p-4 font-bold border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                        onClick={handleEdit}
+                    >
+                        Edit
+                    </button>
                 </div>
-                <button
-                    className="p-4 font-bold border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
-                    onClick={handleEdit}
-                >
-                    Edit
-                </button>
             </div>
         </>
     );
@@ -211,7 +282,7 @@ const EditUser: NextPage<{
     // Render the edit user
     return (
         <>
-            <div className="flex flex-col justify-center items-center bg-gray-100">
+            <div className="flex flex-col justify-center items-center ">
                 <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col flex-space gap-4">
                     <div className="grid grid-cols-2 items-center">
                         <h1 className="text-2xl font-bold text-black mr-4">
@@ -325,11 +396,19 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
         },
     });
 
+    // Get the bank details
+    const bankDetails = await prisma.bankDetails.findFirst({
+        where: {
+            userId: user?.id,
+        },
+    });
+
     context.res.setHeader("Cache-Control", "no-store");
 
     return {
         props: {
             user: JSON.parse(JSON.stringify(user)),
+            bankDetails: JSON.parse(JSON.stringify(bankDetails)),
         },
     };
 };

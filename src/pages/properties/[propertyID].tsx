@@ -13,6 +13,7 @@ import { User } from "@prisma/client";
 import BackArrow from "@/components/BackArrow";
 import { useLoadScript, GoogleMap, MarkerF } from "@react-google-maps/api";
 import { useMemo } from "react";
+import Spinner from "@/components/Spinner";
 
 // Props for the property page
 interface PropertyPageProps {
@@ -76,9 +77,9 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
         }
     }, [isLoaded, address, property.address, property.postcode]);
 
-    // If the session is loading, show a loading message
+    // If the session is loading, show a spinner
     if (!isLoaded) {
-        return <p>Loading...</p>;
+        return <Spinner />;
     }
 
     // Calculate the length of the image sliders
@@ -139,7 +140,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                     priority={true}
                                 />
                             ) : property.panoramicImages.length > 0 &&
-                              currentImageIndex >= property.images.length ? (
+                               currentImageIndex >= property.images.length ? (
                                 <PanoramaViewer
                                     image={
                                         CDN +
