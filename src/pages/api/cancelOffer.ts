@@ -45,25 +45,12 @@ export default async function handler(
         },
     });
 
-    // Get the contract and offer and delete them
-    const contract = await prisma.contract.findUnique({
-        where: {
-            id: cancelOffer?.id,
-        },
-    });
-
     const deleteOffer = await prisma.offer.delete({
         where: {
             id: cancelOffer?.id,
         },
     });
 
-    const deleteContract = await prisma.contract.delete({
-        where: {
-            id: contract?.id,
-        },
-    });
-    
 
     // Return the updated offer
     return res.status(200).json({ cancelOffer });

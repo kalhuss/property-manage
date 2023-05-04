@@ -23,7 +23,7 @@ const SuccessPage: NextPage = () => {
             }),
         });
 
-        fetch("/api/payment", {
+        fetch("/api/payout", {
             method: "POST",
             body: JSON.stringify({ id }),
         });
