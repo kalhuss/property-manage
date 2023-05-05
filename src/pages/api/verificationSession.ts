@@ -46,10 +46,10 @@ export default async function handler(
             metadata: {
                 user_id: account?.accountId!,
             },
-            return_url: "https://property-manage.vercel.app/verified", // Replace with your actual return URL
+            return_url: "https://property-manage.vercel.app/verified?id=${verificationSession.id}", // Replace with your actual return URL
         });
 
-        return res.status(200).json({ verificationURL: verificationSession.url, verificationSessionId: verificationSession.id });
+        return res.status(200).json({ verificationURL: verificationSession.url });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error" });

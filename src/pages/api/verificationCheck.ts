@@ -10,10 +10,11 @@ export default async function handler(
         apiVersion: "2022-11-15",
     });
 
-    const { sessionId } : { sessionId: string } = JSON.parse(req.body);
+    // Get data from request body
+    const { id }: { id: string } = JSON.parse(req.body);
 
     // Get the verification session ID from the request body
-    const verificationSessionId = sessionId;
+    const verificationSessionId = id;
     
     // Retrieve the verification session
     const verificationSession = await stripe.identity.verificationSessions.retrieve(
