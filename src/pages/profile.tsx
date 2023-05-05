@@ -70,6 +70,25 @@ const Profile: NextPage<UserProps> = ({ user, bankDetails }) => {
         }
     };
 
+    const handleVerify = async () => {
+        try {
+            // Call the verify API
+            const response = await fetch("/api/verificationSession", {
+                method: "POST",
+                body: JSON.stringify({ email: user.email }),
+            });
+
+            if (response.ok) {
+                const { verificationURL } = await response.json();
+                Router.push(verificationURL);
+            } else {
+                console.log("Failed to verify");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     // Render the profile page
     return (
         <div>
@@ -178,6 +197,15 @@ const Profile: NextPage<UserProps> = ({ user, bankDetails }) => {
                                                 </button>
                                             </Link>
                                         </div>
+                                    )}
+                                    {!user.verified ? (
+                                        <div className="m-auto">
+                                                <button onClick = {handleVerify}className="mt-5 w-full p-4 font-bold border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg">
+                                                    Verify Account
+                                                </button>
+                                        </div>
+                                    ) : (
+                                        <></>
                                     )}
                                 </div>
                             </div>
