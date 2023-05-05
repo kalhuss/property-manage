@@ -1,7 +1,6 @@
 import { getSession, useSession } from "next-auth/react";
 import NavBar from "@/components/NavBar";
 import Head from "next/head";
-import { NextPage } from "next";
 import Link from "next/link";
 import { GetServerSideProps } from "next";
 import prisma from "../../prisma/prisma";
@@ -9,11 +8,14 @@ import Background from "@/components/Backgrounds";
 import { useRouter } from "next/router";
 
 const VerifiedPage = () => {
+    // Get the user session
     const { data: session } = useSession();
     const router = useRouter();
-    const email  = session?.user?.email;
 
-    // Call the updatePaid API
+    // Get the user email
+    const email = session?.user?.email;
+
+    // Call the verificationCheck API
     if (session) {
         fetch("/api/verificationCheck", {
             method: "POST",
@@ -65,6 +67,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Get the contract ID from the URL query string
     const { id } = context.query;
+
+    // Check if the user is logged in
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
 
     // Get the user from the database
     const user = await prisma.user.findFirst({

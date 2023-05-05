@@ -19,7 +19,7 @@ import { User } from "@prisma/client";
 import Link from "next/link";
 
 interface Props {
-    user: User
+    user: User;
 }
 
 // Listing page
@@ -248,236 +248,238 @@ const Listing: FC<Props> = ({ user }) => {
             <Background />
             <NavBar isLoggedIn={!!session} />
             {isLoading && <Spinner />}
-            { !user.bankAdded ? (
+            {!user.bankAdded ? (
                 <div className="container mx-auto p-5 pt-20 flex flex-col">
-                <h1 className="text-4xl font-bold text-center mb-5">
-                    You cannot make a listing without adding a bank account
-                </h1>
-                <Link href="/profile" className="flex justify-center">
-                    <button className="justify-center px-8 py-3 mt-44 bg-white bg-opacity-75 text-blue-500 font-bold text-3xl rounded-md hover:shadow-lg  hover:bg-blue-500 hover:text-white border-2 border-blue-500">
-                        Profile
-                    </button>
-                </Link>
-            </div>
-            ) : (
-            <div className="flex flex-col items-center justify-center pt-20">
-                <div className=" min-h-fit p-5 w-3/6 bg-white rounded-lg shadow-lg ">
-                    {/* Title */}
-                    <h1 className="text-4xl font-bold text-center">
-                        Create a new listing
+                    <h1 className="text-4xl font-bold text-center mb-5">
+                        You cannot make a listing without adding a bank account
                     </h1>
-
-                    <section className="w-3/4 mx-auto flex flex-col">
-                        {/* Form */}
-                        <form
-                            className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
-                            onSubmit={formik.handleSubmit}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    e.preventDefault();
-                                }
-                            }}
-                        >
-                            {/* Tenure */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Tenure"
-                                inputType="dropdown"
-                                formikName="tenure"
-                                isRequired={true}
-                            />
-
-                            {/* Price */}
-                            <div
-                                className={
-                                    formik.values.tenure === "to rent"
-                                        ? "hidden"
-                                        : "block"
-                                }
-                            >
-                                <ListingInput
-                                    getFieldProps={formik.getFieldProps}
-                                    labelName="Price"
-                                    inputType="text"
-                                    formikName="price"
-                                    isRequired={
-                                        formik.values.tenure !== "to rent"
-                                    }
-                                />
-
-                                {formik.touched.price && formik.errors.price ? (
-                                    <div className="text-red-500 text-sm">
-                                        {formik.errors.price}
-                                    </div>
-                                ) : null}
-                            </div>
-
-                            {/* Rent */}
-                            <div
-                                className={
-                                    formik.values.tenure === "to rent"
-                                        ? "block"
-                                        : "hidden"
-                                }
-                            >
-                                <ListingInput
-                                    getFieldProps={formik.getFieldProps}
-                                    labelName="Rent"
-                                    inputType="text"
-                                    formikName="rent"
-                                    isRequired={
-                                        formik.values.tenure === "to rent"
-                                    }
-                                />
-
-                                {formik.touched.rent && formik.errors.rent ? (
-                                    <div className="text-red-500 text-sm">
-                                        {formik.errors.rent}
-                                    </div>
-                                ) : null}
-                            </div>
-
-                            {/* Bedrooms */}
-                            <div>
-                                <ListingInput
-                                    getFieldProps={formik.getFieldProps}
-                                    labelName="Bedrooms"
-                                    inputType="text"
-                                    formikName="bedrooms"
-                                    isRequired={true}
-                                />
-                                {formik.touched.bedrooms &&
-                                formik.errors.bedrooms ? (
-                                    <div className="text-red-500 text-sm">
-                                        {formik.errors.bedrooms}
-                                    </div>
-                                ) : null}
-                            </div>
-
-                            <div>
-                                {/* Bathrooms */}
-                                <ListingInput
-                                    getFieldProps={formik.getFieldProps}
-                                    labelName="Bathrooms"
-                                    inputType="text"
-                                    formikName="bathrooms"
-                                    isRequired={true}
-                                />
-                                {formik.touched.bathrooms &&
-                                formik.errors.bathrooms ? (
-                                    <div className="text-red-500 text-sm">
-                                        {formik.errors.bathrooms}
-                                    </div>
-                                ) : null}
-                            </div>
-
-                            {/* House Type */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="House Type"
-                                inputType="text"
-                                formikName="houseType"
-                                isRequired={true}
-                            />
-
-                            {/* Address */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Address"
-                                inputType="text"
-                                formikName="address"
-                                isRequired={true}
-                            />
-
-                            {/* Postcode */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Postcode"
-                                inputType="text"
-                                formikName="postcode"
-                                isRequired={true}
-                            />
-
-                            {/* Tax Band */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Tax Band"
-                                inputType="text"
-                                formikName="taxBand"
-                                isRequired={true}
-                            />
-
-                            {/* Key Features */}
-                            <KeyFeaturesInput
-                                setFieldValue={formik.setFieldValue}
-                            />
-
-                            {/* Description */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Description"
-                                inputType="textarea"
-                                formikName="description"
-                                isRequired={true}
-                            />
-
-                            {/* Contact Number */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Contact Number"
-                                inputType="text"
-                                formikName="contactNumber"
-                                isRequired={true}
-                            />
-
-                            {/* Contact Email */}
-                            <ListingInput
-                                getFieldProps={formik.getFieldProps}
-                                labelName="Contact Email"
-                                inputType="text"
-                                formikName="contactEmail"
-                                isRequired={true}
-                            />
-
-                            {/* Exterior Images */}
-                            <ListingFileUpload
-                                labelName="Exterior Image"
-                                onChange={encodeExteriorImage}
-                                isRequired={true}
-                            />
-
-                            {/* Images */}
-                            <ListingFileUpload
-                                labelName="Images"
-                                onChange={encodeImage}
-                                isRequired={true}
-                            />
-
-                            {/* Panoramic Images */}
-                            <ListingFileUpload
-                                labelName="Panoramic Images"
-                                onChange={encodePanoramicImage}
-                                isRequired={false}
-                            />
-
-                            {/* Floor Plan */}
-                            <ListingFileUpload
-                                labelName="Floor Plan"
-                                onChange={encodeFloorPlan}
-                                isRequired={false}
-                            />
-
-                            {/* Submit */}
-                            <button
-                                className="p-4 col-span-2 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
-                                type="submit"
-                            >
-                                Submit
-                            </button>
-                        </form>
-                    </section>
+                    <Link href="/profile" className="flex justify-center">
+                        <button className="justify-center px-8 py-3 mt-44 bg-white bg-opacity-75 text-blue-500 font-bold text-3xl rounded-md hover:shadow-lg  hover:bg-blue-500 hover:text-white border-2 border-blue-500">
+                            Profile
+                        </button>
+                    </Link>
                 </div>
-            </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center pt-20">
+                    <div className=" min-h-fit p-5 w-3/6 bg-white rounded-lg shadow-lg ">
+                        {/* Title */}
+                        <h1 className="text-4xl font-bold text-center">
+                            Create a new listing
+                        </h1>
+
+                        <section className="w-3/4 mx-auto flex flex-col">
+                            {/* Form */}
+                            <form
+                                className="mt-10 grid grid-cols-2 gap-y-5 gap-x-10"
+                                onSubmit={formik.handleSubmit}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                    }
+                                }}
+                            >
+                                {/* Tenure */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Tenure"
+                                    inputType="dropdown"
+                                    formikName="tenure"
+                                    isRequired={true}
+                                />
+
+                                {/* Price */}
+                                <div
+                                    className={
+                                        formik.values.tenure === "to rent"
+                                            ? "hidden"
+                                            : "block"
+                                    }
+                                >
+                                    <ListingInput
+                                        getFieldProps={formik.getFieldProps}
+                                        labelName="Price"
+                                        inputType="text"
+                                        formikName="price"
+                                        isRequired={
+                                            formik.values.tenure !== "to rent"
+                                        }
+                                    />
+
+                                    {formik.touched.price &&
+                                    formik.errors.price ? (
+                                        <div className="text-red-500 text-sm">
+                                            {formik.errors.price}
+                                        </div>
+                                    ) : null}
+                                </div>
+
+                                {/* Rent */}
+                                <div
+                                    className={
+                                        formik.values.tenure === "to rent"
+                                            ? "block"
+                                            : "hidden"
+                                    }
+                                >
+                                    <ListingInput
+                                        getFieldProps={formik.getFieldProps}
+                                        labelName="Rent"
+                                        inputType="text"
+                                        formikName="rent"
+                                        isRequired={
+                                            formik.values.tenure === "to rent"
+                                        }
+                                    />
+
+                                    {formik.touched.rent &&
+                                    formik.errors.rent ? (
+                                        <div className="text-red-500 text-sm">
+                                            {formik.errors.rent}
+                                        </div>
+                                    ) : null}
+                                </div>
+
+                                {/* Bedrooms */}
+                                <div>
+                                    <ListingInput
+                                        getFieldProps={formik.getFieldProps}
+                                        labelName="Bedrooms"
+                                        inputType="text"
+                                        formikName="bedrooms"
+                                        isRequired={true}
+                                    />
+                                    {formik.touched.bedrooms &&
+                                    formik.errors.bedrooms ? (
+                                        <div className="text-red-500 text-sm">
+                                            {formik.errors.bedrooms}
+                                        </div>
+                                    ) : null}
+                                </div>
+
+                                <div>
+                                    {/* Bathrooms */}
+                                    <ListingInput
+                                        getFieldProps={formik.getFieldProps}
+                                        labelName="Bathrooms"
+                                        inputType="text"
+                                        formikName="bathrooms"
+                                        isRequired={true}
+                                    />
+                                    {formik.touched.bathrooms &&
+                                    formik.errors.bathrooms ? (
+                                        <div className="text-red-500 text-sm">
+                                            {formik.errors.bathrooms}
+                                        </div>
+                                    ) : null}
+                                </div>
+
+                                {/* House Type */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="House Type"
+                                    inputType="text"
+                                    formikName="houseType"
+                                    isRequired={true}
+                                />
+
+                                {/* Address */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Address"
+                                    inputType="text"
+                                    formikName="address"
+                                    isRequired={true}
+                                />
+
+                                {/* Postcode */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Postcode"
+                                    inputType="text"
+                                    formikName="postcode"
+                                    isRequired={true}
+                                />
+
+                                {/* Tax Band */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Tax Band"
+                                    inputType="text"
+                                    formikName="taxBand"
+                                    isRequired={true}
+                                />
+
+                                {/* Key Features */}
+                                <KeyFeaturesInput
+                                    setFieldValue={formik.setFieldValue}
+                                />
+
+                                {/* Description */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Description"
+                                    inputType="textarea"
+                                    formikName="description"
+                                    isRequired={true}
+                                />
+
+                                {/* Contact Number */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Contact Number"
+                                    inputType="text"
+                                    formikName="contactNumber"
+                                    isRequired={true}
+                                />
+
+                                {/* Contact Email */}
+                                <ListingInput
+                                    getFieldProps={formik.getFieldProps}
+                                    labelName="Contact Email"
+                                    inputType="text"
+                                    formikName="contactEmail"
+                                    isRequired={true}
+                                />
+
+                                {/* Exterior Images */}
+                                <ListingFileUpload
+                                    labelName="Exterior Image"
+                                    onChange={encodeExteriorImage}
+                                    isRequired={true}
+                                />
+
+                                {/* Images */}
+                                <ListingFileUpload
+                                    labelName="Images"
+                                    onChange={encodeImage}
+                                    isRequired={true}
+                                />
+
+                                {/* Panoramic Images */}
+                                <ListingFileUpload
+                                    labelName="Panoramic Images"
+                                    onChange={encodePanoramicImage}
+                                    isRequired={false}
+                                />
+
+                                {/* Floor Plan */}
+                                <ListingFileUpload
+                                    labelName="Floor Plan"
+                                    onChange={encodeFloorPlan}
+                                    isRequired={false}
+                                />
+
+                                {/* Submit */}
+                                <button
+                                    className="p-4 col-span-2 border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg"
+                                    type="submit"
+                                >
+                                    Submit
+                                </button>
+                            </form>
+                        </section>
+                    </div>
+                </div>
             )}
         </>
     );

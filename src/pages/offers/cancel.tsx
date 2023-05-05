@@ -4,7 +4,6 @@ import Head from "next/head";
 import { NextPage } from "next";
 import Link from "next/link";
 import { GetServerSideProps } from "next";
-import prisma from "../../../prisma/prisma";
 import Background from "@/components/Backgrounds";
 
 // Cancel page

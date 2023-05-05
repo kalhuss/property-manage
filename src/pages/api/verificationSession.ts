@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../prisma/prisma";
 
-// Handler for /api/test
+// Handler for /api/verificationSuccess
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -18,8 +18,7 @@ export default async function handler(
     });
 
     try {
-
-        const { email } : { email: string } = JSON.parse(req.body);
+        const { email }: { email: string } = JSON.parse(req.body);
 
         // Check if user is logged in
         if (!email) {
@@ -39,21 +38,19 @@ export default async function handler(
                 userId: user?.id,
             },
         });
-        
-        const verificationSession = await stripe.identity.verificationSessions.create({
-            type: "document",
-            metadata: {
-                user_id: account?.accountId!,
-            },
-            return_url: `https://property-manage.vercel.app/verified`,
-        });
 
+        const verificationSession =
+            await stripe.identity.verificationSessions.create({
+                type: "document",
+                metadata: {
+                    user_id: account?.accountId!,
+                },
+                return_url: `https://property-manage.vercel.app/verified`,
+            });
 
-        const getVerificationSession = await stripe.identity.verificationSessions.retrieve(
-            verificationSession.id
-        );
-
-        return res.status(200).json({ verificationURL: verificationSession.url });
+        return res
+            .status(200)
+            .json({ verificationURL: verificationSession.url });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error" });

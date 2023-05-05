@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cypress": "cypress open"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.15.1",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "autoprefixer": "^10.4.13",
+    "cypress": "^12.11.0",
     "postcss": "^8.4.21",
     "prisma": "^4.9.0",
     "tailwind-scrollbar": "^3.0.0",

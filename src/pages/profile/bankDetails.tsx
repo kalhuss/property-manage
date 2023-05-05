@@ -1,94 +1,7 @@
-// import { ChangeEvent, FC } from "react";
-// import Head from "next/head";
-// import { useFormik } from "formik";
-// import { useSession } from "next-auth/react";
-// import NavBar from "@/components/NavBar";
-// import Router from "next/router";
-// import KeyFeaturesInput from "@/components/KeyFeaturesInput";
-// import ListingInput from "@/components/ListingInput";
-// import ListingFileUpload from "@/components/ListingFileUpload";
-// import Background from "@/components/Backgrounds";
-// import { GetServerSideProps } from "next";
-// import { getSession } from "next-auth/react";
-// import imageCompression from "browser-image-compression";
-// import { validateListing } from "lib/validate";
-// import { useState } from "react";
-// import Spinner from "@/components/Spinner";
-
-// const IndexPage = () => {
-//     // Get the session
-//     const { data: session } = useSession();
-//     const [email, setEmail] = useState("");
-//     const [result, setResult] = useState("");
-//     const [isLoading, setIsLoading] = useState(false);
-
-//     // Set the initial values for the form
-//     const formik = useFormik({
-//         initialValues: {
-//             email: session?.user?.email!,
-//             name:
-//         },
-//         validate: validateListing,
-//         onSubmit: async (values) => {
-//             setIsLoading(true);
-//             const response = await fetch("/api/connectStripeAccount", {
-//                 method: "POST",
-//                 body: JSON.stringify({ values }),
-//             });
-//     const createStripeAccount = async () => {
-//         try {
-//             const response = await fetch("/api/connectStripeAccount", {
-//                 method: "POST",
-//                 body: JSON.stringify({ email }),
-//             });
-
-//             console.log(email);
-
-//             const data = await response.json();
-
-//             if (response.ok) {
-//                 setResult(`Stripe account created with ID ${data.accountId}`);
-//             } else {
-//                 setResult(`Failed to create Stripe account: ${data.error}`);
-//             }
-//         } catch (err) {
-//             console.error(err);
-//             setResult("Failed to create Stripe account");
-//         }
-//     };
-
-//     const payout = async () => {
-//         try {
-//             const response = await fetch("/api/payout", {
-//                 method: "POST",
-//             });
-
-//             const data = await response.json();
-//             if (response.ok) {
-//                 setResult(`Stripe account connected with ID ${data.accountId}`);
-//             } else {
-//                 setResult(`Failed to connect Stripe account: ${data.error}`);
-//             }
-//         } catch (err) {
-//             console.error(err);
-//             setResult("Failed to connect Stripe account");
-//         }
-//     };
-
-//     return (
-//         <>
-//         </>
-//     );
-// };
-
-// export default IndexPage;
-
 import { useState } from "react";
-import { useEffect } from "react";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { User } from "@prisma/client";
-import { BankDetails } from "@prisma/client";
 import { NextPage } from "next";
 import { GetServerSideProps } from "next";
 import prisma from "../../../prisma/prisma";
@@ -99,15 +12,19 @@ import Head from "next/head";
 import Background from "@/components/Backgrounds";
 import Spinner from "@/components/Spinner";
 
+// Props for the BankDetailsPage
 interface BankDetailProps {
     user: User;
 }
 
+// Bank details page
 const BankDetailsPage: NextPage<BankDetailProps> = ({ user }) => {
-    const { data: session, status } = useSession();
+    // Get the user session
+    const { data: session } = useSession();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    console.log(user);
+
+    // Formik form
     const formik = useFormik({
         initialValues: {
             address: "",
@@ -125,6 +42,7 @@ const BankDetailsPage: NextPage<BankDetailProps> = ({ user }) => {
         },
         onSubmit: async (values) => {
             setIsLoading(true);
+            // Call the connectStripeAccount API
             fetch(`/api/connectStripeAccount`, {
                 method: "POST",
                 body: JSON.stringify(values),
@@ -134,11 +52,11 @@ const BankDetailsPage: NextPage<BankDetailProps> = ({ user }) => {
                 } else {
                     alert("Something went wrong");
                 }
-            }
-            );
+            });
         },
     });
 
+    // Render the bank details page
     return (
         <>
             <Head>
@@ -236,14 +154,14 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
     const session = await getSession(context);
 
     // If there's no session, redirect to the login page
-    // if (!session) {
-    //     return {
-    //         redirect: {
-    //             destination: "/login",
-    //             permanent: false,
-    //         },
-    //     };
-    // }
+    if (!session) {
+        return {
+            redirect: {
+                destination: "/login",
+                permanent: false,
+            },
+        };
+    }
 
     const email = session?.user?.email;
     // Get the user

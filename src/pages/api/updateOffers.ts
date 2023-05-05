@@ -52,5 +52,7 @@ export default async function handler(
     });
 
     // Return rejectedOffers
-    return res.status(200).json({ updatedOffer, updatedProperty , rejectedOffers });
+    return res
+        .status(200)
+        .json({ updatedOffer, updatedProperty, rejectedOffers });
 }

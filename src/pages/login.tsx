@@ -16,6 +16,7 @@ import { getSession } from "next-auth/react";
 // Login page
 const Login: FC = () => {
     const [show, setShow] = useState(false);
+    const [error, setError] = useState(false);
     const router = useRouter();
 
     // Setup formik for form validation
@@ -31,10 +32,13 @@ const Login: FC = () => {
                 callbackUrl: "/",
                 email: values.email,
                 password: values.password,
+                redirect: false,
             });
 
             if (result!.ok) {
                 router.push(result!.url!);
+            } else {
+                setError(true);
             }
         },
     });
@@ -124,6 +128,11 @@ const Login: FC = () => {
                             Login
                         </button>
                     </div>
+                    {error && (
+                        <div className="text-red-500 text-sm">
+                            Invalid email or password
+                        </div>
+                    )}
                 </form>
 
                 <p className="text-center text-gray-400">

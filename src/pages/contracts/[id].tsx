@@ -18,6 +18,7 @@ interface ContractPageProps {
     users: User;
     property: Property;
     acceptedOffer: Offer;
+    propertyOwner: User;
 }
 
 // Contract page
@@ -25,6 +26,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
     users,
     property,
     acceptedOffer,
+    propertyOwner,
 }) => {
     // Get the session
     const { data: session } = useSession();
@@ -67,6 +69,11 @@ const ContractPage: React.FC<ContractPageProps> = ({
         const textField = form.createTextField("signature");
         textField.isRequired();
 
+        const filledTextField = form.createTextField("signed");
+        filledTextField.setText(
+            propertyOwner.name + " " + propertyOwner.surname
+        );
+
         const headerText = "RESIDENTIAL LEASE AGREEMENT";
         const footerText = "Page 1 of 1";
 
@@ -94,13 +101,16 @@ const ContractPage: React.FC<ContractPageProps> = ({
         });
 
         // Add property information to the PDF document
-        page.drawText(`Property address: ${property.address}`, {
-            x: 100,
-            y: 700,
-            size: 14,
-            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
-            color: rgb(0, 0, 0),
-        });
+        page.drawText(
+            `Property address: ${property.address}, ${property.postcode}`,
+            {
+                x: 100,
+                y: 700,
+                size: 14,
+                font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+                color: rgb(0, 0, 0),
+            }
+        );
 
         // Add tenant information to the PDF document
         page.drawText(`Tenant name: ${users.name} ${users.surname}`, {
@@ -112,7 +122,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
         });
 
         // Add lease terms to the PDF document
-        page.drawText("LEASE TERMS", {
+        page.drawText("TERMS", {
             x: 100,
             y: 650,
             size: 18,
@@ -120,14 +130,26 @@ const ContractPage: React.FC<ContractPageProps> = ({
             color: rgb(0, 0.53, 0.71),
         });
 
-        // Add rent amount to the PDF document
-        page.drawText(`Rent amount: ${property.rent}`, {
-            x: 100,
-            y: 620,
-            size: 14,
-            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
-            color: rgb(0, 0, 0),
-        });
+        // If tenure is "to rent" show rent, otherwise show price
+        if (property.tenure === "To rent") {
+            // Add rent amount to the PDF document
+            page.drawText(`Rent amount: ${property.rent}`, {
+                x: 100,
+                y: 620,
+                size: 14,
+                font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+                color: rgb(0, 0, 0),
+            });
+        } else {
+            // Add price to the PDF document
+            page.drawText(`Price: ${property.price}`, {
+                x: 100,
+                y: 620,
+                size: 14,
+                font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+                color: rgb(0, 0, 0),
+            });
+        }
 
         // Add termination clause to the PDF document
         page.drawText("TERMINATION", {
@@ -168,7 +190,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
         // Add signature section to the PDF document
         page.drawText("SIGNATURES", {
             x: 100,
-            y: 200,
+            y: 310,
             size: 18,
             font: await pdfDoc.embedFont(StandardFonts.HelveticaBold),
             color: rgb(0, 0.53, 0.71),
@@ -176,13 +198,40 @@ const ContractPage: React.FC<ContractPageProps> = ({
 
         page.drawText(`Tenant signature:`, {
             x: 100,
-            y: 140,
+            y: 280,
             size: 14,
             font: await pdfDoc.embedFont(StandardFonts.Helvetica),
             color: rgb(0, 0, 0),
         });
 
-        textField.addToPage(page, { x: 220, y: 120 });
+        textField.addToPage(page, { x: 220, y: 260 });
+
+        page.drawText(`Landlord signature:`, {
+            x: 100,
+            y: 200,
+            size: 14,
+            font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+            color: rgb(0, 0, 0),
+        });
+
+        filledTextField.addToPage(page, { x: 220, y: 180 });
+
+        page.drawText(
+            `        By signing this contract, the Tenant agrees to abide by all terms
+        and conditions set forth herein. Any violation of the terms of this contract may 
+        result in eviction and/or forfeiture of any security deposit. The Tenant agrees to
+        keep the Property clean and well-maintained, and to promptly notify the Landlord of
+        any necessary repairs. The Landlord reserves the right to make reasonable inspections 
+        of the Property to ensure compliance with these terms.`,
+            {
+                x: 90,
+                y: 150,
+                size: 6,
+                font: await pdfDoc.embedFont(StandardFonts.Helvetica),
+                lineHeight: 10,
+                color: rgb(0, 0, 0),
+            }
+        );
 
         // Add footer to the PDF document
         page.drawText(footerText, {
@@ -341,6 +390,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
 
+    // Get the property owner data from the database
+    const propertyOwner = await prisma.user.findFirst({
+        where: {
+            id: property?.userId,
+        },
+    });
+
     // If the user is not logged in or is not the tenant, redirect to the homepage
     if (users?.email !== session?.user?.email) {
         return {
@@ -355,6 +411,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: {
             offers: JSON.parse(JSON.stringify(offers)),
             users: JSON.parse(JSON.stringify(users)),
+            propertyOwner: JSON.parse(JSON.stringify(propertyOwner)),
             property: JSON.parse(JSON.stringify(property)),
             acceptedOffer: JSON.parse(JSON.stringify(acceptedOffer)),
         },

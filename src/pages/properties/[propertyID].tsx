@@ -140,7 +140,7 @@ const PropertyPage: NextPage<PropertyPageProps> = ({ property, user }) => {
                                     priority={true}
                                 />
                             ) : property.panoramicImages.length > 0 &&
-                               currentImageIndex >= property.images.length ? (
+                              currentImageIndex >= property.images.length ? (
                                 <PanoramaViewer
                                     image={
                                         CDN +

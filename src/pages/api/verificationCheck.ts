@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { getSession } from "next-auth/react";
 import prisma from "../../../prisma/prisma";
 
+// Handler for /api/verificationCheck
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -12,7 +13,7 @@ export default async function handler(
         apiVersion: "2022-11-15",
     });
 
-    const { email } : { email : string } = JSON.parse(req.body);
+    const { email }: { email: string } = JSON.parse(req.body);
 
     // Get user from database
     const user = await prisma.user.findUnique({
