@@ -48,6 +48,11 @@ export default async function handler(
             return_url: `https://property-manage.vercel.app/verified`,
         });
 
+
+        const getVerificationSession = await stripe.identity.verificationSessions.retrieve(
+            verificationSession.id
+        );
+
         return res.status(200).json({ verificationURL: verificationSession.url });
     } catch (error) {
         console.log(error);

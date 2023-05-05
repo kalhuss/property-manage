@@ -11,14 +11,14 @@ import { useRouter } from "next/router";
 const VerifiedPage = () => {
     const { data: session } = useSession();
     const router = useRouter();
-    const { id } = router.query;
+    const email  = session?.user?.email;
 
     // Call the updatePaid API
     if (session) {
         fetch("/api/verificationCheck", {
             method: "POST",
             body: JSON.stringify({
-                id: id,
+                email: email,
             }),
         })
             .then((res) => {

@@ -12,24 +12,24 @@ export default async function handler(
         apiVersion: "2022-11-15",
     });
 
-    // Retrieve the verification session ID from the query string
-    const { id } = req.query;
-    console.log(id);
+    const { email } : { email : string } = JSON.parse(req.body);
 
-    // Retrieve the verification session
-    const verificationSession =
-        await stripe.identity.verificationSessions.retrieve(id as string);
+    // Get user from database
+    const user = await prisma.user.findUnique({
+        where: {
+            email: email,
+        },
+    });
 
-    console.log(verificationSession);
+    // Set verified to true
+    await prisma.user.update({
+        where: {
+            id: user?.id,
+        },
+        data: {
+            verified: true,
+        },
+    });
 
-    if(verificationSession.status === "verified") {
-        console.log("verified");
-    }
-    else {
-        console.log("pending");
-    }
-    
-
-    // Return the verification session
-    return res.status(200).json({ verificationSession });
+    return res.status(200).json({ message: "User verified" });
 }
