@@ -28,7 +28,7 @@ const Login: FC = () => {
             // Sign in user
             const result = await signIn("credentials", {
                 callbackUrl: "/",
-                email: values.email,
+                email: values.email.toLowerCase(),
                 password: values.password,
                 redirect: false,
             });
