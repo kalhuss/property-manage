@@ -198,7 +198,7 @@ const Profile: NextPage<UserProps> = ({ user, bankDetails }) => {
                                             </Link>
                                         </div>
                                     )}
-                                    {!user.verified ? (
+                                    {user.bankAdded && !user.verified ? (
                                         <div className="m-auto">
                                                 <button onClick = {handleVerify}className="mt-5 w-full p-4 font-bold border-blue-500 border-2 text-blue-500 hover:border-white hover:text-white hover:bg-blue-500 rounded-lg">
                                                     Verify Account
