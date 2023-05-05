@@ -31,7 +31,7 @@ export default NextAuth({
                 });
 
                 if (!user) {
-                    throw new Error("No user found");
+                    return null;
                 }
 
                 const isValid = await compare(

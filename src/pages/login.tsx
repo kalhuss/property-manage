@@ -8,7 +8,6 @@ import { FaLock } from "react-icons/fa";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useFormik } from "formik";
-import { validateLogin } from "lib/validate";
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
@@ -25,7 +24,6 @@ const Login: FC = () => {
             email: "",
             password: "",
         },
-        validate: validateLogin,
         onSubmit: async (values) => {
             // Sign in user
             const result = await signIn("credentials", {

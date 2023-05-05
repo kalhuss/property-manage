@@ -107,7 +107,7 @@ export const validateRegister = (values: LoginErrors): LoginErrors => {
     }
 
     if (!values.dob) {
-        errors.dob = "Username is required";
+        errors.dob = "Date of Birth is required";
     }
 
     if (!values.phoneNumber) {
@@ -137,7 +137,7 @@ export const validateRegister = (values: LoginErrors): LoginErrors => {
     }
 
     if (!values.cpassword) {
-        errors.cpassword = "Confirm password is required";
+        errors.cpassword = "Confirmation password is required";
     } else if (values.cpassword !== values.password) {
         errors.cpassword = "Passwords do not match";
     } else if (values.cpassword.includes(" ")) {

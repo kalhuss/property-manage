@@ -83,7 +83,7 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.name && formik.errors.name ? (
-                        <div className="text-red-500 text-sm">
+                        <div data-cy="name-error" className="text-red-500 text-sm">
                             {formik.errors.name}
                         </div>
                     ) : null}
@@ -101,7 +101,7 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.surname && formik.errors.surname ? (
-                        <div className="text-red-500 text-sm">
+                        <div data-cy="surname-error" className="text-red-500 text-sm">
                             {formik.errors.surname}
                         </div>
                     ) : null}
@@ -123,7 +123,7 @@ export default function Register() {
                     <div className={styles.input_group}>
                         <input
                             className={styles.input_text}
-                            type="text"
+                            type="number"
                             placeholder="Phone Number"
                             {...formik.getFieldProps("phoneNumber")}
                         />
@@ -132,7 +132,7 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
-                        <div className="text-red-500 text-sm">
+                        <div data-cy="phone-error" className="text-red-500 text-sm">
                             {formik.errors.phoneNumber}
                         </div>
                     ) : null}
@@ -150,7 +150,7 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.email && formik.errors.email ? (
-                        <div className="text-red-500 text-sm">
+                        <div data-cy="phone-error" className="text-red-500 text-sm">
                             {formik.errors.email}
                         </div>
                     ) : null}
@@ -173,7 +173,7 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.password && formik.errors.password ? (
-                        <div className="text-red-500 text-sm">
+                        <div data-cy="password-error" className="text-red-500 text-sm">
                             {formik.errors.password}
                         </div>
                     ) : null}
@@ -196,7 +196,7 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.cpassword && formik.errors.cpassword ? (
-                        <div className="text-red-500 text-sm">
+                        <div data-cy="cpassword-error" className="text-red-500 text-sm">
                             {formik.errors.cpassword}
                         </div>
                     ) : null}
