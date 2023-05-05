@@ -29,10 +29,16 @@ export default function Register() {
         },
         validate: validateRegister,
         onSubmit: async (values) => {
+            // Remove "+44" prefix from phone number if it exists
+            const phoneNumber = values.phoneNumber!.replace(/^\+44/, "");
+            values.email = values.email!.toLowerCase();
+
+            // Update form values with cleaned phone number
+            const cleanedValues = { ...values, phoneNumber };
             // Call the signUp API
             fetch("/api/auth/signUp", {
                 method: "POST",
-                body: JSON.stringify(values),
+                body: JSON.stringify(cleanedValues),
             })
                 // Then go to the login page
                 .then(() => (window.location.href = "/login"));
@@ -83,7 +89,10 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.name && formik.errors.name ? (
-                        <div data-cy="name-error" className="text-red-500 text-sm">
+                        <div
+                            data-cy="name-error"
+                            className="text-red-500 text-sm"
+                        >
                             {formik.errors.name}
                         </div>
                     ) : null}
@@ -101,7 +110,10 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.surname && formik.errors.surname ? (
-                        <div data-cy="surname-error" className="text-red-500 text-sm">
+                        <div
+                            data-cy="surname-error"
+                            className="text-red-500 text-sm"
+                        >
                             {formik.errors.surname}
                         </div>
                     ) : null}
@@ -124,7 +136,7 @@ export default function Register() {
                         <input
                             className={styles.input_text}
                             type="text"
-                            placeholder="Phone Number"
+                            placeholder="+44 Phone Number"
                             {...formik.getFieldProps("phoneNumber")}
                         />
                         <span className="icon flex items-center px-4">
@@ -132,7 +144,10 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
-                        <div data-cy="phone-error" className="text-red-500 text-sm">
+                        <div
+                            data-cy="phone-error"
+                            className="text-red-500 text-sm"
+                        >
                             {formik.errors.phoneNumber}
                         </div>
                     ) : null}
@@ -150,7 +165,10 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.email && formik.errors.email ? (
-                        <div data-cy="phone-error" className="text-red-500 text-sm">
+                        <div
+                            data-cy="phone-error"
+                            className="text-red-500 text-sm"
+                        >
                             {formik.errors.email}
                         </div>
                     ) : null}
@@ -173,7 +191,10 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.password && formik.errors.password ? (
-                        <div data-cy="password-error" className="text-red-500 text-sm">
+                        <div
+                            data-cy="password-error"
+                            className="text-red-500 text-sm"
+                        >
                             {formik.errors.password}
                         </div>
                     ) : null}
@@ -196,7 +217,10 @@ export default function Register() {
                         </span>
                     </div>
                     {formik.touched.cpassword && formik.errors.cpassword ? (
-                        <div data-cy="cpassword-error" className="text-red-500 text-sm">
+                        <div
+                            data-cy="cpassword-error"
+                            className="text-red-500 text-sm"
+                        >
                             {formik.errors.cpassword}
                         </div>
                     ) : null}
