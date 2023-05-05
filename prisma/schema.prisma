@@ -19,9 +19,10 @@ model User {
   email       String    @unique
   password    String
   bankAdded   Boolean   @default(false)
-  properties Property[]
-  offers     Offer[]
-  contracts  Contract[]
+  verified    Boolean   @default(false)
+  properties  Property[]
+  offers      Offer[]
+  contracts   Contract[]
   bankDetails BankDetails[]
 }
 
