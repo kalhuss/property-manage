@@ -4,14 +4,6 @@ import { useSession } from "next-auth/react";
 import NavBar from "../components/NavBar";
 import Image from "next/image";
 
-// Write more about payment
-// update diagrams and talk about changes -> site map -> talk about profile page -> database diagram 
-// Add more references
-// Do the testing
-// write about the id verification
-// write about the payment system paying out
-// write about the remove of about us page
-
 // Home page
 export default function Home() {
     // Get the session
