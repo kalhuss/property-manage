@@ -100,6 +100,7 @@ describe("Register", () => {
         cy.get('input[name="cpassword"]').type("password", {force: true});
         cy.get('input[name="email"]').click({force: true});
         cy.get('input[name="cpassword"]').click({force: true});
+        cy.get('[data-cy="cpassword-error"]').scrollIntoView();
         cy.contains("Passwords do not match").should("be.visible");
 
         // Remove the current text
@@ -123,18 +124,4 @@ describe("Register", () => {
         cy.url().should("include", "/login");
     });
     
-
-    // it("submits the form with valid inputs", () => {
-    //     cy.get('input[name="name"]').type("John");
-    //     cy.get('input[name="surname"]').type("Doe");
-    //     cy.get('input[name="dob"]').type("2000-01-01");
-    //     cy.get('input[name="phoneNumber"]').type("+1234567890");
-    //     cy.get('input[name="email"]').type("test@example.com");
-    //     cy.get('input[name="password"]').type("password123");
-    //     cy.get('input[name="cpassword"]').type("password123");
-    //     cy.get('button[type="submit"]').click();
-
-    //     // check if redirected to the login page
-    //     cy.url().should("include", "/login");
     });
-// });

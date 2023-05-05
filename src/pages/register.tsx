@@ -123,7 +123,7 @@ export default function Register() {
                     <div className={styles.input_group}>
                         <input
                             className={styles.input_text}
-                            type="number"
+                            type="text"
                             placeholder="Phone Number"
                             {...formik.getFieldProps("phoneNumber")}
                         />
