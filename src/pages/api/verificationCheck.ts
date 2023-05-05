@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
+import { getSession } from "next-auth/react";
+import prisma from "../../../prisma/prisma";
 
 export default async function handler(
     req: NextApiRequest,
@@ -10,18 +12,23 @@ export default async function handler(
         apiVersion: "2022-11-15",
     });
 
-    // Get data from request body
-    const { id }: { id: string } = JSON.parse(req.body);
+    // Retrieve the verification session ID from the query string
+    const { id } = req.query;
+    console.log(id);
 
-    // Get the verification session ID from the request body
-    const verificationSessionId = id;
-    
     // Retrieve the verification session
-    const verificationSession = await stripe.identity.verificationSessions.retrieve(
-        verificationSessionId
-    );
+    const verificationSession =
+        await stripe.identity.verificationSessions.retrieve(id as string);
 
-    console.log(verificationSession)
+    console.log(verificationSession);
+
+    if(verificationSession.status === "verified") {
+        console.log("verified");
+    }
+    else {
+        console.log("pending");
+    }
+    
 
     // Return the verification session
     return res.status(200).json({ verificationSession });

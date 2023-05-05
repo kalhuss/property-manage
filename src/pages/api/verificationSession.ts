@@ -39,14 +39,13 @@ export default async function handler(
                 userId: user?.id,
             },
         });
-
-
+        
         const verificationSession = await stripe.identity.verificationSessions.create({
             type: "document",
             metadata: {
                 user_id: account?.accountId!,
             },
-            return_url: "https://property-manage.vercel.app/verified?id=${verificationSession.id}", // Replace with your actual return URL
+            return_url: `https://property-manage.vercel.app/verified`,
         });
 
         return res.status(200).json({ verificationURL: verificationSession.url });
