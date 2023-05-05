@@ -133,7 +133,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
         // If tenure is "to rent" show rent, otherwise show price
         if (property.tenure === "to rent") {
             // Add rent amount to the PDF document
-            page.drawText(`Rent amount: ${property.rent}`, {
+            page.drawText(`Rent amount: £${property.rent}`, {
                 x: 100,
                 y: 620,
                 size: 14,
@@ -142,7 +142,7 @@ const ContractPage: React.FC<ContractPageProps> = ({
             });
         } else {
             // Add price to the PDF document
-            page.drawText(`Price: ${property.price}`, {
+            page.drawText(`Price: £${property.price}`, {
                 x: 100,
                 y: 620,
                 size: 14,
